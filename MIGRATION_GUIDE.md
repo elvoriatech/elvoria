@@ -35,7 +35,7 @@ EMAIL_PASSWORD=your-app-password
 CONTACT_EMAIL=contact@elvoriatech.com
 ```
 
-### 2. Gmail Setup (Recommended)
+### 2. Gmail Setup (Recommended) Adding for updating new version
 
 1. Enable 2-Step Verification: [Google Account Security](https://myaccount.google.com/security)
 2. Go to [App Passwords](https://myaccount.google.com/apppasswords)
