@@ -123,29 +123,43 @@ export async function POST(request: NextRequest) {
     const emailService = process.env.EMAIL_SERVICE;
     const emailUser = process.env.EMAIL_USER;
     const emailPassword = process.env.EMAIL_PASSWORD;
+    const smtpHost = process.env.SMTP_HOST;
+    const smtpPort = process.env.SMTP_PORT ? Number(process.env.SMTP_PORT) : undefined;
+    const smtpUser = process.env.SMTP_USER;
+    const smtpPassword = process.env.SMTP_PASSWORD;
+    const smtpFrom = process.env.SMTP_FROM;
     const contactEmail = process.env.CONTACT_EMAIL || 'contact@elvoriatech.com';
     const companyName = process.env.COMPANY_NAME || 'Elvoriatech';
     const siteUrl = process.env.SITE_URL || 'https://elvoriatech.com';
     const supportPhone = process.env.SUPPORT_PHONE || '';
     const sendAutoReply = (process.env.SEND_AUTOREPLY || 'true').toLowerCase() !== 'false';
 
-    if (!emailService || !emailUser || !emailPassword) {
+    const hasSmtp = Boolean(smtpHost && smtpPort && smtpUser && smtpPassword);
+    const hasService = Boolean(emailService && emailUser && emailPassword);
+
+    if (!hasSmtp && !hasService) {
       return NextResponse.json(
         {
           error:
-            'Email is not configured. Set EMAIL_SERVICE, EMAIL_USER, and EMAIL_PASSWORD in your .env.local file.',
+            'Email is not configured. Set either (EMAIL_SERVICE, EMAIL_USER, EMAIL_PASSWORD) or (SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD) in your environment.',
         },
         { status: 500 }
       );
     }
 
-    const transporter = nodemailer.createTransport({
-      service: emailService,
-      auth: {
-        user: emailUser,
-        pass: emailPassword,
-      },
-    });
+    const transporter = hasSmtp
+      ? nodemailer.createTransport({
+          host: smtpHost,
+          port: smtpPort,
+          secure: smtpPort === 465,
+          auth: { user: smtpUser, pass: smtpPassword },
+        })
+      : nodemailer.createTransport({
+          service: emailService,
+          auth: { user: emailUser, pass: emailPassword },
+        });
+
+    const fromAddress = smtpFrom || smtpUser || emailUser;
 
     // Email to company
     const safeName = escapeHtml(String(name));
@@ -157,7 +171,7 @@ export async function POST(request: NextRequest) {
     const safeMessage = escapeHtml(String(message)).replace(/\n/g, '<br>');
 
     await transporter.sendMail({
-      from: emailUser,
+      from: fromAddress,
       to: contactEmail,
       subject: `New Contact Form Submission — ${name}`,
       html: renderEmailShell({
@@ -240,7 +254,7 @@ export async function POST(request: NextRequest) {
     // Confirmation email to user
     if (sendAutoReply) {
       await transporter.sendMail({
-        from: emailUser,
+        from: fromAddress,
         to: email,
         subject: `Thank you for contacting ${companyName}`,
         html: renderEmailShell({
