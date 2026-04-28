@@ -81,7 +81,7 @@ elvoriatech-nextjs/
 │   ├── fonts.css
 │   └── index.css
 ├── public/
-│   └── logo.png                  # Your company logo
+│   └── elvoria.png               # Your company logo
 ├── .env.local                    # Environment variables
 ├── package.json
 └── tsconfig.json
