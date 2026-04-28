@@ -61,7 +61,7 @@ npm start
 ## File Structure
 
 ```
-elvoriatech-nextjs/
+elvoriatech/
 ├── app/
 │   ├── api/
 │   │   └── contact/

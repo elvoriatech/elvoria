@@ -1,134 +1,175 @@
-import { ExternalLink, TrendingUp, Zap, Users } from 'lucide-react';
+import {
+  Briefcase,
+  Car,
+  Clock,
+  Euro,
+  Plane,
+  TrendingUp,
+  Users,
+  UtensilsCrossed,
+} from 'lucide-react';
 
-const projects = [
+const caseStudies = [
   {
-    title: "IntelliChat AI",
-    category: "AI-Powered SaaS Platform",
-    description: "An enterprise AI assistant platform that automates customer support and internal operations using GPT-4 and custom ML models.",
-    challenge: "A B2B SaaS company needed to reduce support costs while improving response times and customer satisfaction.",
-    solution: "Built a multi-tenant AI platform with custom training capabilities, sentiment analysis, and seamless CRM integration.",
-    technologies: ["Next.js", "Node.js", "OpenAI API", "PostgreSQL", "AWS Lambda", "Redis"],
-    results: [
-      { metric: "87%", label: "Reduction in support tickets" },
-      { metric: "2.4s", label: "Average response time" },
-      { metric: "$450K", label: "Annual cost savings" },
-      { metric: "94%", label: "Customer satisfaction" }
+    icon: Plane,
+    name: 'TravelConnect',
+    industry: 'Aviation Technology',
+    tagline: 'Mission-Critical Flight Operations Platform',
+    description:
+      'Real-time flight management system serving airlines with 99.99% uptime requirements and sub-second response times.',
+    kpis: [
+      { value: '99.99%', label: 'System Uptime', icon: TrendingUp },
+      { value: '< 50ms', label: 'Response Time', icon: Clock },
+      { value: '€2.3M', label: 'Cost Savings/Year', icon: Euro },
+      { value: '15K', label: 'Daily Active Users', icon: Users },
     ],
-    image: "https://images.unsplash.com/photo-1770171323762-7b9a517a7094?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080"
+    technologies: ['Next.js', 'NestJS', 'AWS Lambda', 'PostgreSQL', 'Redis'],
+    gradient: 'from-[#06B6D4] to-[#3B82F6]',
   },
   {
-    title: "CloudScale Analytics",
-    category: "Scalable Cloud Application",
-    description: "A real-time analytics platform processing millions of events per day with sub-second query performance.",
-    challenge: "A fintech startup needed to process and analyze massive datasets in real-time while keeping infrastructure costs under control.",
-    solution: "Designed a serverless, event-driven architecture using AWS Lambda, DynamoDB, and Elasticsearch with auto-scaling capabilities.",
-    technologies: ["React", "AWS Lambda", "DynamoDB", "Elasticsearch", "Kinesis", "CloudFront"],
-    results: [
-      { metric: "10M+", label: "Events processed daily" },
-      { metric: "450ms", label: "P95 query latency" },
-      { metric: "60%", label: "Infrastructure cost reduction" },
-      { metric: "99.99%", label: "Uptime achieved" }
+    icon: Briefcase,
+    name: 'HireFlow',
+    industry: 'HR Technology',
+    tagline: 'AI-Powered Recruitment Automation',
+    description:
+      'Intelligent hiring platform leveraging GPT-4 for candidate screening, reducing manual review time by 95%.',
+    kpis: [
+      { value: '95%', label: 'Time Reduction', icon: Clock },
+      { value: '3.2x', label: 'Faster Hiring', icon: TrendingUp },
+      { value: '€450K', label: 'Annual Savings', icon: Euro },
+      { value: '50K+', label: 'Candidates Processed', icon: Users },
     ],
-    image: "https://images.unsplash.com/photo-1667984390553-7f439e6ae401?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080"
+    technologies: ['React', 'OpenAI GPT-4', 'Node.js', 'MongoDB', 'AWS'],
+    gradient: 'from-[#8B5CF6] to-[#06B6D4]',
   },
   {
-    title: "VelocityCommerce",
-    category: "High-Performance E-Commerce",
-    description: "A headless e-commerce platform with advanced personalization, achieving 3x faster page loads than competitors.",
-    challenge: "An online retailer was losing sales due to slow page loads and needed a modern, performant solution.",
-    solution: "Built a headless architecture with Next.js, implemented edge caching, image optimization, and AI-powered product recommendations.",
-    technologies: ["Next.js", "Shopify API", "Stripe", "Vercel Edge", "Tailwind", "AI Recommendations"],
-    results: [
-      { metric: "0.8s", label: "Average page load" },
-      { metric: "42%", label: "Conversion rate increase" },
-      { metric: "156%", label: "Mobile revenue growth" },
-      { metric: "3.2x", label: "Performance improvement" }
+    icon: UtensilsCrossed,
+    name: 'FoodHub SaaS',
+    industry: 'Restaurant Technology',
+    tagline: 'Complete Restaurant Management Platform',
+    description:
+      'Multi-tenant SaaS platform for restaurants with digital menus, online ordering, payment processing, delivery tracking, and receipt management.',
+    kpis: [
+      { value: '500+', label: 'Active Restaurants', icon: Users },
+      { value: '85%', label: 'Order Automation', icon: TrendingUp },
+      { value: '€3.2M', label: 'Monthly Transactions', icon: Euro },
+      { value: '1.2s', label: 'Avg Order Time', icon: Clock },
     ],
-    image: "https://images.unsplash.com/photo-1660165458059-57cfb6cc87e5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080"
-  }
-];
+    technologies: [
+      'Next.js',
+      'Stripe API',
+      'NestJS',
+      'PostgreSQL',
+      'AWS Lambda',
+      'Real-time DB',
+    ],
+    gradient: 'from-[#8B5CF6] to-[#06B6D4]',
+  },
+  {
+    icon: Car,
+    name: 'MarketHub Pro',
+    industry: 'E-Commerce Platform',
+    tagline: 'High-Performance Multi-Vendor Marketplace',
+    description:
+      'Scalable B2B/B2C marketplace platform with real-time inventory, advanced search, and payment integration serving global merchants.',
+    kpis: [
+      { value: '35%', label: 'Infrastructure Cost ↓', icon: Euro },
+      { value: '0.8s', label: 'Page Load Time', icon: Clock },
+      { value: '€8M', label: 'GMV/Month', icon: TrendingUp },
+      { value: '1,800+', label: 'Active Vendors', icon: Users },
+    ],
+    technologies: ['Next.js', 'Microservices', 'AWS Lambda', 'DynamoDB', 'CloudFront'],
+    gradient: 'from-[#3B82F6] to-[#8B5CF6]',
+  },
+] as const;
 
 export function Portfolio() {
   return (
-    <section id="portfolio" className="py-24 bg-gradient-to-b from-slate-950 to-slate-900">
+    <section
+      id="portfolio"
+      className="py-24 bg-linear-to-b from-[#0F172A] to-[#1E293B]"
+    >
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-16">
-          <h2 className="text-5xl mb-6 bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
-            Success Stories
+          <div className="inline-block px-4 py-2 bg-[#06B6D4]/10 border border-[#06B6D4]/30 rounded-full mb-6">
+            <span className="text-sm text-[#06B6D4] font-semibold">PROVEN IMPACT</span>
+          </div>
+          <h2 className="text-5xl md:text-6xl mb-6 bg-linear-to-r from-[#F8FAFC] to-[#06B6D4] bg-clip-text text-transparent font-bold">
+            Enterprise Success Stories
           </h2>
-          <p className="text-xl text-slate-300 max-w-3xl mx-auto">
-            Real projects, real results. See how we've helped businesses scale, optimize,
-            and dominate their markets with modern technology.
+          <p className="text-xl text-slate-300 max-w-3xl mx-auto font-light">
+            KPI-driven results from mission-critical systems deployed across global enterprises
           </p>
         </div>
 
-        <div className="space-y-12">
-          {projects.map((project, index) => (
+        <div className="space-y-8">
+          {caseStudies.map((study, index) => (
             <div
               key={index}
-              className="p-8 bg-gradient-to-br from-slate-900 to-slate-800 border border-purple-500/20 rounded-2xl hover:border-purple-500/40 transition-all"
+              className="group p-8 bg-linear-to-br from-[#1E293B] to-[#0F172A] border border-slate-700/50 rounded-2xl hover:border-[#06B6D4]/50 transition-all duration-300"
             >
-              <div className="grid lg:grid-cols-2 gap-8">
-                <div>
-                  <div className="inline-block px-3 py-1 bg-purple-600/20 border border-purple-500/30 rounded-full text-sm text-purple-300 mb-4">
-                    {project.category}
-                  </div>
-
-                  <h3 className="text-3xl mb-4 text-purple-300">{project.title}</h3>
-                  <p className="text-lg text-slate-300 mb-6">{project.description}</p>
-
-                  <div className="space-y-4 mb-6">
-                    <div>
-                      <div className="flex items-center gap-2 mb-2">
-                        <Users className="w-5 h-5 text-purple-400" />
-                        <span className="text-purple-300">Challenge</span>
-                      </div>
-                      <p className="text-slate-300">{project.challenge}</p>
+              <div className="grid lg:grid-cols-5 gap-8">
+                <div className="lg:col-span-2">
+                  <div className="flex items-start gap-4 mb-6">
+                    <div
+                      className={`w-16 h-16 rounded-xl bg-linear-to-br ${study.gradient} flex items-center justify-center shrink-0`}
+                    >
+                      <study.icon className="w-8 h-8 text-white" />
                     </div>
-
                     <div>
-                      <div className="flex items-center gap-2 mb-2">
-                        <Zap className="w-5 h-5 text-blue-400" />
-                        <span className="text-blue-300">Solution</span>
-                      </div>
-                      <p className="text-slate-300">{project.solution}</p>
+                      <h3 className="text-2xl font-bold text-[#F8FAFC] mb-1">{study.name}</h3>
+                      <div className="text-sm text-[#06B6D4] font-semibold mb-2">{study.industry}</div>
+                      <div className="text-slate-400 italic">{study.tagline}</div>
                     </div>
                   </div>
 
-                  <div className="mb-6">
-                    <div className="text-sm text-slate-400 mb-2">Tech Stack:</div>
-                    <div className="flex flex-wrap gap-2">
-                      {project.technologies.map((tech) => (
-                        <span key={tech} className="px-3 py-1 bg-slate-800 border border-slate-700 rounded-lg text-sm text-slate-300">
+                  <div className="grid grid-cols-2 gap-4">
+                    {study.kpis.map((kpi, i) => (
+                      <div key={i} className="p-4 bg-[#0F172A]/50 border border-slate-700/30 rounded-lg">
+                        <div className="flex items-center gap-2 mb-1">
+                          <kpi.icon className="w-4 h-4 text-[#06B6D4]" />
+                          <div
+                            className={`text-2xl font-bold bg-linear-to-r ${study.gradient} bg-clip-text text-transparent`}
+                          >
+                            {kpi.value}
+                          </div>
+                        </div>
+                        <div className="text-xs text-slate-400 font-medium">{kpi.label}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="lg:col-span-3 flex flex-col justify-between">
+                  <div>
+                    <h4 className="text-lg font-semibold text-[#F8FAFC] mb-3">Challenge &amp; Solution</h4>
+                    <p className="text-slate-300 mb-6 leading-relaxed">{study.description}</p>
+
+                    <h4 className="text-lg font-semibold text-[#F8FAFC] mb-3">Technology Stack</h4>
+                    <div className="flex flex-wrap gap-2 mb-6">
+                      {study.technologies.map((tech) => (
+                        <span
+                          key={tech}
+                          className="px-3 py-1.5 bg-[#1E293B] border border-[#06B6D4]/30 rounded-lg text-sm text-slate-300 font-medium"
+                        >
                           {tech}
                         </span>
                       ))}
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    {project.results.map((result, i) => (
-                      <div key={i} className="p-4 bg-slate-800/50 border border-slate-700/50 rounded-lg">
-                        <div className="text-2xl mb-1 bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
-                          {result.metric}
-                        </div>
-                        <div className="text-sm text-slate-400">{result.label}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="relative rounded-xl overflow-hidden">
-                  <img
-                    src={project.image}
-                    alt={project.title}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
-                  <div className="absolute bottom-4 left-4 right-4">
-                    <button className="flex items-center gap-2 px-4 py-2 bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors">
-                      <span>View Case Study</span>
-                      <ExternalLink className="w-4 h-4" />
+                  <div className="flex gap-3 flex-wrap">
+                    <button
+                      type="button"
+                      className={`px-6 py-3 bg-linear-to-r ${study.gradient} rounded-lg font-semibold text-white hover:shadow-lg hover:shadow-[#06B6D4]/30 transition-all`}
+                    >
+                      View Full Case Study
+                    </button>
+                    <button
+                      type="button"
+                      className="px-6 py-3 bg-[#1E293B] border border-slate-700 rounded-lg font-semibold text-[#F8FAFC] hover:border-[#06B6D4]/50 transition-all"
+                    >
+                      Technical Architecture
                     </button>
                   </div>
                 </div>

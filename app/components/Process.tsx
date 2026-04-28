@@ -47,13 +47,13 @@ const steps = [
 
 export function Process() {
   return (
-    <section className="py-24 bg-slate-950">
+    <section className="py-24 bg-background dark:bg-slate-950">
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-16">
-          <h2 className="text-5xl mb-6 bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+          <h2 className="text-5xl mb-6 bg-linear-to-r from-(--brand-primary) to-(--brand-accent) bg-clip-text text-transparent">
             Our Development Process
           </h2>
-          <p className="text-xl text-slate-300 max-w-3xl mx-auto">
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             Agile methodology meets strategic planning. Transparent, collaborative,
             and designed to deliver exceptional results on time and on budget.
           </p>
@@ -61,29 +61,29 @@ export function Process() {
 
         <div className="relative">
           {/* Vertical line */}
-          <div className="absolute left-8 top-8 bottom-8 w-0.5 bg-gradient-to-b from-purple-500 via-blue-500 to-purple-500 hidden md:block"></div>
+          <div className="absolute left-8 top-8 bottom-8 w-0.5 bg-linear-to-b from-(--brand-primary) via-(--brand-accent) to-(--brand-primary) hidden md:block opacity-70"></div>
 
           <div className="space-y-8">
             {steps.map((step, index) => (
               <div key={index} className="relative">
                 <div className="flex items-start gap-6">
                   {/* Icon circle */}
-                  <div className="relative z-10 w-16 h-16 bg-gradient-to-br from-purple-600 to-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+                  <div className="relative z-10 w-16 h-16 bg-linear-to-br from-(--brand-accent) to-(--brand-primary) rounded-full flex items-center justify-center shrink-0 shadow-sm dark:shadow-none">
                     <step.icon className="w-8 h-8 text-white" />
                   </div>
 
                   {/* Content */}
                   <div className="flex-1 pb-8">
-                    <div className="p-6 bg-gradient-to-br from-slate-900 to-slate-800 border border-purple-500/20 rounded-xl hover:border-purple-500/40 transition-all">
-                      <h3 className="text-2xl mb-3 text-purple-300">{step.title}</h3>
-                      <p className="text-lg text-slate-300 mb-4">{step.description}</p>
+                    <div className="p-6 rounded-xl border border-border/60 bg-card/90 hover:bg-card transition-all dark:bg-linear-to-br dark:from-slate-900 dark:to-slate-800 dark:border-white/10">
+                      <h3 className="text-2xl mb-3 text-foreground">{step.title}</h3>
+                      <p className="text-lg text-muted-foreground mb-4">{step.description}</p>
 
                       <div className="space-y-2">
-                        <div className="text-sm text-slate-400">Key Deliverables:</div>
+                        <div className="text-sm text-muted-foreground">Key Deliverables:</div>
                         <ul className="grid md:grid-cols-2 gap-2">
                           {step.deliverables.map((deliverable, i) => (
-                            <li key={i} className="flex items-center gap-2 text-slate-300">
-                              <div className="w-1.5 h-1.5 bg-purple-500 rounded-full"></div>
+                            <li key={i} className="flex items-center gap-2 text-muted-foreground">
+                              <div className="w-1.5 h-1.5 bg-(--brand-accent) rounded-full"></div>
                               <span>{deliverable}</span>
                             </li>
                           ))}
@@ -97,12 +97,12 @@ export function Process() {
           </div>
         </div>
 
-        <div className="mt-12 p-8 bg-gradient-to-r from-purple-900/20 to-blue-900/20 border border-purple-500/20 rounded-2xl">
-          <h3 className="text-2xl mb-4 text-purple-300">Agile & Collaborative</h3>
-          <p className="text-lg text-slate-300 mb-4">
+        <div className="mt-12 p-8 rounded-2xl border border-border/60 bg-card/80 dark:bg-linear-to-r dark:from-purple-900/20 dark:to-blue-900/20 dark:border-white/10">
+          <h3 className="text-2xl mb-4 text-foreground">Agile & Collaborative</h3>
+          <p className="text-lg text-muted-foreground mb-4">
             We believe in radical transparency and close collaboration. You're not just a client—you're a partner in the process.
           </p>
-          <ul className="grid md:grid-cols-2 gap-3 text-slate-300">
+          <ul className="grid md:grid-cols-2 gap-3 text-muted-foreground">
             <li>✓ Daily standups and regular demos</li>
             <li>✓ Shared Slack channel for real-time communication</li>
             <li>✓ Access to project management tools (Jira/Linear)</li>

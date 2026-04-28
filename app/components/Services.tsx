@@ -1,103 +1,103 @@
-import { Bot, Cloud, Smartphone, Code2, Database, Palette, TestTube, Zap, GitBranch, BarChart3, Workflow, Lock } from 'lucide-react';
+import { Brain, Cloud, Rocket, Shield, Users, Zap } from 'lucide-react';
 
 const services = [
   {
-    icon: Bot,
-    title: "AI & Generative AI Solutions",
-    description: "Build intelligent applications with ChatGPT, Claude, and custom AI models. From AI chatbots and virtual assistants to automation workflows and predictive analytics.",
-    useCases: ["Customer support automation", "AI-powered content generation", "Intelligent document processing", "Predictive analytics dashboards"],
-    trending: true
+    icon: Brain,
+    name: 'AI-First SaaS Platforms',
+    description:
+      'Build intelligent, self-learning systems with GPT-4, Claude, and custom ML models. From conversational interfaces to predictive analytics.',
+    capabilities: [
+      'AI chatbots & virtual assistants',
+      'Intelligent document processing',
+      'Predictive analytics dashboards',
+      'LLM-powered automation',
+    ],
+    gradient: 'from-[#8B5CF6] to-[#06B6D4]',
   },
   {
     icon: Cloud,
-    title: "SaaS Product Development",
-    description: "End-to-end SaaS platform development with multi-tenancy, subscription management, analytics, and scalable architecture designed for rapid growth.",
-    useCases: ["B2B SaaS platforms", "Subscription-based services", "Multi-tenant applications", "Usage-based billing systems"],
-    trending: true
+    name: 'DevOps & Automation',
+    description:
+      'CI/CD pipelines, infrastructure as code, automated testing, and continuous monitoring.',
+    capabilities: [
+      'GitHub Actions workflows',
+      'Docker containerization',
+      'Infrastructure as Code (Terraform)',
+      'Automated testing suites',
+    ],
+    gradient: 'from-[#3B82F6] to-[#06B6D4]',
   },
   {
-    icon: Code2,
-    title: "Web Development",
-    description: "Modern, high-performance web applications using React, Next.js, and Angular. Server-side rendering, SEO optimization, and lightning-fast user experiences.",
-    useCases: ["Progressive web apps", "E-commerce platforms", "Admin dashboards", "Real-time collaboration tools"],
-    trending: false
+    icon: Rocket,
+    name: 'Cloud-Native Architecture',
+    description:
+      'Serverless, auto-scaling, cost-optimized infrastructure on AWS. Built for European compliance and global performance.',
+    capabilities: [
+      'AWS Lambda & serverless compute',
+      'Microservices architecture',
+      'Event-driven systems',
+      'Auto-scaling infrastructure',
+    ],
+    gradient: 'from-[#06B6D4] to-[#3B82F6]',
   },
   {
-    icon: Smartphone,
-    title: "Mobile App Development",
-    description: "Native iOS, Android, and cross-platform mobile apps using React Native and Flutter. Seamless user experiences across all devices.",
-    useCases: ["On-demand service apps", "Mobile banking solutions", "Fitness & health tracking", "Social networking platforms"],
-    trending: false
+    icon: Users,
+    name: 'Marketplace Platforms',
+    description:
+      'Multi-tenant B2B and B2C marketplaces with complex matching, payments, and logistics integration.',
+    capabilities: [
+      'Advanced search & filtering',
+      'Payment gateway integration',
+      'Multi-vendor management',
+      'Real-time analytics',
+    ],
+    gradient: 'from-[#3B82F6] to-[#8B5CF6]',
   },
   {
-    icon: Database,
-    title: "Backend & API Development",
-    description: "Scalable REST and GraphQL APIs using Node.js, Java Spring Boot, and serverless architectures. Built for performance and reliability.",
-    useCases: ["Microservices architecture", "Real-time data APIs", "Third-party integrations", "Legacy system modernization"],
-    trending: false
-  },
-  {
-    icon: Workflow,
-    title: "Cloud & DevOps",
-    description: "AWS cloud infrastructure, serverless computing, containerization with Docker, and automated CI/CD pipelines for rapid, reliable deployments.",
-    useCases: ["AWS Lambda functions", "Auto-scaling infrastructure", "Kubernetes orchestration", "Continuous deployment pipelines"],
-    trending: true
-  },
-  {
-    icon: GitBranch,
-    title: "Microservices Architecture",
-    description: "Design and implement distributed systems with microservices, event-driven architecture, and message queues for ultimate scalability.",
-    useCases: ["Service mesh implementation", "Event sourcing patterns", "Distributed transactions", "API gateway solutions"],
-    trending: true
-  },
-  {
-    icon: Palette,
-    title: "UI/UX Design",
-    description: "Conversion-focused design systems, user research, prototyping, and beautiful interfaces that users love and that drive business metrics.",
-    useCases: ["Design system creation", "User journey mapping", "A/B testing optimization", "Mobile-first responsive design"],
-    trending: false
-  },
-  {
-    icon: TestTube,
-    title: "QA & Test Automation",
-    description: "Comprehensive testing strategies with Playwright, Cypress, and Jest. Automated E2E tests integrated into CI/CD pipelines.",
-    useCases: ["End-to-end test automation", "Performance testing", "Security testing", "Load & stress testing"],
-    trending: false
+    icon: Shield,
+    name: 'Mission-Critical Systems',
+    description:
+      'Aviation, automotive, and financial platforms where 99.99% uptime and zero-downtime deployments are mandatory.',
+    capabilities: [
+      'High-availability architecture',
+      'Real-time monitoring',
+      'Disaster recovery planning',
+      'Zero-downtime deployments',
+    ],
+    gradient: 'from-[#06B6D4] to-[#8B5CF6]',
   },
   {
     icon: Zap,
-    title: "Performance Optimization",
-    description: "Application performance audits, database optimization, caching strategies, and CDN implementation to achieve sub-second load times.",
-    useCases: ["Page speed optimization", "Database query tuning", "Code splitting & lazy loading", "CDN & caching strategies"],
-    trending: true
+    name: 'Performance Engineering',
+    description:
+      'Sub-second response times, database optimization, caching strategies, and CDN implementation.',
+    capabilities: [
+      'Database query optimization',
+      'Redis caching strategies',
+      'CDN & edge computing',
+      'Performance monitoring',
+    ],
+    gradient: 'from-[#8B5CF6] to-[#3B82F6]',
   },
-  {
-    icon: BarChart3,
-    title: "API Development & Integrations",
-    description: "Seamlessly integrate with third-party services, payment gateways, CRMs, and enterprise systems. Custom API development and management.",
-    useCases: ["Payment gateway integration", "CRM & ERP connections", "Marketing automation sync", "Custom webhook systems"],
-    trending: false
-  },
-  {
-    icon: Lock,
-    title: "Security & Compliance",
-    description: "Enterprise-grade security implementation, GDPR compliance, SOC 2 preparation, penetration testing, and security audits.",
-    useCases: ["OAuth & SSO implementation", "Data encryption strategies", "Compliance documentation", "Security vulnerability fixes"],
-    trending: false
-  }
 ];
 
 export function Services() {
   return (
-    <section id="services" className="py-24 bg-gradient-to-br from-slate-900 to-slate-950">
+    <section
+      id="services"
+      className="py-24 bg-linear-to-b from-[#1E293B] to-[#0F172A]"
+    >
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-16">
-          <h2 className="text-5xl mb-6 bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
-            High-Demand Services
+          <div className="inline-block px-4 py-2 bg-[#06B6D4]/10 border border-[#06B6D4]/30 rounded-full mb-6">
+            <span className="text-sm text-[#06B6D4] font-semibold">CORE CAPABILITIES</span>
+          </div>
+          <h2 className="text-5xl md:text-6xl mb-6 bg-linear-to-r from-[#F8FAFC] to-[#06B6D4] bg-clip-text text-transparent font-bold">
+            Enterprise Services
           </h2>
-          <p className="text-xl text-slate-300 max-w-3xl mx-auto">
-            Cutting-edge solutions aligned with 2026 market trends. We focus on technologies
-            and services that deliver maximum business value and competitive advantage.
+          <p className="text-xl text-slate-300 max-w-3xl mx-auto font-light">
+            Senior-level expertise in AI, cloud architecture, SaaS platforms, and mission-critical
+            systems
           </p>
         </div>
 
@@ -105,27 +105,27 @@ export function Services() {
           {services.map((service, index) => (
             <div
               key={index}
-              className="p-6 bg-gradient-to-br from-slate-800/50 to-slate-900/50 border border-slate-700/50 rounded-xl hover:border-purple-500/50 transition-all duration-300 group"
+              className="group p-8 bg-linear-to-br from-[#1E293B] to-[#0F172A] border border-slate-700/50 rounded-xl hover:border-[#06B6D4]/50 transition-all duration-300"
             >
-              {service.trending && (
-                <div className="inline-flex items-center gap-1 px-3 py-1 bg-purple-600/20 border border-purple-500/30 rounded-full text-xs text-purple-300 mb-4">
-                  <Zap className="w-3 h-3" />
-                  <span>High Demand 2026</span>
-                </div>
-              )}
-
-              <div className="w-12 h-12 bg-purple-600/10 rounded-lg flex items-center justify-center mb-4 group-hover:bg-purple-600/20 transition-colors">
-                <service.icon className="w-6 h-6 text-purple-400" />
+              <div
+                className={`w-14 h-14 rounded-xl bg-linear-to-br ${service.gradient} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}
+              >
+                <service.icon className="w-7 h-7 text-white" />
               </div>
 
-              <h3 className="text-xl mb-3 text-purple-300">{service.title}</h3>
-              <p className="text-slate-300 mb-4">{service.description}</p>
+              <h3 className="text-2xl font-bold text-[#F8FAFC] mb-3">{service.name}</h3>
+              <p className="text-slate-300 mb-6 leading-relaxed">{service.description}</p>
 
               <div className="space-y-2">
-                <div className="text-sm text-slate-400">Real-world use cases:</div>
-                <ul className="space-y-1 text-sm text-slate-400">
-                  {service.useCases.map((useCase, i) => (
-                    <li key={i}>• {useCase}</li>
+                <div className="text-sm font-semibold text-[#06B6D4] mb-3">
+                  Key Capabilities:
+                </div>
+                <ul className="space-y-2">
+                  {service.capabilities.map((capability, i) => (
+                    <li key={i} className="flex items-start gap-2 text-slate-400">
+                      <span className="text-[#06B6D4] mt-1">•</span>
+                      <span>{capability}</span>
+                    </li>
                   ))}
                 </ul>
               </div>

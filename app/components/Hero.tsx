@@ -11,30 +11,30 @@ export function Hero() {
     () => [
       {
         eyebrow: 'AI-First Development Partner',
-        title: 'Elvoriatech',
-        subtitle: 'Transforming Ideas into Scalable, AI‑Powered Digital Solutions',
-        body:
-          'Premium software development for startups and enterprises. We build SaaS platforms, AI solutions, and cloud-native applications that drive real business growth.',
+        title: 'Architecting the Future\nof Global Enterprise',
+        subtitle:
+          'Senior-only engineering teams building AI-first, cloud-native SaaS and marketplace platforms for mission-critical global systems',
+        body: '',
         image:
           'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=2400&q=80',
       },
       {
-        eyebrow: 'Product Engineering',
-        title: 'Ship Faster',
-        subtitle: 'Design, build, and scale products your users love',
-        body:
-          'From discovery to delivery, we move with senior velocity—clean architecture, delightful UX, and measurable outcomes.',
+        eyebrow: 'AI-First Development Partner',
+        title: 'Architecting the Future\nof Global Enterprise',
+        subtitle:
+          'Senior-only engineering teams building AI-first, cloud-native SaaS and marketplace platforms for mission-critical global systems',
+        body: '',
         image:
-          'https://images.unsplash.com/photo-1526378722484-bd91ca387e72?auto=format&fit=crop&w=2400&q=80',
+          'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=2400&q=80',
       },
       {
-        eyebrow: 'Cloud & Platforms',
-        title: 'Scale Reliably',
-        subtitle: 'Cloud-native systems built for performance and security',
-        body:
-          'We help you modernize infrastructure, strengthen security, and optimize cost with best-practice DevOps and platform engineering.',
+        eyebrow: 'AI-First Development Partner',
+        title: 'Architecting the Future\nof Global Enterprise',
+        subtitle:
+          'Senior-only engineering teams building AI-first, cloud-native SaaS and marketplace platforms for mission-critical global systems',
+        body: '',
         image:
-          'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=2400&q=80',
+          'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=2400&q=80',
       },
     ],
     []
@@ -79,7 +79,7 @@ export function Hero() {
   return (
     <section
       id="top"
-      className="relative min-h-[calc(100vh-4rem)] flex items-center justify-center overflow-hidden bg-background mesh-hero"
+      className="relative min-h-[calc(100vh-4rem)] flex items-center justify-center overflow-hidden bg-linear-to-br from-[#0F172A] via-[#1E293B] to-[#0F172A]"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onFocusCapture={() => setPaused(true)}
@@ -101,46 +101,61 @@ export function Hero() {
       aria-roledescription="carousel"
       aria-label="Hero highlights"
     >
+      {/* Grid Pattern Overlay */}
+      <div className="absolute inset-0 opacity-[0.03]">
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage:
+              'linear-gradient(to right, #06B6D4 1px, transparent 1px), linear-gradient(to bottom, #06B6D4 1px, transparent 1px)',
+            backgroundSize: '80px 80px',
+          }}
+        />
+      </div>
+
+      {/* Gradient Orbs */}
+      <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-[#8B5CF6] rounded-full mix-blend-multiply filter blur-[128px] opacity-20 animate-pulse" />
+      <div
+        className="absolute bottom-1/4 left-1/4 w-96 h-96 bg-[#06B6D4] rounded-full mix-blend-multiply filter blur-[128px] opacity-20 animate-pulse"
+        style={{ animationDelay: '1s' }}
+      />
+
       {/* Background image + brand mesh */}
       <div className="absolute inset-0 opacity-20">
         <img src={slide.image} alt="" className="w-full h-full object-cover" />
       </div>
 
       {/* Gradient Overlays */}
-      <div className="absolute inset-0 bg-linear-to-t from-background via-transparent to-transparent"></div>
-      <div className="absolute inset-0 geo-overlay pointer-events-none"></div>
+      <div className="absolute inset-0 bg-linear-to-t from-[#0F172A] via-transparent to-transparent" />
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-24 text-center">
-        <div className="inline-flex items-center gap-2 px-4 py-2 bg-foreground/5 border border-border/60 rounded-full mb-8">
-          <Sparkles className="w-4 h-4 text-(--brand-accent)" />
-          <span className="text-sm text-foreground/80">{slide.eyebrow}</span>
+        <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#06B6D4]/10 border border-[#06B6D4]/30 rounded-full mb-8 backdrop-blur-sm">
+          <Sparkles className="w-4 h-4 text-[#06B6D4]" />
+          <span className="text-sm text-[#06B6D4] font-semibold">{slide.eyebrow}</span>
         </div>
 
-        <h1 className="mb-6">
-          {active === 0 ? (
-            <div className="flex flex-col items-center gap-4">
-              <span className="sr-only">Elvoriatech</span>
-              <Image
-                src="/elvoria.png"
-                alt=""
-                width={96}
-                height={96}
-                priority
-                className="h-20 w-20 sm:h-24 sm:w-24"
-              />
-            </div>
-          ) : (
-            <span className="block text-5xl sm:text-6xl md:text-8xl bg-linear-to-r from-white via-purple-200 to-blue-200 bg-clip-text text-transparent">
+        <h1 className="mb-6 font-bold tracking-tight min-h-[12.6rem] flex flex-col items-center justify-start pt-2">
+          <div className="flex flex-col items-center gap-4">
+            <span className="sr-only">Elvoriatech</span>
+            <Image
+              src="/elvoria.png"
+              alt=""
+              width={96}
+              height={96}
+              priority
+              className="h-20 w-20 sm:h-24 sm:w-24"
+            />
+            <span className="block text-[6rem] whitespace-pre-line leading-[1.05] bg-linear-to-r from-[#F8FAFC] via-[#06B6D4] to-[#8B5CF6] bg-clip-text text-transparent">
               {slide.title}
             </span>
-          )}
+          </div>
         </h1>
 
-        <p className="text-xl sm:text-2xl md:text-3xl text-foreground/90 mb-8 max-w-4xl mx-auto">
+        <p className="text-xl md:text-2xl font-light text-slate-300 mb-8 max-w-4xl mx-auto min-h-18">
           {slide.subtitle}
         </p>
 
-        <p className="text-lg text-muted-foreground mb-12 max-w-3xl mx-auto">
+        <p className="text-lg text-slate-400 mb-12 max-w-3xl mx-auto min-h-18">
           {slide.body}
         </p>
 
@@ -203,20 +218,28 @@ export function Hero() {
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-24 max-w-4xl mx-auto">
           <div>
-            <div className="text-4xl mb-2 bg-linear-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">150+</div>
-            <div className="text-slate-400">Projects Delivered</div>
+            <div className="text-4xl font-bold mb-2 bg-linear-to-r from-(--brand-accent) to-(--brand-primary) dark:from-purple-400 dark:to-blue-400 bg-clip-text text-transparent">
+              150+
+            </div>
+            <div className="text-muted-foreground">Projects Delivered</div>
           </div>
           <div>
-            <div className="text-4xl mb-2 bg-linear-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">98%</div>
-            <div className="text-slate-400">Client Satisfaction</div>
+            <div className="text-4xl font-bold mb-2 bg-linear-to-r from-(--brand-accent) to-(--brand-primary) dark:from-purple-400 dark:to-blue-400 bg-clip-text text-transparent">
+              98%
+            </div>
+            <div className="text-muted-foreground">Client Satisfaction</div>
           </div>
           <div>
-            <div className="text-4xl mb-2 bg-linear-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">50+</div>
-            <div className="text-slate-400">Expert Developers</div>
+            <div className="text-4xl font-bold mb-2 bg-linear-to-r from-(--brand-accent) to-(--brand-primary) dark:from-purple-400 dark:to-blue-400 bg-clip-text text-transparent">
+              50+
+            </div>
+            <div className="text-muted-foreground">Expert Developers</div>
           </div>
           <div>
-            <div className="text-4xl mb-2 bg-linear-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">24/7</div>
-            <div className="text-slate-400">Support Available</div>
+            <div className="text-4xl font-bold mb-2 bg-linear-to-r from-(--brand-accent) to-(--brand-primary) dark:from-purple-400 dark:to-blue-400 bg-clip-text text-transparent">
+              24/7
+            </div>
+            <div className="text-muted-foreground">Support Available</div>
           </div>
         </div>
       </div>

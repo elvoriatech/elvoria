@@ -42,48 +42,51 @@
 }
 
 .theme-elvoria {
-  /* Pan‑European Enterprise (LIGHT ONLY) */
-  --brand-bg-light: #f8fafc; /* Clean Slate */
-  --brand-bg-dark: #0f172a;  /* Deep Atlantic Blue */
-  --brand-surface: rgba(255, 255, 255, 0.05); /* glass surface (used in dark) */
+  /*
+    "Professional Company Profile PDF -version 2" theme
+    Apply this look when the user selects the LIGHT theme option (elvoria-light).
+  */
+  --deep-atlantic: #0f172a;
+  --clean-slate: #f8fafc;
+  --electric-purple: #8b5cf6;
+  --electric-cyan: #06b6d4;
+  --european-azure: #3b82f6;
 
-  /* Bridge system */
-  --brand-accent: #22d3ee; /* Logo Cyan → primary action */
-  --brand-primary: #2563eb; /* European Azure bridge */
-  --brand-ai: #6366f1; /* Purple accent for AI */
+  --brand-bg-light: var(--clean-slate);
+  --brand-bg-dark: var(--deep-atlantic);
+  --brand-surface: rgba(255, 255, 255, 0.05);
 
-  --background: var(--brand-bg-light);
-  --foreground: #0f172a; /* Atlantic ink */
-  --card: #ffffff;
-  --card-foreground: #0f172a;
-  --popover: #ffffff;
-  --popover-foreground: #0f172a;
+  --brand-accent: var(--electric-cyan);
+  --brand-primary: var(--european-azure);
+  --brand-ai: var(--electric-purple);
+
+  --background: var(--deep-atlantic);
+  --foreground: var(--clean-slate);
+  --card: #1e293b;
+  --card-foreground: var(--clean-slate);
+  --popover: #1e293b;
+  --popover-foreground: var(--clean-slate);
 
   /* Actions */
   --primary: var(--brand-accent);
-  --primary-foreground: #06222a;
+  --primary-foreground: var(--deep-atlantic);
 
   /* AI / secondary accent */
-  --secondary: color-mix(in srgb, var(--brand-ai) 12%, transparent);
-  --secondary-foreground: #0f172a;
+  --secondary: var(--brand-ai);
+  --secondary-foreground: var(--clean-slate);
 
-  --muted: rgba(15, 23, 42, 0.06);
-  --muted-foreground: rgba(15, 23, 42, 0.65);
+  --muted: #334155;
+  --muted-foreground: #94a3b8;
 
-  /* Subtle highlight */
-  --accent: rgba(34, 211, 238, 0.12);
-  --accent-foreground: #0f172a;
+  --accent: var(--brand-primary);
+  --accent-foreground: var(--clean-slate);
 
-  --border: rgba(15, 23, 42, 0.12);
-  --ring: color-mix(in srgb, var(--brand-primary) 28%, transparent);
+  --border: rgba(203, 213, 225, 0.1);
+  --ring: var(--brand-accent);
 }
 
 .theme-elvoria:not(.dark) {
-  /* Make LIGHT variant feel clearly different: crisp enterprise surfaces */
-  --card: rgba(255, 255, 255, 0.78);
-  --popover: rgba(255, 255, 255, 0.88);
-  --muted: rgba(15, 23, 42, 0.045);
-  --border: rgba(15, 23, 42, 0.10);
+  /* Keep PDF v2 look consistent in "light" selection */
 }
 
 .theme-elvoria.dark {
@@ -290,5 +293,20 @@
       radial-gradient(circle at 70% 40%, rgba(255,255,255,0.05) 0 2px, transparent 3px),
       radial-gradient(circle at 40% 75%, rgba(255,255,255,0.05) 0 2px, transparent 3px);
     opacity: 0.35;
+  }
+
+  .theme-elvoria:not(.dark) .mesh-hero {
+    background:
+      radial-gradient(1200px 800px at 20% 20%, color-mix(in srgb, var(--brand-accent) 18%, transparent), transparent 62%),
+      radial-gradient(900px 700px at 85% 25%, color-mix(in srgb, var(--brand-primary) 16%, transparent), transparent 62%),
+      radial-gradient(900px 900px at 50% 95%, color-mix(in srgb, var(--brand-ai) 14%, transparent), transparent 62%);
+  }
+
+  .theme-elvoria:not(.dark) .geo-overlay {
+    background:
+      radial-gradient(circle at 25% 30%, rgba(15,23,42,0.08) 0 2px, transparent 3px),
+      radial-gradient(circle at 70% 40%, rgba(15,23,42,0.07) 0 2px, transparent 3px),
+      radial-gradient(circle at 40% 75%, rgba(15,23,42,0.07) 0 2px, transparent 3px);
+    opacity: 0.28;
   }
 }

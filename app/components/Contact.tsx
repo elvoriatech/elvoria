@@ -127,22 +127,24 @@ export function Contact() {
   };
 
   return (
-    <section id="contact" className="py-24 bg-slate-950">
+    <section id="contact" className="py-24 bg-[#0F172A]">
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-16">
-          <h2 className="text-5xl mb-6 bg-linear-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
-            Let's Build Your Next Big Product
+          <div className="inline-block px-4 py-2 bg-[#06B6D4]/10 border border-[#06B6D4]/30 rounded-full mb-6">
+            <span className="text-sm text-[#06B6D4] font-semibold">GET IN TOUCH</span>
+          </div>
+          <h2 className="text-5xl md:text-6xl mb-6 bg-linear-to-r from-[#F8FAFC] to-[#06B6D4] bg-clip-text text-transparent font-bold">
+            Start Your Project
           </h2>
-          <p className="text-xl text-slate-300 max-w-3xl mx-auto">
-            Ready to transform your idea into reality? Get in touch with our team
-            and let's discuss how we can help you achieve your goals.
+          <p className="text-xl text-slate-300 max-w-3xl mx-auto font-light">
+            Let&apos;s discuss how we can architect your global digital transformation
           </p>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-12">
           {/* Contact Form */}
-          <div className="p-8 bg-linear-to-br from-slate-900 to-slate-800 border border-purple-500/20 rounded-2xl">
-            <h3 className="text-2xl mb-6 text-purple-300">Send Us a Message</h3>
+          <div className="p-8 bg-linear-to-br from-[#1E293B] to-[#0F172A] border border-slate-700/50 rounded-2xl">
+            <h3 className="text-2xl font-bold text-[#F8FAFC] mb-6">Project Inquiry</h3>
 
             {submitted && (
               <div className="mb-6 p-4 bg-green-500/10 border border-green-500/30 rounded-lg text-green-300">
@@ -159,7 +161,7 @@ export function Contact() {
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm mb-2 text-slate-300">Full Name *</label>
+                  <label className="block text-sm font-semibold mb-2 text-slate-300">Full Name *</label>
                   <input
                     type="text"
                     name="name"
@@ -167,11 +169,11 @@ export function Contact() {
                     onChange={handleChange}
                     required
                     placeholder="John Doe"
-                    className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg focus:border-purple-500 focus:outline-none text-slate-200 placeholder:text-slate-500"
+                    className="w-full px-4 py-3 bg-[#0F172A] border border-slate-700 rounded-lg focus:border-[#06B6D4] focus:outline-none text-[#F8FAFC] placeholder:text-slate-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm mb-2 text-slate-300">Email Address *</label>
+                  <label className="block text-sm font-semibold mb-2 text-slate-300">Email Address *</label>
                   <input
                     type="email"
                     name="email"
@@ -179,43 +181,43 @@ export function Contact() {
                     onChange={handleChange}
                     required
                     placeholder="john@company.com"
-                    className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg focus:border-purple-500 focus:outline-none text-slate-200 placeholder:text-slate-500"
+                    className="w-full px-4 py-3 bg-[#0F172A] border border-slate-700 rounded-lg focus:border-[#06B6D4] focus:outline-none text-[#F8FAFC] placeholder:text-slate-500"
                   />
                 </div>
               </div>
 
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm mb-2 text-slate-300">Phone Number</label>
+                  <label className="block text-sm font-semibold mb-2 text-slate-300">Phone Number</label>
                   <input
                     type="tel"
                     name="phone"
                     value={formData.phone}
                     onChange={handleChange}
                     placeholder="+1 (555) 123-4567"
-                    className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg focus:border-purple-500 focus:outline-none text-slate-200 placeholder:text-slate-500"
+                    className="w-full px-4 py-3 bg-[#0F172A] border border-slate-700 rounded-lg focus:border-[#06B6D4] focus:outline-none text-[#F8FAFC] placeholder:text-slate-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm mb-2 text-slate-300">Company</label>
+                  <label className="block text-sm font-semibold mb-2 text-slate-300">Company</label>
                   <input
                     type="text"
                     name="company"
                     value={formData.company}
                     onChange={handleChange}
                     placeholder="Your Company"
-                    className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg focus:border-purple-500 focus:outline-none text-slate-200 placeholder:text-slate-500"
+                    className="w-full px-4 py-3 bg-[#0F172A] border border-slate-700 rounded-lg focus:border-[#06B6D4] focus:outline-none text-[#F8FAFC] placeholder:text-slate-500"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm mb-2 text-slate-300">Project Type</label>
+                <label className="block text-sm font-semibold mb-2 text-slate-300">Project Type</label>
                 <select 
                   name="projectType"
                   value={formData.projectType}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg focus:border-purple-500 focus:outline-none text-slate-200">
+                  className="w-full px-4 py-3 bg-[#0F172A] border border-slate-700 rounded-lg focus:border-[#06B6D4] focus:outline-none text-[#F8FAFC]">
                   <option>Select a service</option>
                   <option>AI & Generative AI Solutions</option>
                   <option>SaaS Product Development</option>
@@ -227,22 +229,22 @@ export function Contact() {
               </div>
 
               <div>
-                <label className="block text-sm mb-2 text-slate-300">Budget Range</label>
+                <label className="block text-sm font-semibold mb-2 text-slate-300">Budget Range</label>
                 <select 
                   name="budget"
                   value={formData.budget}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg focus:border-purple-500 focus:outline-none text-slate-200">
+                  className="w-full px-4 py-3 bg-[#0F172A] border border-slate-700 rounded-lg focus:border-[#06B6D4] focus:outline-none text-[#F8FAFC]">
                   <option>Select budget range</option>
-                  <option>$25K - $50K</option>
-                  <option>$50K - $100K</option>
-                  <option>$100K - $250K</option>
-                  <option>$250K+</option>
+                  <option>€25K - €50K</option>
+                  <option>€50K - €100K</option>
+                  <option>€100K - €250K</option>
+                  <option>€250K+</option>
                 </select>
               </div>
 
               <div>
-                <label className="block text-sm mb-2 text-slate-300">Project Details *</label>
+                <label className="block text-sm font-semibold mb-2 text-slate-300">Project Details *</label>
                 <textarea
                   name="message"
                   rows={4}
@@ -250,16 +252,16 @@ export function Contact() {
                   onChange={handleChange}
                   required
                   placeholder="Tell us about your project, goals, and timeline..."
-                  className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg focus:border-purple-500 focus:outline-none text-slate-200 placeholder:text-slate-500 resize-none"
+                  className="w-full px-4 py-3 bg-[#0F172A] border border-slate-700 rounded-lg focus:border-[#06B6D4] focus:outline-none text-[#F8FAFC] placeholder:text-slate-500 resize-none"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full px-8 py-4 bg-linear-to-r from-purple-600 to-blue-600 rounded-lg hover:shadow-lg hover:shadow-purple-500/50 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full px-8 py-4 bg-linear-to-r from-[#06B6D4] to-[#3B82F6] rounded-lg hover:shadow-xl hover:shadow-[#06B6D4]/30 transition-all flex items-center justify-center gap-2 font-semibold text-white disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <span className="text-lg">{loading ? 'Sending...' : 'Send Message'}</span>
+                <span className="text-lg">{loading ? 'Sending...' : 'Submit Inquiry'}</span>
                 <Send className="w-5 h-5" />
               </button>
             </form>
@@ -267,24 +269,24 @@ export function Contact() {
 
           {/* Contact Info */}
           <div className="space-y-8">
-            <div className="p-8 bg-linear-to-br from-slate-900 to-slate-800 border border-purple-500/20 rounded-2xl">
-              <h3 className="text-2xl mb-6 text-purple-300">Get In Touch</h3>
+            <div className="p-8 bg-linear-to-br from-[#1E293B] to-[#0F172A] border border-slate-700/50 rounded-2xl">
+              <h3 className="text-2xl font-bold text-[#F8FAFC] mb-6">Contact Information</h3>
 
               <div className="space-y-6">
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-purple-600/20 rounded-lg flex items-center justify-center shrink-0">
-                    <Mail className="w-6 h-6 text-purple-400" />
+                  <div className="w-12 h-12 rounded-lg bg-linear-to-br from-[#06B6D4] to-[#3B82F6] flex items-center justify-center shrink-0">
+                    <Mail className="w-6 h-6 text-white" />
                   </div>
                   <div>
                     <div className="text-slate-400 mb-1">Email</div>
                     <div className="text-slate-200">contact@elvoriatech.com</div>
-                    <div className="text-slate-200">sales@elvoriatech.com</div>
+                    <div className="text-slate-200">info@elvoriatech.com</div>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-blue-600/20 rounded-lg flex items-center justify-center shrink-0">
-                    <Phone className="w-6 h-6 text-blue-400" />
+                  <div className="w-12 h-12 rounded-lg bg-linear-to-br from-[#06B6D4] to-[#3B82F6] flex items-center justify-center shrink-0">
+                    <Phone className="w-6 h-6 text-white" />
                   </div>
                   <div>
                     <div className="text-slate-400 mb-1">Phone</div>
@@ -294,8 +296,8 @@ export function Contact() {
                 </div>
 
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-purple-600/20 rounded-lg flex items-center justify-center shrink-0">
-                    <MapPin className="w-6 h-6 text-purple-400" />
+                  <div className="w-12 h-12 rounded-lg bg-linear-to-br from-[#8B5CF6] to-[#06B6D4] flex items-center justify-center shrink-0">
+                    <MapPin className="w-6 h-6 text-white" />
                   </div>
                   <div>
                     <div className="text-slate-400 mb-1">Office</div>
@@ -306,8 +308,8 @@ export function Contact() {
               </div>
             </div>
 
-            <div className="p-8 bg-linear-to-r from-purple-900/20 to-blue-900/20 border border-purple-500/20 rounded-2xl">
-              <h4 className="text-xl mb-4 text-purple-300">Quick Actions</h4>
+            <div className="p-8 bg-linear-to-r from-[#06B6D4]/10 to-[#8B5CF6]/10 border border-[#06B6D4]/30 rounded-2xl">
+              <h4 className="text-xl font-bold text-[#F8FAFC] mb-4">Quick Actions</h4>
 
               <div className="space-y-3">
                 <button
@@ -316,28 +318,35 @@ export function Contact() {
                     setScheduleError('');
                     setScheduleOpen(true);
                   }}
-                  className="w-full px-6 py-3 bg-slate-800 border border-slate-700 rounded-lg hover:border-purple-500 transition-all flex items-center gap-3 group"
+                  className="w-full px-6 py-4 bg-[#1E293B] border border-slate-700 rounded-lg hover:border-[#06B6D4] transition-all flex items-center gap-3 group"
                 >
-                  <Calendar className="w-5 h-5 text-purple-400" />
-                  <span className="text-slate-200 group-hover:text-purple-300">Schedule a Free Consultation</span>
+                  <Calendar className="w-5 h-5 text-[#06B6D4]" />
+                  <span className="text-[#F8FAFC] group-hover:text-[#06B6D4] font-semibold">
+                    Schedule 30-Min Consultation
+                  </span>
                 </button>
 
-                <button className="w-full px-6 py-3 bg-slate-800 border border-slate-700 rounded-lg hover:border-blue-500 transition-all flex items-center gap-3 group">
-                  <MessageSquare className="w-5 h-5 text-blue-400" />
-                  <span className="text-slate-200 group-hover:text-blue-300">Chat with Us on Slack</span>
+                <button
+                  type="button"
+                  className="w-full px-6 py-4 bg-[#1E293B] border border-slate-700 rounded-lg hover:border-[#8B5CF6] transition-all flex items-center gap-3 group"
+                >
+                  <MessageSquare className="w-5 h-5 text-[#8B5CF6]" />
+                  <span className="text-[#F8FAFC] group-hover:text-[#8B5CF6] font-semibold">
+                    Request Technical Proposal
+                  </span>
                 </button>
               </div>
             </div>
 
-            <div className="p-8 bg-linear-to-br from-slate-900 to-slate-800 border border-purple-500/20 rounded-2xl">
-              <h4 className="text-xl mb-4 text-purple-300">Response Time</h4>
+            <div className="p-8 bg-linear-to-br from-[#1E293B] to-[#0F172A] border border-slate-700/50 rounded-2xl">
+              <h4 className="text-xl font-bold text-[#F8FAFC] mb-4">Response Time</h4>
               <p className="text-slate-300 mb-4">
-                We typically respond to all inquiries within 2-4 business hours.
-                For urgent projects, call us directly.
+                Enterprise inquiries receive priority attention. Our solution architects typically
+                respond within 4 business hours.
               </p>
               <div className="flex items-center gap-2 text-sm text-slate-400">
-                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                <span>Our team is currently online</span>
+                <div className="w-2 h-2 bg-[#06B6D4] rounded-full animate-pulse"></div>
+                <span>Senior team available Mon-Fri, 9:00-18:00 CET</span>
               </div>
             </div>
           </div>

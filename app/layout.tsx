@@ -41,6 +41,7 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${inter.variable} ${plexSans.variable} h-full antialiased scroll-smooth`}
+      suppressHydrationWarning
     >
       <head>
         <link rel="icon" type="image/png" href="/elvoria.png" />
