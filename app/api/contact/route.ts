@@ -1,3 +1,5 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import nodemailer from 'nodemailer';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -10,7 +12,9 @@ function toPublicEmailError(error: unknown) {
         'Email login failed (Gmail). Use a Google “App Password” (requires 2‑Step Verification) for EMAIL_PASSWORD, and ensure EMAIL_USER is the mailbox address. If this is not a Gmail/Workspace inbox, use SMTP settings instead.',
     };
   }
-  return { status: 500, message: 'Failed to send email' };
+  const code = e?.code ? ` (${e.code})` : '';
+  const msg = e?.message ? `: ${String(e.message)}` : '';
+  return { status: 500, message: `Failed to send email${code}${msg}` };
 }
 
 function escapeHtml(input: string) {
@@ -124,7 +128,8 @@ export async function POST(request: NextRequest) {
     const emailUser = process.env.EMAIL_USER;
     const emailPassword = process.env.EMAIL_PASSWORD;
     const smtpHost = process.env.SMTP_HOST;
-    const smtpPort = process.env.SMTP_PORT ? Number(process.env.SMTP_PORT) : undefined;
+    const smtpPortRaw = process.env.SMTP_PORT;
+    const smtpPort = smtpPortRaw ? Number.parseInt(smtpPortRaw.trim(), 10) : undefined;
     const smtpUser = process.env.SMTP_USER;
     const smtpPassword = process.env.SMTP_PASSWORD;
     const smtpFrom = process.env.SMTP_FROM;
@@ -160,6 +165,16 @@ export async function POST(request: NextRequest) {
         });
 
     const fromAddress = smtpFrom || smtpUser || emailUser;
+    const attachmentPath = path.join(process.cwd(), 'public', 'elvoria.png');
+    const attachments = fs.existsSync(attachmentPath)
+      ? [
+          {
+            filename: 'elvoria.png',
+            path: attachmentPath,
+            cid: 'elvoria-mark',
+          },
+        ]
+      : [];
 
     // Email to company
     const safeName = escapeHtml(String(name));
@@ -241,13 +256,7 @@ export async function POST(request: NextRequest) {
           </div>
         `,
       }),
-      attachments: [
-        {
-          filename: 'elvoria.png',
-          path: `${process.cwd()}/public/elvoria.png`,
-          cid: 'elvoria-mark',
-        },
-      ],
+      attachments,
       replyTo: email,
     });
 
@@ -293,13 +302,7 @@ export async function POST(request: NextRequest) {
             </div>
           `,
         }),
-        attachments: [
-          {
-            filename: 'elvoria.png',
-            path: `${process.cwd()}/public/elvoria.png`,
-            cid: 'elvoria-mark',
-          },
-        ],
+        attachments,
       });
     }
 
