@@ -133,11 +133,11 @@ export async function POST(request: NextRequest) {
     const smtpUser = process.env.SMTP_USER;
     const smtpPassword = process.env.SMTP_PASSWORD;
     const smtpFrom = process.env.SMTP_FROM;
-    const contactEmail = process.env.CONTACT_EMAIL || 'contact@elvoriatech.com';
+    const contactEmail = process.env.SMTP_TO || process.env.CONTACT_EMAIL || 'contact@elvoriatech.com';
     const companyName = process.env.COMPANY_NAME || 'Elvoriatech';
     const siteUrl = process.env.SITE_URL || 'https://elvoriatech.com';
     const supportPhone = process.env.SUPPORT_PHONE || '';
-    const sendAutoReply = (process.env.SEND_AUTOREPLY || 'true').toLowerCase() !== 'false';
+    const sendAutoReply = String(process.env.SEND_AUTOREPLY ?? 'true').toLowerCase() !== 'false';
 
     const hasSmtp = Boolean(smtpHost && smtpPort && smtpUser && smtpPassword);
     const hasService = Boolean(emailService && emailUser && emailPassword);
@@ -260,17 +260,21 @@ export async function POST(request: NextRequest) {
       replyTo: email,
     });
 
-    // Confirmation email to user
+    // Confirmation email to user (do not fail the request if this fails)
+    let autoReplySent = false;
+    let autoReplyError: string | undefined;
     if (sendAutoReply) {
-      await transporter.sendMail({
-        from: fromAddress,
-        to: email,
-        subject: `Thank you for contacting ${companyName}`,
-        html: renderEmailShell({
-          title: 'We received your message',
-          preheader: 'Thanks — we’ll get back to you shortly.',
-          showTimestamp: false,
-          contentHtml: `
+      try {
+        await transporter.sendMail({
+          from: fromAddress,
+          to: email,
+          subject: `Thank you for contacting ${companyName}`,
+          replyTo: contactEmail,
+          html: renderEmailShell({
+            title: 'We received your message',
+            preheader: 'Thanks — we’ll get back to you shortly.',
+            showTimestamp: false,
+            contentHtml: `
             <div class="h1" style="font-size:18px;font-weight:800;color:#ffffff;margin:0 0 10px 0;">Thank you for reaching out</div>
             <div class="p" style="font-size:13px;color:#cbd5e1;line-height:1.7;margin:0 0 14px 0;">
               Dear ${safeName},<br><br>
@@ -301,14 +305,23 @@ export async function POST(request: NextRequest) {
               <a href="mailto:${escapeHtml(contactEmail)}" style="color:#93c5fd;text-decoration:none;">${escapeHtml(contactEmail)}</a>${supportPhone ? `<br>${escapeHtml(supportPhone)}` : ''}
             </div>
           `,
-        }),
-        attachments,
-      });
+          }),
+          attachments,
+        });
+        autoReplySent = true;
+      } catch (err) {
+        const e = err as { code?: string; message?: string };
+        autoReplyError = `${e?.code ? `${e.code}: ` : ''}${e?.message ? String(e.message) : 'unknown error'}`;
+        console.error('Auto-reply email error:', err);
+      }
     }
 
     return NextResponse.json({
       success: true,
       message: 'Email sent successfully',
+      autoReplyEnabled: sendAutoReply,
+      autoReplySent,
+      autoReplyError,
     });
   } catch (error) {
     console.error('Email error:', error);
