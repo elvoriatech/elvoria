@@ -8,11 +8,13 @@ import { Portfolio } from './components/Portfolio';
 import { Services } from './components/Services';
 import { TechStack } from './components/TechStack';
 import { EngagementModels } from './components/EngagementModels';
+import { Analytics } from '@vercel/analytics/next';
 
 export default function Home() {
   return (
     <div className="min-h-screen bg-[#0F172A] text-[#F8FAFC]">
       <TopBar />
+      <Analytics />
       <Hero />
       <SovereigntyBar />
       <About />
