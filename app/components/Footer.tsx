@@ -3,7 +3,7 @@ import Image from 'next/image';
 
 export function Footer() {
   return (
-    <footer className="bg-linear-to-b from-[#0F172A] to-black border-t border-slate-800">
+    <footer className="bg-background border-t border-border/60 dark:bg-linear-to-b dark:from-[#0F172A] dark:to-black dark:border-slate-800">
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid md:grid-cols-4 gap-12 mb-12 py-16">
           <div className="col-span-2">
@@ -19,35 +19,35 @@ export function Footer() {
                 Elvoria Tech
               </h3>
             </div>
-            <p className="text-slate-400 mb-6 max-w-md leading-relaxed">
+            <p className="text-muted-foreground dark:text-slate-400 mb-6 max-w-md leading-relaxed">
               Architecting the future of global enterprise with AI-first, cloud-native solutions.
-              Senior-only teams delivering mission-critical systems across 35+ countries worldwide.
+              Experienced engineering teams delivering mission-critical systems across 35+ countries worldwide.
             </p>
             <div className="flex items-center gap-4">
               <a
                 href="#"
-                className="w-10 h-10 bg-[#1E293B] border border-slate-700 rounded-lg flex items-center justify-center hover:border-[#06B6D4] hover:bg-[#1E293B]/80 transition-all"
+                className="w-10 h-10 bg-card border border-border/60 rounded-lg flex items-center justify-center hover:border-[#06B6D4] hover:bg-muted/30 transition-all dark:bg-[#1E293B] dark:border-slate-700 dark:hover:bg-[#1E293B]/80"
               >
-                <Linkedin className="w-5 h-5 text-slate-400 hover:text-[#06B6D4]" />
+                <Linkedin className="w-5 h-5 text-muted-foreground hover:text-[#06B6D4] dark:text-slate-400" />
               </a>
               <a
                 href="#"
-                className="w-10 h-10 bg-[#1E293B] border border-slate-700 rounded-lg flex items-center justify-center hover:border-[#06B6D4] hover:bg-[#1E293B]/80 transition-all"
+                className="w-10 h-10 bg-card border border-border/60 rounded-lg flex items-center justify-center hover:border-[#06B6D4] hover:bg-muted/30 transition-all dark:bg-[#1E293B] dark:border-slate-700 dark:hover:bg-[#1E293B]/80"
               >
-                <Github className="w-5 h-5 text-slate-400 hover:text-[#06B6D4]" />
+                <Github className="w-5 h-5 text-muted-foreground hover:text-[#06B6D4] dark:text-slate-400" />
               </a>
               <a
                 href="#"
-                className="w-10 h-10 bg-[#1E293B] border border-slate-700 rounded-lg flex items-center justify-center hover:border-[#06B6D4] hover:bg-[#1E293B]/80 transition-all"
+                className="w-10 h-10 bg-card border border-border/60 rounded-lg flex items-center justify-center hover:border-[#06B6D4] hover:bg-muted/30 transition-all dark:bg-[#1E293B] dark:border-slate-700 dark:hover:bg-[#1E293B]/80"
               >
-                <Mail className="w-5 h-5 text-slate-400 hover:text-[#06B6D4]" />
+                <Mail className="w-5 h-5 text-muted-foreground hover:text-[#06B6D4] dark:text-slate-400" />
               </a>
             </div>
           </div>
 
           <div>
-            <h4 className="text-lg font-bold mb-4 text-[#F8FAFC]">Services</h4>
-            <ul className="space-y-2 text-slate-400">
+            <h4 className="text-lg font-bold mb-4 text-foreground dark:text-[#F8FAFC]">Services</h4>
+            <ul className="space-y-2 text-muted-foreground dark:text-slate-400">
               <li>
                 <a href="#services" className="hover:text-[#06B6D4] transition-colors">
                   AI-First SaaS
@@ -77,8 +77,8 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="text-lg font-bold mb-4 text-[#F8FAFC]">Company</h4>
-            <ul className="space-y-2 text-slate-400">
+            <h4 className="text-lg font-bold mb-4 text-foreground dark:text-[#F8FAFC]">Company</h4>
+            <ul className="space-y-2 text-muted-foreground dark:text-slate-400">
               <li>
                 <a href="#about" className="hover:text-[#06B6D4] transition-colors">
                   About Us
@@ -98,33 +98,33 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mb-8 p-6 bg-linear-to-r from-[#06B6D4]/10 to-[#8B5CF6]/10 border border-[#06B6D4]/30 rounded-xl">
+        <div className="mb-8 p-6 bg-linear-to-r from-[#06B6D4]/10 to-[#8B5CF6]/10 border border-border/60 rounded-xl dark:border-[#06B6D4]/30">
           <div className="flex items-center justify-center gap-8 flex-wrap">
             <div className="flex items-center gap-2">
               <Shield className="w-5 h-5 text-[#06B6D4]" />
-              <span className="text-sm font-semibold text-[#F8FAFC]">Global Senior Teams</span>
+              <span className="text-sm font-semibold text-foreground dark:text-[#F8FAFC]">Global Experienced Teams</span>
             </div>
-            <div className="w-px h-6 bg-slate-700"></div>
+            <div className="w-px h-6 bg-border/60 dark:bg-slate-700"></div>
             <div className="flex items-center gap-2">
               <Shield className="w-5 h-5 text-[#06B6D4]" />
-              <span className="text-sm font-semibold text-[#F8FAFC]">GDPR Compliant</span>
+              <span className="text-sm font-semibold text-foreground dark:text-[#F8FAFC]">GDPR Compliant</span>
             </div>
-            <div className="w-px h-6 bg-slate-700"></div>
+            <div className="w-px h-6 bg-border/60 dark:bg-slate-700"></div>
             <div className="flex items-center gap-2">
               <Shield className="w-5 h-5 text-[#06B6D4]" />
-              <span className="text-sm font-semibold text-[#F8FAFC]">Enterprise Security</span>
+              <span className="text-sm font-semibold text-foreground dark:text-[#F8FAFC]">Enterprise Security</span>
             </div>
-            <div className="w-px h-6 bg-slate-700"></div>
+            <div className="w-px h-6 bg-border/60 dark:bg-slate-700"></div>
             <div className="flex items-center gap-2">
               <Shield className="w-5 h-5 text-[#06B6D4]" />
-              <span className="text-sm font-semibold text-[#F8FAFC]">World-Class Quality</span>
+              <span className="text-sm font-semibold text-foreground dark:text-[#F8FAFC]">World-Class Quality</span>
             </div>
           </div>
         </div>
 
-        <div className="pt-8 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4 pb-10">
-          <div className="text-slate-400 text-sm">© 2026 Elvoria Tech. All rights reserved.</div>
-          <div className="flex items-center gap-6 text-sm text-slate-400">
+        <div className="pt-8 border-t border-border/60 dark:border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4 pb-10">
+          <div className="text-muted-foreground dark:text-slate-400 text-sm">© 2026 Elvoria Tech. All rights reserved.</div>
+          <div className="flex items-center gap-6 text-sm text-muted-foreground dark:text-slate-400">
             <a href="#" className="hover:text-[#06B6D4] transition-colors">
               Privacy Policy
             </a>

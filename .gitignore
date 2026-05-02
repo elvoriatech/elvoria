@@ -28,3 +28,7 @@ yarn-error.log*
 
 # optional cache
 .cache/
+
+# Support lead log (PII) — generated locally / on server; do not commit
+data/support-leads.json
+data/proposal-finalize-log.json

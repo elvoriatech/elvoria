@@ -12,7 +12,7 @@ import { Analytics } from '@vercel/analytics/next';
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-[#0F172A] text-[#F8FAFC]">
+    <div className="min-h-screen bg-background text-foreground">
       <TopBar />
       <Analytics />
       <Hero />

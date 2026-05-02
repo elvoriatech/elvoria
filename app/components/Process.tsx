@@ -1,4 +1,4 @@
-import { Search, FileText, Palette, Code, TestTube2, Rocket, HeadphonesIcon } from 'lucide-react';
+import { Check, Code, FileText, HeadphonesIcon, Palette, Rocket, Search, TestTube2 } from 'lucide-react';
 
 const steps = [
   {
@@ -100,15 +100,22 @@ export function Process() {
         <div className="mt-12 p-8 rounded-2xl border border-border/60 bg-card/80 dark:bg-linear-to-r dark:from-purple-900/20 dark:to-blue-900/20 dark:border-white/10">
           <h3 className="text-2xl mb-4 text-foreground">Agile & Collaborative</h3>
           <p className="text-lg text-muted-foreground mb-4">
-            We believe in radical transparency and close collaboration. You're not just a client—you're a partner in the process.
+            We believe in radical transparency and close collaboration. You&apos;re not just a client—you&apos;re a partner in the process.
           </p>
           <ul className="grid md:grid-cols-2 gap-3 text-muted-foreground">
-            <li>✓ Daily standups and regular demos</li>
-            <li>✓ Shared Slack channel for real-time communication</li>
-            <li>✓ Access to project management tools (Jira/Linear)</li>
-            <li>✓ Bi-weekly sprint reviews and planning</li>
-            <li>✓ Continuous integration and deployment</li>
-            <li>✓ Regular feedback loops and iterations</li>
+            {[
+              'Daily standups and regular demos',
+              'Shared Slack channel for real-time communication',
+              'Access to project management tools (Jira/Linear)',
+              'Bi-weekly sprint reviews and planning',
+              'Continuous integration and deployment',
+              'Regular feedback loops and iterations',
+            ].map((line) => (
+              <li key={line} className="flex items-start gap-2">
+                <Check className="mt-0.5 h-4 w-4 shrink-0 text-(--brand-accent)" strokeWidth={2.5} aria-hidden />
+                <span>{line}</span>
+              </li>
+            ))}
           </ul>
         </div>
       </div>

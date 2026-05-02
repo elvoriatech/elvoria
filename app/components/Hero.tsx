@@ -10,31 +10,31 @@ export function Hero() {
   const slides = useMemo(
     () => [
       {
-        eyebrow: 'AI-First Development Partner',
+        eyebrow: 'AI-First Digital & Software Development Partner',
         title: 'Architecting the Future\nof Global Enterprise',
         subtitle:
-          'Senior-only engineering teams building AI-first, cloud-native SaaS and marketplace platforms for mission-critical global systems',
+          'Experienced engineering teams building AI-first, cloud-native SaaS and marketplace platforms for mission-critical global systems',
         body: '',
         image:
-          'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=2400&q=80',
+          'https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&w=2400&q=80',
       },
       {
-        eyebrow: 'AI-First Development Partner',
+        eyebrow: 'AI-First Digital & Software Development Partner',
         title: 'Architecting the Future\nof Global Enterprise',
         subtitle:
-          'Senior-only engineering teams building AI-first, cloud-native SaaS and marketplace platforms for mission-critical global systems',
+          'Experienced engineering teams building AI-first, cloud-native SaaS and marketplace platforms for mission-critical global systems',
         body: '',
         image:
-          'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=2400&q=80',
+          'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=2400&q=80',
       },
       {
-        eyebrow: 'AI-First Development Partner',
+        eyebrow: 'AI-First Digital & Software Development Partner',
         title: 'Architecting the Future\nof Global Enterprise',
         subtitle:
-          'Senior-only engineering teams building AI-first, cloud-native SaaS and marketplace platforms for mission-critical global systems',
+          'Experienced engineering teams building AI-first, cloud-native SaaS and marketplace platforms for mission-critical global systems',
         body: '',
         image:
-          'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=2400&q=80',
+          'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=2400&q=80',
       },
     ],
     []
@@ -79,7 +79,7 @@ export function Hero() {
   return (
     <section
       id="top"
-      className="relative min-h-[calc(100vh-4rem)] flex items-center justify-center overflow-hidden bg-linear-to-br from-[#0F172A] via-[#1E293B] to-[#0F172A]"
+      className="relative min-h-[calc(100vh-4rem)] flex items-center justify-center overflow-hidden bg-slate-50 dark:bg-linear-to-br dark:from-[#0F172A] dark:via-[#1E293B] dark:to-[#0F172A]"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onFocusCapture={() => setPaused(true)}
@@ -101,32 +101,32 @@ export function Hero() {
       aria-roledescription="carousel"
       aria-label="Hero highlights"
     >
-      {/* Grid Pattern Overlay */}
-      <div className="absolute inset-0 opacity-[0.03]">
+      {/* Grid Pattern Overlay — slightly stronger in light theme for definition */}
+      <div className="absolute inset-0 opacity-[0.06] dark:opacity-[0.03]">
         <div
           className="absolute inset-0"
           style={{
             backgroundImage:
-              'linear-gradient(to right, #06B6D4 1px, transparent 1px), linear-gradient(to bottom, #06B6D4 1px, transparent 1px)',
+              'linear-gradient(to right, rgb(6 182 212 / 0.45) 1px, transparent 1px), linear-gradient(to bottom, rgb(6 182 212 / 0.45) 1px, transparent 1px)',
             backgroundSize: '80px 80px',
           }}
         />
       </div>
 
-      {/* Gradient Orbs */}
-      <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-[#8B5CF6] rounded-full mix-blend-multiply filter blur-[128px] opacity-20 animate-pulse" />
+      {/* Gradient Orbs — normal blend in light so text stays readable */}
+      <div className="absolute top-1/4 right-1/4 w-96 h-96 rounded-full bg-violet-300/50 mix-blend-normal filter blur-[128px] opacity-40 animate-pulse dark:bg-[#8B5CF6] dark:mix-blend-multiply dark:opacity-20" />
       <div
-        className="absolute bottom-1/4 left-1/4 w-96 h-96 bg-[#06B6D4] rounded-full mix-blend-multiply filter blur-[128px] opacity-20 animate-pulse"
+        className="absolute bottom-1/4 left-1/4 w-96 h-96 rounded-full bg-cyan-300/45 mix-blend-normal filter blur-[128px] opacity-40 animate-pulse dark:bg-[#06B6D4] dark:mix-blend-multiply dark:opacity-20"
         style={{ animationDelay: '1s' }}
       />
 
-      {/* Background image + brand mesh */}
-      <div className="absolute inset-0 opacity-20">
-        <img src={slide.image} alt="" className="w-full h-full object-cover" />
+      {/* Background image — higher presence in light + readable scrim */}
+      <div className="absolute inset-0 opacity-35 saturate-[0.95] dark:opacity-20 dark:saturate-100">
+        <img src={slide.image} alt="" className="h-full w-full object-cover object-center" />
       </div>
 
-      {/* Gradient Overlays */}
-      <div className="absolute inset-0 bg-linear-to-t from-[#0F172A] via-transparent to-transparent" />
+      {/* Scrim: strong light wash for readable type; dark keeps cinematic bottom weight */}
+      <div className="absolute inset-0 bg-linear-to-b from-white/90 via-white/55 to-slate-100 dark:from-[#0F172A]/90 dark:via-[#0F172A]/50 dark:to-[#0F172A]" />
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-24 text-center">
         <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#06B6D4]/10 border border-[#06B6D4]/30 rounded-full mb-8 backdrop-blur-sm">
@@ -145,17 +145,17 @@ export function Hero() {
               priority
               className="h-20 w-20 sm:h-24 sm:w-24"
             />
-            <span className="block text-[6rem] whitespace-pre-line leading-[1.05] bg-linear-to-r from-[#F8FAFC] via-[#06B6D4] to-[#8B5CF6] bg-clip-text text-transparent">
+            <span className="block text-[6rem] whitespace-pre-line leading-[1.05] bg-linear-to-r from-slate-900 via-[#0e7490] to-[#5b21b6] bg-clip-text text-transparent dark:from-[#F8FAFC] dark:via-[#06B6D4] dark:to-[#8B5CF6]">
               {slide.title}
             </span>
           </div>
         </h1>
 
-        <p className="text-xl md:text-2xl font-light text-slate-300 mb-8 max-w-4xl mx-auto min-h-18">
+        <p className="text-xl md:text-2xl font-light text-slate-600 dark:text-slate-300 mb-8 max-w-4xl mx-auto min-h-18">
           {slide.subtitle}
         </p>
 
-        <p className="text-lg text-slate-400 mb-12 max-w-3xl mx-auto min-h-18">
+        <p className="text-lg text-slate-500 dark:text-slate-400 mb-12 max-w-3xl mx-auto min-h-18">
           {slide.body}
         </p>
 
@@ -218,28 +218,28 @@ export function Hero() {
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-24 max-w-4xl mx-auto">
           <div>
-            <div className="text-4xl font-bold mb-2 bg-linear-to-r from-(--brand-accent) to-(--brand-primary) dark:from-purple-400 dark:to-blue-400 bg-clip-text text-transparent">
+            <div className="text-4xl font-bold mb-2 bg-linear-to-r from-[#7c3aed] to-[#0891b2] bg-clip-text text-transparent dark:from-purple-400 dark:to-blue-400">
               150+
             </div>
-            <div className="text-muted-foreground">Projects Delivered</div>
+            <div className="text-slate-600 dark:text-muted-foreground">Projects Delivered</div>
           </div>
           <div>
-            <div className="text-4xl font-bold mb-2 bg-linear-to-r from-(--brand-accent) to-(--brand-primary) dark:from-purple-400 dark:to-blue-400 bg-clip-text text-transparent">
+            <div className="text-4xl font-bold mb-2 bg-linear-to-r from-[#7c3aed] to-[#0891b2] bg-clip-text text-transparent dark:from-purple-400 dark:to-blue-400">
               98%
             </div>
-            <div className="text-muted-foreground">Client Satisfaction</div>
+            <div className="text-slate-600 dark:text-muted-foreground">Client Satisfaction</div>
           </div>
           <div>
-            <div className="text-4xl font-bold mb-2 bg-linear-to-r from-(--brand-accent) to-(--brand-primary) dark:from-purple-400 dark:to-blue-400 bg-clip-text text-transparent">
+            <div className="text-4xl font-bold mb-2 bg-linear-to-r from-[#7c3aed] to-[#0891b2] bg-clip-text text-transparent dark:from-purple-400 dark:to-blue-400">
               50+
             </div>
-            <div className="text-muted-foreground">Expert Developers</div>
+            <div className="text-slate-600 dark:text-muted-foreground">Expert Developers</div>
           </div>
           <div>
-            <div className="text-4xl font-bold mb-2 bg-linear-to-r from-(--brand-accent) to-(--brand-primary) dark:from-purple-400 dark:to-blue-400 bg-clip-text text-transparent">
+            <div className="text-4xl font-bold mb-2 bg-linear-to-r from-[#7c3aed] to-[#0891b2] bg-clip-text text-transparent dark:from-purple-400 dark:to-blue-400">
               24/7
             </div>
-            <div className="text-muted-foreground">Support Available</div>
+            <div className="text-slate-600 dark:text-muted-foreground">Support Available</div>
           </div>
         </div>
       </div>

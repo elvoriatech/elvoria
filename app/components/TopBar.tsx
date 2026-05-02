@@ -77,7 +77,7 @@ export function TopBar() {
         : 'Home';
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border/60 bg-background/70 backdrop-blur supports-backdrop-filter:bg-background/55">
+    <header className="sticky top-0 z-50 border-b border-slate-200/90 bg-white/90 shadow-[0_1px_0_0_rgba(15,23,42,0.06)] backdrop-blur-md dark:border-white/9 dark:bg-[#0b1120]/92 dark:shadow-[inset_0_-1px_0_0_rgba(255,255,255,0.06)] dark:backdrop-blur-md">
       <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-[72px]">
           {/* Logo - Left */}
@@ -104,7 +104,7 @@ export function TopBar() {
             <div className="hidden sm:flex flex-col leading-tight">
               <span className="text-sm font-semibold tracking-wide text-foreground">Elvoriatech</span>
               <span className="text-xs text-muted-foreground group-hover:text-foreground/80 transition-colors">
-                AI‑First Development Partner
+                {'AI-First Digital & Software Development Partner'}
               </span>
             </div>
           </Link>
@@ -192,7 +192,7 @@ export function TopBar() {
         {/* Mobile menu */}
         {mobileOpen && (
           <div className="md:hidden pb-4">
-            <div className="mt-2 rounded-xl border border-border/60 bg-background/80 backdrop-blur supports-backdrop-filter:bg-background/65 overflow-hidden">
+            <div className="mt-2 overflow-hidden rounded-xl border border-slate-200/90 bg-white/95 shadow-lg backdrop-blur-md dark:border-white/10 dark:bg-[#0b1120]/96 dark:shadow-xl dark:backdrop-blur-md">
               <nav className="p-2">
                 <ul className="flex flex-col">
                   {navItems.map((item) => (

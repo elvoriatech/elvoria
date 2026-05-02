@@ -1,4 +1,4 @@
-import { Trophy, Rocket, Shield, TrendingUp, Users, Zap } from 'lucide-react';
+import { MessagesSquare, Rocket, Shield, TrendingUp, Users, Zap } from 'lucide-react';
 
 export function WhyChooseUs() {
   const reasons = [
@@ -24,11 +24,12 @@ export function WhyChooseUs() {
     },
     {
       icon: Users,
-      title: "Senior Developers Only",
-      description: "No junior developers learning on your dime. Our team averages 7+ years of experience with proven track records in scaling applications to millions of users."
+      title: "Experienced Engineers Only",
+      description:
+        "Experienced engineers with proven track records—we focus on depth, not using your product as a training ground. Our team averages 7+ years of experience scaling applications to millions of users.",
     },
     {
-      icon: Trophy,
+      icon: MessagesSquare,
       title: "Transparent & Communicative",
       description: "No surprises, no hidden costs, no scope creep. Daily updates, shared tools, and clear documentation. You'll always know exactly where your project stands."
     }
@@ -42,7 +43,7 @@ export function WhyChooseUs() {
             Why Choose Elvoriatech
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            We're not your typical software agency. Here's what makes us different
+            We&apos;re not your typical software agency. Here&apos;s what makes us different
             in a crowded market of mediocre development shops.
           </p>
         </div>
@@ -89,21 +90,33 @@ export function WhyChooseUs() {
           </div>
 
           <div className="bg-foreground/3 p-6 rounded-xl border border-border/60 dark:bg-slate-900/50 dark:border-white/10">
-            <h4 className="text-xl mb-4 text-foreground">Outdated Agencies vs Elvoriatech</h4>
+            <h4 className="text-xl mb-4 text-foreground">Modern Engineering Approach</h4>
+
             <div className="grid md:grid-cols-2 gap-4 text-sm">
               <div className="space-y-2">
-                <div className="text-red-400">❌ WordPress & jQuery</div>
-                <div className="text-red-400">❌ Monolithic architecture</div>
-                <div className="text-red-400">❌ Manual deployments</div>
-                <div className="text-red-400">❌ Junior developers</div>
-                <div className="text-red-400">❌ Fixed-scope waterfall</div>
+                <div className="text-foreground/80">Legacy systems and rigid architectures</div>
+                <div className="text-foreground/80">Manual deployment processes</div>
+                <div className="text-foreground/80">Slow delivery cycles</div>
+                <div className="text-foreground/80">Fragmented team expertise</div>
+                <div className="text-foreground/80">Fixed and inflexible processes</div>
               </div>
+
               <div className="space-y-2">
-                <div className="text-emerald-600 dark:text-green-400">✅ React, Next.js & AI-first</div>
-                <div className="text-emerald-600 dark:text-green-400">✅ Microservices & serverless</div>
-                <div className="text-emerald-600 dark:text-green-400">✅ Automated CI/CD pipelines</div>
-                <div className="text-emerald-600 dark:text-green-400">✅ Senior engineers only</div>
-                <div className="text-emerald-600 dark:text-green-400">✅ Agile with continuous delivery</div>
+                <div className="text-emerald-600 dark:text-green-400">
+                  Scalable React, Next.js &amp; AI-first architectures
+                </div>
+                <div className="text-emerald-600 dark:text-green-400">
+                  Automated CI/CD &amp; cloud-native deployments
+                </div>
+                <div className="text-emerald-600 dark:text-green-400">
+                  Fast, iterative delivery with Agile workflows
+                </div>
+                <div className="text-emerald-600 dark:text-green-400">
+                  Experienced engineers focused on system design
+                </div>
+                <div className="text-emerald-600 dark:text-green-400">
+                  Flexible, product-driven development approach
+                </div>
               </div>
             </div>
           </div>

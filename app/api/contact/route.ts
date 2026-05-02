@@ -48,12 +48,14 @@ function renderEmailShell(params: {
         .card { padding: 16px !important; }
         .h1 { font-size: 18px !important; }
         .p { font-size: 13px !important; }
+        .grid td { display:block !important; width:100% !important; }
+        .grid td + td { margin-top:10px !important; }
       }
     </style>
   </head>
-  <body style="margin:0;padding:0;background:#0b1220;color:#e5e7eb;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Inter,Arial,sans-serif;">
+  <body style="margin:0;padding:0;background:#070b14;color:#e5e7eb;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Inter,Arial,sans-serif;">
     <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">${escapeHtml(preheader)}</div>
-    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;background:#0b1220;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;background:#070b14;">
       <tr>
         <td align="center" class="container" style="padding:32px 16px;">
           <table role="presentation" width="640" cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;max-width:640px;">
@@ -65,14 +67,14 @@ function renderEmailShell(params: {
                       <table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;">
                         <tr>
                           <td style="vertical-align:middle;padding-right:12px;">
-                            <img src="cid:elvoria-mark" alt="" width="36" height="36" style="display:block;border-radius:10px;" />
+                            <img src="cid:elvoria-mark" alt="" width="36" height="36" style="display:block;border-radius:10px;box-shadow:0 10px 26px rgba(34,211,238,0.18);" />
                           </td>
                           <td style="vertical-align:middle;">
                             <div style="font-size:14px;font-weight:700;letter-spacing:0.3px;color:#ffffff;line-height:1.2;">
                               Elvoriatech
                             </div>
                             <div style="font-size:12px;color:#94a3b8;line-height:1.2;margin-top:2px;">
-                              AI‑First Development Partner
+                              AI-First Digital &amp; Software Development Partner
                             </div>
                           </td>
                         </tr>
@@ -91,7 +93,7 @@ function renderEmailShell(params: {
             </tr>
 
             <tr>
-              <td class="card" style="background:linear-gradient(135deg, rgba(147,51,234,0.18), rgba(59,130,246,0.14));border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:20px 20px 16px 20px;">
+              <td class="card" style="background:linear-gradient(135deg, rgba(139,92,246,0.16), rgba(6,182,212,0.10));border:1px solid rgba(255,255,255,0.10);border-radius:18px;padding:22px 22px 18px 22px;box-shadow:0 20px 60px rgba(0,0,0,0.35);">
                 ${contentHtml}
               </td>
             </tr>
@@ -99,7 +101,10 @@ function renderEmailShell(params: {
             <tr>
               <td style="padding:14px 4px 0 4px;">
                 <div style="font-size:12px;color:#94a3b8;line-height:1.6;">
-                  You’re receiving this email because a form was submitted on your website.
+                  You’re receiving this email because a message was submitted via your website contact form.
+                </div>
+                <div style="margin-top:10px;font-size:11px;color:#64748b;line-height:1.6;">
+                  © ${new Date().getFullYear()} Elvoriatech. All rights reserved.
                 </div>
               </td>
             </tr>
@@ -245,14 +250,14 @@ export async function POST(request: NextRequest) {
           </div>
 
           <div style="margin-top:14px;">
-            <a href="mailto:${encodeURIComponent(String(email))}" style="display:inline-block;background:linear-gradient(90deg,#7c3aed,#2563eb);color:#ffffff;text-decoration:none;font-weight:700;font-size:13px;padding:10px 14px;border-radius:10px;">
+            <a href="mailto:${encodeURIComponent(String(email))}" style="display:inline-block;background:linear-gradient(90deg,#06b6d4,#3b82f6);color:#04131a;text-decoration:none;font-weight:800;font-size:13px;padding:11px 14px;border-radius:12px;">
               Reply to ${safeName}
             </a>
           </div>
 
           <div style="margin-top:12px;font-size:12px;color:#94a3b8;line-height:1.6;">
             Best regards,<br>
-            Your Website Notification System
+            ${escapeHtml(companyName)} Team
           </div>
         `,
       }),

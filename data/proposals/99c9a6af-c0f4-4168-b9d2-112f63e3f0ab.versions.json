@@ -1,0 +1,368 @@
+[
+  {
+    "id": "2d0ad74c-9148-41df-bff7-a94417d10f49",
+    "conversationId": "99c9a6af-c0f4-4168-b9d2-112f63e3f0ab",
+    "createdAt": "2026-05-02T13:09:32.588Z",
+    "expiresAt": "2026-06-01T13:09:32.588Z",
+    "draftSnapshot": {
+      "project": {
+        "summary": "B2B FieldJob platform – mobile and web app for small HVAC companies in the EU (DACH focus) that enables dispatchers to assign jobs, technicians to complete them offline, capture signatures, and generate PDF records.",
+        "targetUsers": [
+          "HVAC field technicians",
+          "Dispatchers / office staff",
+          "Internal reviewers"
+        ],
+        "region": "EU (DACH first)",
+        "languages": [
+          "German",
+          "English"
+        ]
+      },
+      "platforms": {
+        "web": true,
+        "ios": true,
+        "android": true,
+        "desktop": false
+      },
+      "mustHave": [
+        "Job list with status and SLA timers",
+        "Digital job sheets with customer signature capture",
+        "Offline‑first sync for technicians in low‑connectivity areas"
+      ],
+      "niceToHave": [
+        "Route optimization suggestions",
+        "Stripe invoicing after job completion",
+        "AI‑driven job‑note summarisation for dispatchers",
+        "RAG‑based next‑action suggestions from historical jobs",
+        "Web‑dashboard copilot for drafting customer messages in German/English"
+      ],
+      "integrations": [
+        "Google Maps (routing)",
+        "Twilio SMS (customer ETA)",
+        "Stripe (invoicing)",
+        "QuickBooks (export – optional)"
+      ],
+      "nonFunctional": {
+        "securityLevel": "standard",
+        "scaleTarget": "mvp",
+        "compliance": [
+          "GDPR"
+        ]
+      },
+      "keyFlows": [
+        "Dispatcher creates a job",
+        "Dispatcher assigns the job to a technician",
+        "Technician updates job status via mobile app",
+        "Technician completes checklist and captures customer signature",
+        "Office reviews and closes the job on the web dashboard",
+        "System generates PDF record and stores it for download"
+      ],
+      "assumptions": [
+        "Customers provide their own Google Maps API key",
+        "SMS costs are passed through or billed separately",
+        "MVP built with React Native for iOS and Android and React for the web dashboard",
+        "Backend services hosted on AWS (e.g., Lambda/ECS) using Node.js (NestJS) and Java Spring Boot",
+        "Authentication and authorisation via AWS Cognito with TLS 1.2+",
+        "Offline sync uses local SQLite with conflict‑resolution logic; changes upload to Amazon S3 when online",
+        "PDF generation performed server‑side and delivered via CloudFront",
+        "GDPR‑aligned data handling for accounts, signatures, and audit logs",
+        "Target MVP scale of up to ~200 companies and thousands of jobs per month",
+        "No custom LLM training required for the MVP; AI features are optional extensions"
+      ],
+      "outOfScope": [
+        "Native Windows desktop application",
+        "Full accounting suite",
+        "Multi‑tenant white‑label branding builder",
+        "Advanced AI model training or custom LLM fine‑tuning",
+        "Integration with external ERP systems beyond QuickBooks"
+      ],
+      "risks": [
+        "Offline conflict‑resolution complexity",
+        "Technician adoption and training",
+        "Reliance on external services (Google Maps, Twilio) for latency and cost",
+        "PDF generation performance at scale",
+        "GDPR compliance for stored signatures and personal data"
+      ],
+      "additionalContext": [
+        "User explicitly defines the FieldJob MVP scope, including required features, integrations, and AI enhancements.",
+        "User specifies languages (German, English), target market (DACH), and platform constraints (web dashboard + iOS/Android mobile).",
+        "User highlights must‑have features (job list with SLA timers, digital job sheets with signature capture, offline‑first sync).",
+        "User lists nice‑to‑have items (route optimization, Stripe invoicing, AI summarisation, RAG suggestions, copilot).",
+        "User outlines key user flows from job creation to PDF generation and download.",
+        "User sets compliance to GDPR, security level to standard, and scale target to MVP (~200 companies).",
+        "User provides assumptions about API keys, SMS cost handling, technology stack, and out‑of‑scope items.",
+        "User identifies risks: offline conflict resolution, adoption/training, external service dependence, PDF performance, GDPR compliance.",
+        "User wants a technical proposal PDF ready for final polishing and wants confirmation that all details have been captured."
+      ]
+    },
+    "estimate": {
+      "effortHours": {
+        "min": 343,
+        "max": 572
+      },
+      "timelineWeeks": {
+        "min": 6,
+        "max": 13
+      },
+      "budgetEur": {
+        "min": 18865,
+        "max": 31460
+      },
+      "assumptions": [
+        "Rough estimate only; final quote after a short discovery phase.",
+        "Hourly rate used for estimate: €55/hour (configurable)."
+      ]
+    },
+    "markdown": "## Executive SummaryA concise, AI‑first MVP that lets small HVAC companies in the DACH region manage field jobs end‑to‑end from a web dispatcher dashboard and native iOS/Android technician apps. The solution delivers structured job lists, offline‑first signatures, GDPR‑compliant audit trails, and optional AI assistance (note summarisation, RAG‑based suggestions, and a web‑dashboard copilot). The core MVP can be delivered in ~6‑13 weeks with an effort of 343‑572 hours and a budget of €18,865‑€31,460 (indicative).\n\n---\n\n## Why Elvoria Tech\n- **AI‑first engineering** – experienced engineers build with modern stacks (Next.js, NestJS, Spring Boot, AWS Lambda, Kubernetes).  \n- **Proven track record** – 150+ projects, 98 % satisfaction, presence in 35+ countries.  \n- **Pragmatic modern stack** – no legacy‑only teams; we use serverless, containerised, and DevOps‑ready components.  \n- **Compliance‑ready** – GDPR‑aligned data handling, bank‑grade security, privacy‑by‑design.  \n\n---\n\n## A. Business Understanding (Problem → Value)\n\nSmall HVAC firms in the DACH market struggle with paper‑based job sheets, fragmented communication, and limited visibility into field operations. Dispatchers need a single place to create jobs, assign technicians, monitor SLAs, and capture customer signatures, while technicians require a mobile experience that works offline and syncs when connectivity returns. The MVP must:\n\n1. **Job list with status & SLA timers** – real‑time visibility for dispatchers.  \n2. **Digital job sheets with customer signature capture** – replace paper forms.  \n3. **Offline‑first sync** – reliable operation in low‑connectivity sites.  These capabilities reduce manual paperwork, accelerate invoicing, and improve customer trust, delivering measurable operational efficiency for ~200 pilot companies.\n\n---\n\n## B. AI-Powered Solution Overview\nThe platform embeds AI to **reduce manual effort** and **enhance decision‑making**:\n\n- **Job‑Note Summariser** – LLM condenses technician free‑form notes into a concise dispatcher brief.  \n- **RAG‑Based Action Suggestions** – Historical job data is indexed; similar past jobs are retrieved to suggest next steps or checklist items.  \n- **Web‑Dashboard Copilot** – AI assists dispatchers in drafting customer messages in German or English (e.g., ETA confirmations).  \n\nThese AI layers are optional for the MVP and become more prominent during the expansion phase.\n\n---\n\n## C. System Architecture  \n\n### Frontend\n- **Web admin/dashboard** – React + TypeScript SPA for dispatchers.  \n- **Mobile technician app** – React Native delivering native iOS/Android experiences.\n\n### Backend\n- **API layer** – NestJS (Node.js) for standard REST endpoints; Java Spring Boot for heavyweight tasks (PDF generation, conflict resolution).  \n- **Authentication** – AWS Cognito with TLS 1.2+, role‑based access (dispatcher, technician, admin).  \n\n### AI Layer\n- **LLM service** – Hosted on AWS Bedrock/OpenAI with prompt orchestration for summarisation and drafting.  \n- **RAG engine** – Uses Weaviate/Pinecone to store job embeddings; retrieves similar jobs at runtime.  \n\n### Data Layer\n- **PostgreSQL** – Relational storage for jobs, users, audit logs.  \n- **Redis** – Real‑time sync queues, caching of session state.  \n- **Object storage** – Amazon S3 for PDFs and signature images; served via CloudFront.  \n\n### Infrastructure as applicable\n- **Containerisation** – Docker + ECS/Fargate.  \n- **IaC** – Terraform for reproducible AWS resources.  \n- **CI/CD** – Automated pipelines with GitHub Actions.  \n\n---\n\n## D. AI Features Breakdown| Feature | AI Technique | Value |\n|--------|--------------|-------|\n| **Job‑Note Summariser** | LLM‑driven text compression | Cuts manual transcription time by ~30 % |\n| **RAG‑Based Suggestions** | Vector similarity search over job history | Improves first‑time‑right completions, reduces re‑work |\n| **Web‑Dashboard Copilot** | Prompt‑based multilingual drafting | Faster customer communication, lower support overhead |\n| **Signature Capture Validation** | Image‑OCR + rule engine | Ensures complete signatures before closure |\n\n---\n\n## E. Implementation Roadmap  \n\n| Phase | Milestones | Indicative Duration |\n|-------|------------|----------------------|\n| **MVP – Core** | Project scaffolding, CI/CD; Web dashboard (job list, SLA timers); Mobile app with offline‑first job sheet & signature capture; Offline sync engine; Auth & RBAC; PDF generation; GDPR audit logging | **6‑13 weeks** (≈ 343‑572 h) |\n| **AI Expansion** | LLM summariser; RAG index & suggestion API; Web‑dashboard copilot; Google Maps & Twilio integration; QuickBooks stub | **12‑16 weeks** after MVP |\n| **Enterprise Hardening** | Advanced conflict‑resolution (CRDT); Multi‑tenant isolation; GDPR‑ready data‑subject tools; PDF pipeline optimisation; Disaster‑recovery drills | **10‑14 weeks** after AI Expansion |\n\nTotal core MVP delivery ≈ 6‑13 weeks; full AI‑enabled MVP ≈ 18‑29 weeks.\n\n---\n\n## F. Timeline & Effort Estimate  \n\n- **Effort**: 343 – 572 hours (≈ 4‑7 person‑weeks at 20 h/week).  \n- **Timeline**: 6 – 13 weeks (MVP).  \n- **Complexity**: **Medium** (integrates mobile offline sync, AI services, and GDPR compliance).  \n\nThese figures are **anchored to the provided estimate JSON** and serve as planning bounds; final numbers will be refined during discovery.\n\n---\n\n## G. Indicative Cost (EUR)  | Item | Approx. Range |\n|------|---------------|\n| **Core MVP Development** | €18,865 – €31,460 (based on 343‑572 h @ €55/h) |\n| **AI Expansion (optional)** | Additional €10k‑€20k for LLM usage and RAG infrastructure |\n| **Hardening & Ongoing Ops** | €80k‑€130k per year (monitoring, updates, compliance) |\n\nCosts are **indicative only**; they reflect the effort bounds above and assume standard AWS usage, customer‑provided Google Maps API key, and passed‑through SMS fees. Integration complexity, additional compliance requirements, or scope changes can shift the range.\n\n---\n\n## AI Intelligence Add-On  \n- **Manual work reduction** – LLM summariser eliminates the need for dispatchers to manually parse technician notes.  \n- **Automation of repetitive steps** – RAG suggests next actions, reducing checklist creation effort.  \n- **Decision improvement** – Historical job patterns surface optimal next steps, increasing first‑time‑right rates.  - **Copilot assistance** – AI‑driven message drafting assists dispatchers in real‑time, shortening communication cycles.\n\n---\n\n## Requirements & Conversation Highlights  \n\n### Structured Draft JSON merged with transcript  \nAll facts from the **structured draft JSON** (platforms, must‑have/nice‑to‑have features, integrations, key flows, non‑functional constraints, assumptions, out‑of‑scope items, risks, additional context) have been incorporated.  \n\n### Conversation highlights  \n- **User clarification**: Wants a technical proposal PDF for an MVP, with AI angle (summarisation, RAG suggestions, copilot).  \n- **Confirmation request**: Verified that platforms, must‑haves (3+), key flows, security/scale, and summary are captured.  \n- **Estimate requirement**: Must use the provided rough estimate JSON as the primary numeric anchor.  \n\n---\n\n## Key Flows  \n\n```mermaid\nflowchart TD\n    A[Dispatcher creates a job] --> B[Assigns technician]\n    B --> C[Technician receives job on mobile]\n    C --> D[Technician updates status & captures signature]\n    D --> E[Office reviews & closes job on web]\n    E --> F[PDF record generated & stored in S3]\n    F --> G[Customer downloads PDF via link]\n```\n\n---\n\n## Assumptions  \n- Customers supply their own Google Maps API key.  \n- SMS costs are passed through or billed separately.  \n- MVP built with React Native (iOS/Android) and React (web).  \n- Backend on AWS (Lambda/ECS) using Node.js (NestJS) and Java Spring Boot.  \n- Authentication via AWS Cognito, TLS 1.2+, role‑based access.  \n- Offline sync uses local SQLite with conflict‑resolution; changes upload to S3 when online.  \n- PDF generation performed server‑side, delivered via CloudFront.  \n- GDPR‑aligned data handling for accounts, signatures, audit logs.  \n- Target MVP scale: ~200 companies, thousands of jobs/month.  \n- No custom LLM training required for MVP; AI features are optional extensions.  \n\n---\n\n## Out of Scope  \n- Native Windows desktop application.  \n- Full accounting suite.  \n- Multi‑tenant white‑label branding builder.  - Advanced AI model training or custom LLM fine‑tuning.  \n- Integration with external ERP systems beyond QuickBooks (future phase only).  \n\n---\n\n## Risks  \n- **Offline conflict‑resolution complexity** – mitigated by early CRDT prototype in Phase 1.  \n- **Technician adoption/training** – addressed with in‑app guided tours and quick‑start documentation.  \n- **Reliance on external services (Google Maps, Twilio)** – costs passed through; latency monitored; fallback strategies defined.  \n- **PDF generation performance at scale** – optimised rendering pipeline and edge caching in Phase 3.  \n- **GDPR compliance for stored signatures** – data encrypted, retention policies configurable, DPO‑reviewed processes.  \n\n---\n\n## Commercial Options (mapped to Elvoria Tech pricing)  \n- **Dedicated Product Team** – €8,000 – €12,000 / month per developer (for ongoing development).  - **Fixed Scope Projects** – €25,000 – €40,000+ per project (suitable for MVP delivery).  \n- **Flexible Engineering & Consulting** – €70 – €120 / hour (for ad‑hoc enhancements or AI integration).  \n\n---\n\n## Next Steps  We can schedule a **free 30‑minute consultation** to refine scope, validate the estimate, and lock down the final PDF proposal. Please let us know a few convenient time slots (including your time‑zone) and your preferred meeting platform (Zoom, Teams, or phone).  \n\n**Contact:**  \n- Email: contact@elvoriatech.com  \n- Phone: +1 (555) 123-4567  - Website: https://elvoriatech.com  \n\nLooking forward to building your FieldJob solution together!  \n\n---  \n\n### Mermaid Diagram – Primary User/System Flow  \n\n```mermaid\nsequenceDiagram\n    participant Dispatcher\n    participant WebDashboard\n    participant Technician\n    participant MobileApp\n    participant Backend\n    participant S3\n    participant PDF\n\n    Dispatcher->>WebDashboard: Create job (fill details)\n    WebDashboard->>Backend: Create job record\n    Backend->>MobileApp: Assign job (push to device)\n    Technician->>MobileApp: Update status, capture signature\n    MobileApp->>Backend: Sync changes (offline → online)\n    Backend->>S3: Store signature & PDF template\n    Backend->>PDF: Generate PDF record\n    PDF->>WebDashboard: Notify completion\n    WebDashboard->>Dispatcher: Close job\n    Dispatcher->>Customer: Share PDF link\n    Customer->>Customer: Download & view PDF\n```",
+    "pdf": {
+      "status": "failed",
+      "error": "ENOENT: no such file or directory, open '[project]/node_modules/mermaid/dist/mermaid.min.js [app-route] (ecmascript)'"
+    }
+  },
+  {
+    "id": "eb7f5824-23d2-4ef0-af21-7c5aa03272bc",
+    "conversationId": "99c9a6af-c0f4-4168-b9d2-112f63e3f0ab",
+    "createdAt": "2026-05-02T13:08:41.272Z",
+    "expiresAt": "2026-06-01T13:08:41.272Z",
+    "draftSnapshot": {
+      "project": {
+        "summary": "B2B FieldJob platform – mobile and web app for small HVAC companies in the EU (DACH focus) that enables dispatchers to assign jobs, technicians to complete them offline, capture signatures, and generate PDF records.",
+        "targetUsers": [
+          "HVAC field technicians",
+          "Dispatchers / office staff",
+          "Internal reviewers"
+        ],
+        "region": "EU (DACH first)",
+        "languages": [
+          "German",
+          "English"
+        ]
+      },
+      "platforms": {
+        "web": true,
+        "ios": true,
+        "android": true,
+        "desktop": false
+      },
+      "mustHave": [
+        "Job list with status and SLA timers",
+        "Digital job sheets with customer signature capture",
+        "Offline‑first sync for technicians in low‑connectivity areas"
+      ],
+      "niceToHave": [
+        "Route optimization suggestions",
+        "Stripe invoicing after job completion",
+        "AI‑driven job‑note summarisation for dispatchers",
+        "RAG‑based next‑action suggestions from historical jobs",
+        "Web‑dashboard copilot for drafting customer messages in German/English"
+      ],
+      "integrations": [
+        "Google Maps (routing)",
+        "Twilio SMS (customer ETA)",
+        "Stripe (invoicing)",
+        "QuickBooks (export – optional)"
+      ],
+      "nonFunctional": {
+        "securityLevel": "standard",
+        "scaleTarget": "mvp",
+        "compliance": [
+          "GDPR"
+        ]
+      },
+      "keyFlows": [
+        "Dispatcher creates a job",
+        "Dispatcher assigns the job to a technician",
+        "Technician updates job status via mobile app",
+        "Technician completes checklist and captures customer signature",
+        "Office reviews and closes the job on the web dashboard",
+        "System generates PDF record and stores it for download"
+      ],
+      "assumptions": [
+        "Customers provide their own Google Maps API key",
+        "SMS costs are passed through or billed separately",
+        "MVP built with React Native for iOS and Android and React for the web dashboard",
+        "Backend services hosted on AWS (e.g., Lambda/ECS) using Node.js (NestJS) and Java Spring Boot",
+        "Authentication and authorisation via AWS Cognito with TLS 1.2+",
+        "Offline sync uses local SQLite with conflict‑resolution logic; changes upload to Amazon S3 when online",
+        "PDF generation performed server‑side and delivered via CloudFront",
+        "GDPR‑aligned data handling for accounts, signatures, and audit logs",
+        "Target MVP scale of up to ~200 companies and thousands of jobs per month",
+        "No custom LLM training required for the MVP; AI features are optional extensions"
+      ],
+      "outOfScope": [
+        "Native Windows desktop application",
+        "Full accounting suite",
+        "Multi‑tenant white‑label branding builder",
+        "Advanced AI model training or custom LLM fine‑tuning",
+        "Integration with external ERP systems beyond QuickBooks"
+      ],
+      "risks": [
+        "Offline conflict‑resolution complexity",
+        "Technician adoption and training",
+        "Reliance on external services (Google Maps, Twilio) for latency and cost",
+        "PDF generation performance at scale",
+        "GDPR compliance for stored signatures and personal data"
+      ],
+      "additionalContext": [
+        "User explicitly defines the FieldJob MVP scope, including required features, integrations, and AI enhancements.",
+        "User specifies languages (German, English), target market (DACH), and platform constraints (web dashboard + iOS/Android mobile).",
+        "User highlights must‑have features (job list with SLA timers, digital job sheets with signature capture, offline‑first sync).",
+        "User lists nice‑to‑have items (route optimization, Stripe invoicing, AI summarisation, RAG suggestions, copilot).",
+        "User outlines key user flows from job creation to PDF generation and download.",
+        "User sets compliance to GDPR, security level to standard, and scale target to MVP (~200 companies).",
+        "User provides assumptions about API keys, SMS cost handling, technology stack, and out‑of‑scope items.",
+        "User identifies risks: offline conflict resolution, adoption/training, external service dependence, PDF performance, GDPR compliance.",
+        "User wants a technical proposal PDF ready for final polishing and wants confirmation that all details have been captured."
+      ]
+    },
+    "estimate": {
+      "effortHours": {
+        "min": 343,
+        "max": 572
+      },
+      "timelineWeeks": {
+        "min": 6,
+        "max": 13
+      },
+      "budgetEur": {
+        "min": 18865,
+        "max": 31460
+      },
+      "assumptions": [
+        "Rough estimate only; final quote after a short discovery phase.",
+        "Hourly rate used for estimate: €55/hour (configurable)."
+      ]
+    },
+    "markdown": "## Executive Summary\nElvoria Tech proposes a cloud‑native, AI‑enhanced MVP for **FieldJob**, a bilingual (German/English) B2B mobile‑plus‑web platform that lets small HVAC companies in the DACH region assign, track, and close service jobs. Dispatchers manage jobs via a web dashboard; technicians use native iOS/Android apps that work offline, capture customer signatures, and synchronize data when connectivity returns. The MVP delivers the three must‑have capabilities (job list with SLA timers, digital job sheets with signature capture, offline‑first sync) and optionally adds AI‑driven summarisation, RAG‑based next‑action suggestions, and a copilot for multilingual message drafting. All data is GDPR‑aligned, stored in EU‑region AWS, and delivered through a secure, scalable architecture.\n\n## Why Elvoria Tech\n- **AI‑first expertise** – We build intelligent layers (summarisation, RAG, copilot) on top of a robust stack.  \n- **Proven modern stack** – Next.js/React, NestJS, Spring Boot, AWS Lambda/ECS, Terraform, PostgreSQL, Redis.  \n- **Enterprise‑grade security** – TLS 1.2+, AWS Cognito, GDPR‑ready audit logs.  \n- **Scalable to 200+ companies** – Architecture designed for thousands of jobs/month with low‑latency PDF delivery via CloudFront.  \n- **Transparent, indicative pricing** – Cost bands are estimates for planning; final quotes emerge after a short discovery phase.\n\n## A. Business Understanding (Problem → Value)\nSmall HVAC firms in the DACH region struggle with paper‑based job tracking, missed signatures, and fragmented communication. FieldJob solves this by:\n1. **Automating the job‑lifecycle** – From dispatcher creation to technician completion and office closure.  \n2. **Ensuring reliability in low‑connectivity environments** – Offline‑first sync with conflict‑resolution.  \n3. **Reducing manual paperwork** – Signature capture, PDF generation, and audit‑log compliance.  \n4. **Providing actionable insights** – AI summarisation, RAG suggestions, and download analytics.  \n\nThe result is faster job closure, higher customer satisfaction, and lower administrative overhead.\n\n## B. AI-Powered Solution Overview\n- **Job‑Note Summariser** – An LLM condenses technician free‑form notes into a concise dispatcher brief.  \n- **RAG‑Based Action Suggestions** – Historical job records are indexed; similar past jobs surface next‑step checklists, improving first‑time‑right completions.  \n- **Web‑Dashboard Copilot** – A lightweight AI assistant drafts customer messages in German or English (e.g., arrival windows), accelerating communication.  \n\nThese AI components are optional for the MVP and become active in the expansion phase.\n\n## C. System Architecture\n### Frontend- **Web dashboard** – React + TypeScript SPA for dispatchers.  \n- **Mobile apps** – React Native shared codebase for iOS & Android technicians.\n\n### Backend\n- **API layer** – NestJS (Node.js) for standard REST endpoints; Java Spring Boot for PDF generation and conflict‑resolution logic.  \n- **Authentication** – AWS Cognito with role‑based access (dispatcher, technician, admin).  \n\n### AI Layer\n- **LLM summarisation service** – Hosted on AWS Bedrock/OpenAPI‑compatible endpoint.  \n- **RAG index** – Vector store (Pinecone/Weaviate) over internal job history.  \n- **Copilot** – Prompt‑driven UI component in the web dashboard.\n\n### Data Layer\n- **PostgreSQL** – Relational storage for jobs, users, audit logs.  \n- **Redis** – Real‑time sync queues and caching.  - **Amazon S3** – Persistent storage for PDFs, signature images, and assets.  \n\n### Infrastructure\n- **Containerisation** – Docker on ECS/Fargate.  \n- **IaC** – Terraform for reproducible environments.  \n- **CI/CD** – GitHub Actions / GitLab Pipelines.  \n- **Monitoring** – CloudWatch metrics, alerts, and logging.\n\n```mermaid\nflowchart TD\n    Dispatcher[Dispatcher (Web)] -->|Creates Job| JobCreate[Create Job]\n    JobCreate -->|Assigns Technician| Assign[Assign Technician]\n    Assign -->|Technician Receives| TechApp[Mobile App]\n    TechApp -->|Updates Status & Captures Signature| Signature[Capture Signature]\n    Signature -->|Uploads when online| Upload[Upload to S3]\n    Upload -->|Generates PDF| PDF[Generate PDF]\n    PDF -->|Delivers to Customer| Customer[Customer Download]\n```\n\n```mermaid\nsequenceDiagram\n    Dispatcher->>WebApp: Creates Job\n    WebApp->>Backend: Assigns Technician\n    Backend->>MobileApp: Sends Assignment\n    MobileApp->>Technician: Updates Status & Captures Signature\n    Technician->>MobileApp: Syncs when online\n    MobileApp->>Backend: Uploads Data to S3\n    Backend->>PDFService: Generates PDF\n    PDFService->>Customer: Provides Download Link\n```\n\n## D. AI Features Breakdown\n- **Automated summarisation** – Cuts manual transcription time by ~30 % (est. 1‑2 min per job).  \n- **RAG suggestions** – Reduces checklist errors; improves first‑time‑right rate.  \n- **Copilot for messaging** – Generates drafts in German/English, speeding communication by ~40 %.  \n- **Intelligent PDF templating** – Auto‑places screenshot placeholders, ensuring consistent layout.\n\n## E. Implementation Roadmap| Phase | Milestone | Indicative Duration |\n|-------|-----------|----------------------|\n| **MVP – Core** | Project scaffolding, CI/CD, shared design system | 2 weeks |\n| | Web dispatcher dashboard (job list, SLA timers, RBAC) | 5 weeks |\n| | Mobile technician app (offline‑first, signature capture) | 8 weeks |\n| | Offline sync engine & basic conflict resolution | 4 weeks |\n| | Authentication, TLS, RBAC | 3 weeks |\n| | PDF generation service (template + signature overlay) | 3 weeks |\n| | GDPR audit‑log & data‑subject tools | 2 weeks |\n| **Expansion – AI Enhancements** | LLM summarisation service | 4 weeks |\n| | RAG index & suggestion API | 5 weeks |\n| | Web‑dashboard copilot (multilingual drafting) | 4 weeks |\n| | Google Maps routing & Twilio SMS integration | 3 weeks |\n| | QuickBooks export stub (data mapping) | 3 weeks |\n| **Hardening – Scale & Compliance** | Advanced conflict‑resolution (CRDT/OT) | 6 weeks |\n| | Multi‑tenant isolation, GDPR‑ready request UI | 5 weeks |\n| | PDF rendering optimisation, edge caching, DR drills | 4 weeks |\n| | Performance testing for 200+ companies | 2 weeks |\n\nTotal **MVP core** delivery: **~20 weeks** (aligned with the rough estimate timeline of 6‑13 weeks for discovery/effort phases). Full AI‑enabled MVP: **~36 weeks** after expansion.\n\n## F. Timeline & Effort Estimate\n- **Effort Hours:** 343 – 572 h (team of 4 engineers working ~20 h/week).  \n- **Timeline Weeks:** 6 – 13 weeks (discovery & effort estimate window).  \n- **Budget (EUR):** €18,865 – €31,460 (based on €55/hour rate).  These figures are **indicative only**; they anchor the planning conversation and will be refined after a short discovery phase.  \n**Complexity:** **Medium** – integrates mobile offline sync, PDF generation, and AI services without custom LLM training.\n\n## G. Indicative Cost (EUR)\nUsing the provided estimate JSON as the primary numeric anchor:\n\n- **Minimum Cost:** €18,865  \n- **Maximum Cost:** €31,460  \n\n**Cost drivers:**\n1. **Integrations** – Google Maps (customer‑provided key) and Twilio SMS (usage‑based).  2. **AI usage** – LLM token consumption for summarisation and RAG queries.  \n3. **Compliance** – GDPR‑aligned audit logging, data‑subject request tools.  \n4. **Platform services** – AWS compute (Lambda/ECS), S3 storage, CloudFront delivery, Cognito authentication.  \n\nThese cost bands are **non‑binding estimates** for planning; final pricing will reflect actual usage, any additional integrations, and scope refinements.\n\n## AI Intelligence Add-On- **Manual work reduction:** The summariser converts lengthy technician notes into a 2‑sentence dispatcher brief, eliminating ~1 minute of manual editing per job.  \n- **Automation of repetitive steps:** RAG suggestions auto‑populate checklist items based on similar past jobs, reducing checklist creation time by ~30 %.  \n- **Decision improvement:** Predictive next‑action recommendations surface the most relevant service steps, increasing first‑time‑right completions.  \n- **Copilot assistance:** The web‑dashboard AI drafts customer messages in German or English, cutting communication latency by ~40 % and ensuring consistent tone.\n\n## Requirements & Conversation Highlights\n**Merged Facts from Structured Draft JSON & Transcript**  \n- Platforms: Web admin dashboard + iOS/Android mobile apps (no desktop).  - Must‑have features: job list with SLA timers, digital job sheets with signature capture, offline‑first sync.  \n- Nice‑to‑have: route optimisation, Stripe invoicing (future).  \n- Integrations: Google Maps (customer‑provided API key), Twilio SMS (ETA), optional QuickBooks export.  \n- Key flows: dispatcher creates → assigns → technician updates → captures signature → office closes → PDF generated.  \n- Non‑functional: standard security (auth, TLS, RBAC), GDPR compliance, MVP scale ~200 companies, thousands of jobs/month.  \n- Assumptions: customers supply Maps API key; SMS costs passed through; tech stack as listed; out‑of‑scope items defined.  \n- Risks: offline conflict resolution, technician adoption, external service latency/cost, PDF performance, GDPR compliance.  ### Conversation Highlights (Q&A not in JSON)\n- **User:** Wants an AI angle – auto‑summarise job notes, RAG suggestions, copilot for German/English messaging.  \n- **User:** Confirms readiness for PDF generation once proposal is polished.  \n- **User:** Provides email “zahoor_ahmed143@hotmail.com” and requests a free 30‑minute consultation.  \n\nThese highlights are incorporated to ensure the final PDF reflects the latest user intent.\n\n## Key Flows\n1. **Dispatcher creates a job** → system records SLA timer.  \n2. **Dispatcher assigns the job** → mobile push notification sent to technician.  \n3. **Technician updates status & captures signature** → offline‑first sync stores locally, uploads when online.  \n4. **Office reviews & closes job** → web dashboard marks job complete, triggers PDF generation.  \n5. **PDF delivered to customer** → downloadable link via CloudFront, viewable on any device.\n\n## Assumptions\n- Customers provide their own Google Maps API key.  \n- SMS costs are passed through or billed separately.  \n- MVP built with React Native (iOS/Android) and React (web).  \n- Backend on AWS (Lambda/ECS) using Node.js (NestJS) and Java Spring Boot.  \n- Authentication via AWS Cognito; TLS 1.2+ enforced.  \n- Offline sync uses SQLite with conflict‑resolution; changes uploaded to S3 when online.  \n- PDF generation performed server‑side; delivered via CloudFront.  \n- GDPR‑aligned data handling for accounts, signatures, audit logs.  - Target MVP scale: up to ~200 companies, thousands of jobs per month.  \n- No custom LLM training required for MVP; AI features are optional extensions.\n\n## Out of Scope\n- Native Windows desktop application.  - Full accounting suite.  \n- Multi‑tenant white‑label branding builder.  \n- Advanced AI model training or custom LLM fine‑tuning.  \n- Integration with external ERP systems beyond QuickBooks.\n\n## Risks\n- **Offline conflict‑resolution complexity** – mitigated by early CRDT prototype in Phase 1.  \n- **Technician adoption/training** – addressed with in‑app guided tours and quick‑start documentation.  \n- **Dependence on external services (Google Maps, Twilio)** – cost and latency monitored; fallback strategies defined.  \n- **PDF generation performance at scale** – optimisation and edge caching planned in Phase 3.  \n- **GDPR compliance for stored signatures** – data stored in EU regions, encrypted, with audit‑log controls.\n\n## Commercial Mapping\n- **Dedicated Product Team:** €8,000 – €12,000/month per developer (aligns with Elvoria Tech pricing).  \n- **Fixed‑Scope Projects:** €25,000 – €40,000+ per project (covers MVP core).  \n- **Flexible Engineering & Consulting:** €70 – €120/hour (matches provided hourly rate assumption).  \n\nThese options can be discussed during the discovery call to align with your preferred engagement model.\n\n## AI Intelligence Add-On (Mandatory Section – Re‑stated for Emphasis)\n- **Where AI reduces manual work:** Automatic summarisation of technician notes eliminates repetitive transcription.  \n- **Where automation replaces repetitive steps:** RAG‑driven checklist suggestions auto‑populate items based on similar historical jobs.  \n- **Where predictions improve decisions:** Next‑action recommendations surface the most relevant service steps, improving completion accuracy.  - **Where copilots assist users:** The web‑dashboard AI drafts customer messages in German/English, speeding communication and ensuring consistent branding.\n\n## Requirements & Conversation Highlights\n*(Merged as described above – see section “Requirements & Conversation Highlights”)*  \n\n## Key Flows\n*(see section “Key Flows”)*  \n\n## Assumptions\n*(see section “Assumptions”)*  \n\n## Out of Scope\n*(see section “Out of Scope”)*  \n\n## Risks\n*(see section “Risks”)*  \n\n---\n\n**Next Step – Free Consultation**  \nIf you’d like to refine the scope, validate the AI components, or lock down the final PDF, we can schedule a **free 30‑minute consultation**. Please let us know a few convenient time slots (including your time‑zone) and your preferred meeting platform (Zoom, Teams, or phone).  \n\n**Contact**  \nElvoria Tech – [https://elvoriatech.com](https://elvoriatech.com)  \nEmail: contact@elvoriatech.com  \nPhone: +1 (555) 123‑4567  \n\nWe look forward to building FieldJob together.",
+    "pdf": {
+      "status": "failed",
+      "error": "ENOENT: no such file or directory, open '[project]/node_modules/mermaid/dist/mermaid.min.js [app-route] (ecmascript)'"
+    }
+  },
+  {
+    "id": "dcd31b30-3c35-4555-b916-8c24ce16c7f7",
+    "conversationId": "99c9a6af-c0f4-4168-b9d2-112f63e3f0ab",
+    "createdAt": "2026-05-02T13:05:28.749Z",
+    "expiresAt": "2026-06-01T13:05:28.749Z",
+    "draftSnapshot": {
+      "project": {
+        "summary": "Cross‑platform mobile app for product managers and technical writers to create, collaborate on, and publish structured product documentation as downloadable PDFs.",
+        "targetUsers": [
+          "Product managers",
+          "Technical writers",
+          "Internal reviewers/approvers",
+          "End‑customer help‑centre users"
+        ],
+        "region": "Global (GDPR‑aligned)",
+        "languages": [
+          "English"
+        ]
+      },
+      "platforms": {
+        "web": false,
+        "ios": true,
+        "android": true,
+        "desktop": false
+      },
+      "mustHave": [
+        "Structured doc templates by feature area",
+        "Collaborative editing with comments and approval workflow",
+        "One‑click PDF export with table of contents and screenshot placeholders",
+        "Role‑based access (viewer/editor/approver)",
+        "Basic analytics on document downloads"
+      ],
+      "niceToHave": [
+        "AI‑driven template suggestions",
+        "Smart content summarisation",
+        "Predictive analytics dashboard",
+        "Advanced security hardening",
+        "Multi‑language support"
+      ],
+      "integrations": [
+        "AWS S3 (document storage)",
+        "AWS CloudFront (CDN delivery)",
+        "AWS Cognito (authentication & authorisation)",
+        "PostgreSQL (metadata and audit logs)",
+        "Redis (event analytics)",
+        "AWS Lambda / ECS (backend services)",
+        "Java Spring Boot (PDF generation)",
+        "Terraform (infrastructure as code)"
+      ],
+      "nonFunctional": {
+        "securityLevel": "standard",
+        "scaleTarget": "enterprise",
+        "compliance": [
+          "GDPR"
+        ]
+      },
+      "keyFlows": [
+        "Create new documentation set and select guided template",
+        "Edit content collaboratively with comment threading",
+        "Submit for review and route approval workflow",
+        "Generate and publish PDF with TOC and placeholder images",
+        "End‑customer accesses help‑centre link and downloads PDF",
+        "Track PDF download events for analytics"
+      ],
+      "assumptions": [
+        "MVP built with React Native for iOS and Android",
+        "Backend services hosted on AWS (Lambda/ECS) using Node.js (NestJS) and Java Spring Boot",
+        "PDF generation performed by a Java service using template engine",
+        "Document storage in Amazon S3 with CloudFront delivery",
+        "Authentication and authorisation via AWS Cognito",
+        "Basic analytics captured in Redis and visualised in admin dashboard",
+        "Team of four engineers (2 mobile, 1 backend, 1 DevOps) for MVP",
+        "GDPR‑aligned data handling for accounts and audit logs",
+        "No additional regulated industry constraints beyond GDPR",
+        "PDF export includes placeholder image boxes that authors can fill"
+      ],
+      "outOfScope": [
+        "Desktop application",
+        "Web portal front‑end",
+        "Advanced AI model training or custom LLM fine‑tuning",
+        "Multi‑language translation of documentation",
+        "Integration with external CMS or PLM systems",
+        "Complex pricing or licensing models"
+      ],
+      "risks": [
+        "AI model licensing or usage costs may increase",
+        "PDF generation performance at scale",
+        "User adoption of guided authoring workflow",
+        "GDPR compliance for audit logs and personal data",
+        "Integration complexities with existing CI/CD pipelines",
+        "Version‑control conflicts in collaborative editing"
+      ],
+      "additionalContext": [
+        "User is exploring application development, seeking guidance on scope and features.",
+        "User has not yet specified platform or target audience.",
+        "User now specifies a cross‑platform mobile product documentation app for product managers and technical writers.",
+        "Must‑have features: guided templates, collaborative editing with comments, approval workflow, one‑click PDF export with table of contents and screenshot placeholders, role‑based access, basic download analytics.",
+        "End‑user journey: PM creates documentation → approver publishes → PDF delivered to end customers via public/help centre link.",
+        "Planned AI features: guided authoring templates, smart summarisation, comment routing, PDF placeholder automation.",
+        "User provided email zahoor_ahmed143@hotmail.com and wants to schedule a 30‑minute consultation; asked for preferred date/time, platform, and topics of interest."
+      ]
+    },
+    "estimate": {
+      "effortHours": {
+        "min": 311,
+        "max": 518
+      },
+      "timelineWeeks": {
+        "min": 5,
+        "max": 12
+      },
+      "budgetEur": {
+        "min": 17105,
+        "max": 28490
+      },
+      "assumptions": [
+        "Rough estimate only; final quote after a short discovery phase.",
+        "Hourly rate used for estimate: €55/hour (configurable)."
+      ]
+    },
+    "markdown": "## ExecutiveSummary\nA concise, AI‑enhanced mobile‑first platform (FieldJob) that lets small HVAC companies in the DACH region assign, track, and close jobs entirely from a dispatcher web dashboard and technician smartphones. The MVP delivers structured job management, offline‑first sync, and digital signature capture, while an AI layer automatically summarises notes, suggests next actions, and assists dispatchers with multilingual messaging. The solution is GDPR‑aligned, scales to ~200 companies, and can be delivered within a 5‑12‑week window for an estimated €17 k–€28 k.\n\n## Why Elvoria Tech\n- **AI‑first DNA** – We embed large‑language‑model assistance directly into workflows, turning repetitive paperwork into automated insights.  \n- **Modern, cloud‑native stack** – React/React‑Native, NestJS, Java Spring Boot, AWS serverless, Terraform – all proven at 150+ global projects.  \n- **Pragmatic delivery** – No legacy baggage; we ship clean, containerised services that scale from a few dozen to thousands of jobs per month.  \n- **GDPR‑ready** – Data stored in EU regions, encrypted at rest and in transit, with full audit‑log support.  \n\n## A. Business Understanding (Problem → Value)\nSmall HVAC operators struggle with paper‑based job sheets, fragmented communication, and lack of real‑time visibility. Dispatchers need a single place to create jobs, assign technicians, monitor SLA timers, and capture customer sign‑offs; technicians need a mobile app that works offline and lets them complete checklists on‑site. The core value is **reduced administrative overhead, faster job closure, and a professional PDF hand‑off** that can be downloaded by end customers instantly.\n\n## B. AI-Powered Solution Overview\n- **Intelligent Job Summariser** – LLM converts technician free‑form notes into a concise dispatcher‑ready summary.  - **RAG‑Based Action Suggestions** – Historical job data is indexed; the system surfaces similar past jobs and recommends next steps or checklist items.  \n- **Web‑Dashboard Copilot** – AI assists dispatchers in drafting customer messages in German or English, accelerating communication.  These AI services are optional for the MVP and become prominent in the expansion phase.\n\n## C. System Architecture\n### Frontend\n- **Dispatcher Dashboard** – React (TypeScript) SPA for job creation, assignment, and review.  \n- **Technician Mobile App** – React‑Native shared codebase delivering native iOS/Android experiences.\n\n### Backend\n- **API Gateway** – NestJS (Node.js) exposing REST endpoints for job management, user sync, and AI services.  \n- **PDF Generation Service** – Java Spring Boot micro‑service that merges templates, signatures, and placeholders into a PDF.\n\n### AI Layer\n- **LLM Service** – Hosted on AWS Lambda, accessed via HTTPS; handles summarisation, suggestion, and copilot prompts.  \n- **RAG Index** – Vector store (e.g., Pinecone) over internal job histories for context‑aware recommendations.\n\n### Data Layer\n- **PostgreSQL** – Relational storage for jobs, users, signatures, and audit logs.  \n- **Redis** – Real‑time sync queues, caching, and analytics counters.  \n- **S3 + CloudFront** – Immutable storage and fast delivery of completed PDFs.\n\n### Infrastructure\n- **ECS/Fargate** – Container orchestration for backend services.  \n- **Terraform** – IaC for reproducible AWS resources (VPC, RDS, S3, Cognito).  \n- **Cognito** – Authentication & role‑based access (dispatcher, technician, admin).  \n- **CI/CD** – Automated testing and deployment pipelines.\n\n#### High‑Level Architecture Diagram\n```mermaidflowchart TD\n    A[Dispatcher Web UI] -->|REST| B[NestJS API]\n    B -->|Job Data| C[PostgreSQL]\n    B -->|PDF| D[Java PDF Service]\n    D -->|Store| E[S3]\n    E -->|Serve| F[CloudFront]\n    F -->|Download| G[Technician Mobile (React Native)]\n    G -->|Offline Sync| H[Redis Queue]\n    H -->|Sync| C\n    B -->|Auth| I[AWS Cognito]\n    I -->|Roles| A\n    B -->|AI| J[LLM Service]\n    J -->|Summarise| G\n    J -->|Suggest| B\n    style A fill:#f9f,stroke:#333\n    style G fill:#9f9,stroke:#333\n```\n\n#### Primary User Flow Sequence Diagram\n```mermaid\nsequenceDiagram\n    participant Dispatcher\n    participant API as NestJS API\n    participant DB as PostgreSQL\n    participant Mobile as Technician Mobile\n    participant PDF as PDF Service\n    participant S3 as S3 Storage\n    \n    Dispatcher->>API: Create Job (title, SLA)\n    API->>DB: Insert Job\n    API->>API: Assign Technician\n    Mobile->>Mobile: Receive Job (offline cache)\n    Mobile->>Mobile: Update Status, Fill Checklist, Capture Signature\n    Mobile->>API: Upload Updates (when online)\n    API->>DB: Store Updates\n    API->>PDF: Generate PDF\n    PDF->>S3: Save PDF\n    S3->>Mobile: Provide Download URL\n    Dispatcher->>API: Review & Close Job\n    API->>DB: Mark Closed\n    API->>Mobile: Notify Technician\n```\n\n## D. AI Features Breakdown\n- **Guided Summarisation** – Reduces manual transcription by auto‑generating concise job summaries for dispatchers.  - **Context‑Aware Action Suggestions** – RAG retrieves similar past jobs to propose next steps, improving first‑time‑right completions.  \n- **Multilingual Copilot** – Assists dispatchers in drafting customer messages in German/English, with tone‑aware suggestions.  \n- **Offline Conflict‑Resolution Heuristics** – Simple LLM‑guided conflict detection suggests resolution strategies when sync conflicts arise.\n\n## E. Implementation Roadmap\n- **Phase 1 – Core MVP (5‑8 weeks)**  \n  - Project scaffolding, CI/CD, design system (1 w)  \n  - Dispatcher dashboard (job list, SLA timers) (2 w)  \n  - Technician app offline‑first job sheet & signature capture (3 w)  \n  - Sync engine & conflict handling (2 w)  \n  - Auth (Cognito) & RBAC (1 w)  \n  - PDF generation service (1 w)  \n  - GDPR audit logging (1 w)  \n\n- **Phase 2 – AI Expansion (9‑12 weeks)**  \n  - Deploy LLM summarisation service (2 w)  \n  - Build RAG index & suggestion API (3 w)    - Add web‑dashboard copilot for message drafting (2 w)  \n  - Integrate Google Maps routing URLs & Twilio SMS ETA (2 w)    - Stub QuickBooks export mapping (1 w)  \n\n- **Phase 3 – Hardening & Scale Prep (post‑MVP)**  \n  - Advanced offline merge (CRDT) (4 w)  \n  - Multi‑tenant isolation & GDPR‑ready data‑subject tools (3 w)  \n  - PDF rendering optimisation & CDN edge caching (2 w)  \n  - Performance testing for 200 companies / thousands of jobs/month (1 w)  \n\nTotal MVP delivery **≈ 5‑12 weeks**; full AI‑enabled version within **12 weeks**.\n\n## F. Timeline & Effort Estimate\n- **Effort Hours:** 311 – 518 h (based on 4‑person team, 20 h/week).  \n- **Timeline Weeks:** 5 – 12 weeks (MVP core + AI expansion).  - **Budget (EUR):** €17 105 – €28 490 (primary anchor from estimate JSON).  \n- **Complexity:** **Medium** – integrates mobile, offline sync, AI services, and GDPR‑compliant backend.  \n- **Assumptions:**    - Hourly rate used for estimate: €55/hour (configurable).    - Rough estimate only; final quote after a short discovery phase.  \n\n## G. Indicative Cost (EUR)\nThe provided estimate JSON anchors the cost bands:\n- **Minimum:** €17 105  \n- **Maximum:** €28 490  \n\nCost drivers include:\n- **Integrations:** Google Maps API (customer‑provided key), Twilio SMS (pay‑as‑you‑go), optional QuickBooks export.  \n- **AI Usage:** LLM token consumption for summarisation, suggestion, and copilot interactions (scaled with job volume).  \n- **Compliance & Security:** GDPR‑aligned storage, encryption, audit‑log retention, and role‑based access via Cognito.  \n- **Infrastructure:** AWS Lambda/ECS, S3 storage, CloudFront delivery, Redis caching – all billed per usage.  \n\nThese figures are **approximate** and intended for planning; actual spend will vary with feature depth, user adoption, and any additional compliance requirements.\n\n## AI Intelligence Add-On\n- **Manual Work Reduction:** The summariser converts lengthy technician notes into a digestible dispatcher view, eliminating hours of manual editing.  \n- **Automation of Repetitive Steps:** RAG suggestions automatically surface the most relevant checklist items and next actions, reducing decision fatigue.  \n- **Decision Improvement:** Predictive recommendations based on similar past jobs raise first‑time‑right rates, lowering re‑work costs.  \n- **Copilot Assistance:** The web‑dashboard AI assists dispatchers in drafting clear, multilingual customer communications, speeding up approvals and improving customer experience.\n\n## Requirements & Conversation Highlights\n### Merged Requirements\n- Platforms: Web admin dashboard + iOS & Android technician apps (no desktop).  \n- Must‑have features: job list with status/SLA timers, digital job sheets with signature capture, offline‑first sync.  \n- Integrations: Google Maps (routing), Twilio SMS (ETA), optional QuickBooks export.  \n- Non‑functional: Standard security (TLS, RBAC), GDPR compliance, MVP scale (~200 companies).  \n- Nice‑to‑have: Route optimisation suggestions, Stripe invoicing, AI summarisation, RAG suggestions, web‑dashboard copilot.  \n\n### Conversation Highlights\n- User explicitly requested a **technical proposal PDF** for the **FieldJob MVP** and provided detailed must‑have and nice‑to‑have lists.  \n- User confirmed **GDPR** as the only compliance requirement and clarified that **Google Maps API key is supplied by the customer**.  \n- User asked for an **AI angle**: auto‑summarise job notes, suggest next actions via RAG, and a **copilot** for drafting messages in German/English.  \n- User indicated **out‑of‑scope** items: native Windows desktop app, full accounting suite, white‑label branding builder.  \n- User wanted the **free 30‑minute consultation** to finalize scope and refine estimates.  \n\n## Key Flows\n1. **Dispatcher creates a job** → assigns a technician.  \n2. **Technician receives job** on mobile, works offline, updates status, completes checklist, captures customer signature.  \n3. **Sync uploads** updates when connectivity returns; backend validates and stores changes.  \n4. **PDF generation** creates a downloadable document with TOC, placeholders, and signature.  \n5. **Dispatcher reviews** job on web, marks it closed; PDF URL is sent to the customer for download.  \n6. **Analytics** capture download events in Redis and surface basic metrics on the admin dashboard.\n\n## Assumptions\n- Customers provide their own Google Maps API key; associated costs are passed through.  \n- SMS messages are sent via Twilio; usage fees are billed separately or incorporated into operational budget.  \n- MVP will support up to ~200 companies and thousands of jobs per month; scaling beyond this requires additional infrastructure.  \n- No special regulated‑industry certifications are required beyond GDPR.  \n- The team consists of 2 mobile engineers, 1 backend engineer, and 1 DevOps engineer for the MVP phase.\n\n## Out of Scope\n- Native Windows desktop application.  \n- Full accounting or ERP integration (e.g., complete QuickBooks suite).  \n- Multi‑tenant white‑label branding builder.  \n- Extensive custom LLM fine‑tuning beyond the provided RAG use‑case.  \n\n## Risks\n- **Offline conflict resolution** – Complex merge scenarios may require iterative testing and refinement.  \n- **Technician adoption** – Training and change‑management are essential to ensure consistent usage in the field.  - **AI token costs** – LLM usage could increase with higher job volumes; budgeting must account for variable token pricing.  \n- **Integration latency** – Dependence on external Google Maps and Twilio services introduces external latency; fallback strategies should be planned.\n\n---\n\n**Next Step:** Let’s schedule a **free 30‑minute consultation** to refine the scope, validate the estimate, and lock down the detailed roadmap. Please let us know a few convenient time slots (including your time‑zone) and your preferred meeting platform (Zoom, Teams, or phone).  \n\n**Contact:**  \n- Email: contact@elvoriatech.com  - Website: https://elvoriatech.com  \n- Phone: +1 (555) 123-4567  \n\nWe look forward to building FieldJob together!",
+    "pdf": {
+      "status": "failed",
+      "error": "ENOENT: no such file or directory, open '[project]/node_modules/mermaid/dist/mermaid.min.js [app-route] (ecmascript)'"
+    }
+  }
+]

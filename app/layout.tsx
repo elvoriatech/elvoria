@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Sans, Inter } from "next/font/google";
 import { ThemeSwitcher } from "./components/ThemeSwitcher";
+import { ProposalChatWidget } from "./components/ProposalChatWidget";
 import "./globals.css";
 import "./fonts.css";
 import "./index.css";
@@ -18,7 +19,7 @@ const plexSans = IBM_Plex_Sans({
 
 export const metadata: Metadata = {
   title: {
-    default: "Elvoriatech - AI-First Development Partner",
+    default: "Elvoriatech - AI-First Digital & Software Development Partner",
     template: "%s | Elvoriatech",
   },
   description: "Premium software development for startups and enterprises. We build SaaS platforms, AI solutions, and cloud-native applications.",
@@ -40,7 +41,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${plexSans.variable} h-full antialiased scroll-smooth`}
+      className={`${inter.variable} ${plexSans.variable} theme-elvoria dark h-full antialiased scroll-smooth`}
       suppressHydrationWarning
     >
       <head>
@@ -50,12 +51,13 @@ export default function RootLayout({
         <script
           // Apply theme before paint to avoid flash.
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var k='elvoriatech:theme';var v=localStorage.getItem(k)||'elvoria-dark';var root=document.documentElement;['dark','theme-elvoria'].forEach(function(c){root.classList.remove(c);});root.classList.add('theme-elvoria');if(v==='elvoria-light'){root.classList.remove('dark');}else if(v==='elvoria-system'){var m=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)');root.classList.toggle('dark',!!(m&&m.matches));}else{root.classList.add('dark');}}catch(e){}})();`,
+            __html: `(function(){try{var k='elvoriatech:theme';var v=localStorage.getItem(k)||'elvoria-dark';if(v!=='elvoria-light')v='elvoria-dark';var root=document.documentElement;['dark','theme-elvoria'].forEach(function(c){root.classList.remove(c);});root.classList.add('theme-elvoria');if(v==='elvoria-light'){root.classList.remove('dark');}else{root.classList.add('dark');}}catch(e){}})();`,
           }}
         />
       </head>
       <body className="min-h-full flex flex-col">
         {children}
+        <ProposalChatWidget />
         <ThemeSwitcher />
       </body>
     </html>

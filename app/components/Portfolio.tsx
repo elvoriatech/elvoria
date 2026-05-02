@@ -4,6 +4,7 @@ import {
   Clock,
   Euro,
   Plane,
+  TrendingDown,
   TrendingUp,
   Users,
   UtensilsCrossed,
@@ -73,7 +74,7 @@ const caseStudies = [
     description:
       'Scalable B2B/B2C marketplace platform with real-time inventory, advanced search, and payment integration serving global merchants.',
     kpis: [
-      { value: '35%', label: 'Infrastructure Cost ↓', icon: Euro },
+      { value: '35%', label: 'Infrastructure cost reduction', icon: TrendingDown },
       { value: '0.8s', label: 'Page Load Time', icon: Clock },
       { value: '€8M', label: 'GMV/Month', icon: TrendingUp },
       { value: '1,800+', label: 'Active Vendors', icon: Users },
@@ -87,17 +88,17 @@ export function Portfolio() {
   return (
     <section
       id="portfolio"
-      className="py-24 bg-linear-to-b from-[#0F172A] to-[#1E293B]"
+      className="py-24 bg-background dark:bg-linear-to-b dark:from-[#0F172A] dark:to-[#1E293B]"
     >
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-16">
           <div className="inline-block px-4 py-2 bg-[#06B6D4]/10 border border-[#06B6D4]/30 rounded-full mb-6">
             <span className="text-sm text-[#06B6D4] font-semibold">PROVEN IMPACT</span>
           </div>
-          <h2 className="text-5xl md:text-6xl mb-6 bg-linear-to-r from-[#F8FAFC] to-[#06B6D4] bg-clip-text text-transparent font-bold">
+          <h2 className="text-5xl md:text-6xl mb-6 bg-linear-to-r from-foreground to-[#06B6D4] bg-clip-text text-transparent font-bold">
             Enterprise Success Stories
           </h2>
-          <p className="text-xl text-slate-300 max-w-3xl mx-auto font-light">
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto font-light">
             KPI-driven results from mission-critical systems deployed across global enterprises
           </p>
         </div>
@@ -106,7 +107,7 @@ export function Portfolio() {
           {caseStudies.map((study, index) => (
             <div
               key={index}
-              className="group p-8 bg-linear-to-br from-[#1E293B] to-[#0F172A] border border-slate-700/50 rounded-2xl hover:border-[#06B6D4]/50 transition-all duration-300"
+              className="group p-8 bg-card border border-border/60 rounded-2xl hover:border-[#06B6D4]/50 transition-all duration-300 dark:bg-linear-to-br dark:from-[#1E293B] dark:to-[#0F172A] dark:border-slate-700/50"
             >
               <div className="grid lg:grid-cols-5 gap-8">
                 <div className="lg:col-span-2">
@@ -117,15 +118,15 @@ export function Portfolio() {
                       <study.icon className="w-8 h-8 text-white" />
                     </div>
                     <div>
-                      <h3 className="text-2xl font-bold text-[#F8FAFC] mb-1">{study.name}</h3>
+                      <h3 className="text-2xl font-bold text-foreground mb-1">{study.name}</h3>
                       <div className="text-sm text-[#06B6D4] font-semibold mb-2">{study.industry}</div>
-                      <div className="text-slate-400 italic">{study.tagline}</div>
+                      <div className="text-muted-foreground italic">{study.tagline}</div>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
                     {study.kpis.map((kpi, i) => (
-                      <div key={i} className="p-4 bg-[#0F172A]/50 border border-slate-700/30 rounded-lg">
+                      <div key={i} className="p-4 bg-muted/40 border border-border/60 rounded-lg dark:bg-[#0F172A]/50 dark:border-slate-700/30">
                         <div className="flex items-center gap-2 mb-1">
                           <kpi.icon className="w-4 h-4 text-[#06B6D4]" />
                           <div
@@ -134,7 +135,7 @@ export function Portfolio() {
                             {kpi.value}
                           </div>
                         </div>
-                        <div className="text-xs text-slate-400 font-medium">{kpi.label}</div>
+                        <div className="text-xs text-muted-foreground font-medium">{kpi.label}</div>
                       </div>
                     ))}
                   </div>
@@ -142,15 +143,15 @@ export function Portfolio() {
 
                 <div className="lg:col-span-3 flex flex-col justify-between">
                   <div>
-                    <h4 className="text-lg font-semibold text-[#F8FAFC] mb-3">Challenge &amp; Solution</h4>
-                    <p className="text-slate-300 mb-6 leading-relaxed">{study.description}</p>
+                    <h4 className="text-lg font-semibold text-foreground mb-3">Challenge &amp; Solution</h4>
+                    <p className="text-muted-foreground mb-6 leading-relaxed">{study.description}</p>
 
-                    <h4 className="text-lg font-semibold text-[#F8FAFC] mb-3">Technology Stack</h4>
+                    <h4 className="text-lg font-semibold text-foreground mb-3">Technology Stack</h4>
                     <div className="flex flex-wrap gap-2 mb-6">
                       {study.technologies.map((tech) => (
                         <span
                           key={tech}
-                          className="px-3 py-1.5 bg-[#1E293B] border border-[#06B6D4]/30 rounded-lg text-sm text-slate-300 font-medium"
+                          className="px-3 py-1.5 bg-muted/40 border border-border/60 rounded-lg text-sm text-muted-foreground font-medium dark:bg-[#1E293B] dark:border-[#06B6D4]/30 dark:text-slate-300"
                         >
                           {tech}
                         </span>

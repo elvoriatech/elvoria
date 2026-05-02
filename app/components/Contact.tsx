@@ -1,6 +1,6 @@
 'use client';
 
-import { Mail, Phone, MapPin, Send, MessageSquare, Calendar } from 'lucide-react';
+import { Calendar, CircleCheck, Mail, MapPin, MessageSquare, Phone, Send, X } from 'lucide-react';
 import { useState } from 'react';
 
 export function Contact() {
@@ -127,16 +127,16 @@ export function Contact() {
   };
 
   return (
-    <section id="contact" className="py-24 bg-[#0F172A]">
+    <section id="contact" className="py-24 bg-background dark:bg-[#0F172A]">
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-16">
           <div className="inline-block px-4 py-2 bg-[#06B6D4]/10 border border-[#06B6D4]/30 rounded-full mb-6">
             <span className="text-sm text-[#06B6D4] font-semibold">GET IN TOUCH</span>
           </div>
-          <h2 className="text-5xl md:text-6xl mb-6 bg-linear-to-r from-[#F8FAFC] to-[#06B6D4] bg-clip-text text-transparent font-bold">
+          <h2 className="text-5xl md:text-6xl mb-6 bg-linear-to-r from-foreground to-[#06B6D4] bg-clip-text text-transparent font-bold">
             Start Your Project
           </h2>
-          <p className="text-xl text-slate-300 max-w-3xl mx-auto font-light">
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto font-light">
             Let&apos;s discuss how we can architect your global digital transformation
           </p>
         </div>
@@ -147,8 +147,9 @@ export function Contact() {
             <h3 className="text-2xl font-bold text-[#F8FAFC] mb-6">Project Inquiry</h3>
 
             {submitted && (
-              <div className="mb-6 p-4 bg-green-500/10 border border-green-500/30 rounded-lg text-green-300">
-                ✓ Message sent successfully! We'll get back to you soon.
+              <div className="mb-6 flex items-start gap-3 rounded-lg border border-green-500/30 bg-green-500/10 p-4 text-green-300">
+                <CircleCheck className="mt-0.5 h-5 w-5 shrink-0 text-green-400" strokeWidth={2} aria-hidden />
+                <span>Message sent successfully! We&apos;ll get back to you soon.</span>
               </div>
             )}
 
@@ -236,6 +237,7 @@ export function Contact() {
                   onChange={handleChange}
                   className="w-full px-4 py-3 bg-[#0F172A] border border-slate-700 rounded-lg focus:border-[#06B6D4] focus:outline-none text-[#F8FAFC]">
                   <option>Select budget range</option>
+                  <option>€10K - €25K</option>
                   <option>€25K - €50K</option>
                   <option>€50K - €100K</option>
                   <option>€100K - €250K</option>
@@ -328,6 +330,14 @@ export function Contact() {
 
                 <button
                   type="button"
+                  onClick={() => {
+                    window.dispatchEvent(
+                      new CustomEvent('elvoria:open-proposal-chat', {
+                        detail: { source: 'contact_technical_proposal' },
+                      })
+                    );
+                    document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                  }}
                   className="w-full px-6 py-4 bg-[#1E293B] border border-slate-700 rounded-lg hover:border-[#8B5CF6] transition-all flex items-center gap-3 group"
                 >
                   <MessageSquare className="w-5 h-5 text-[#8B5CF6]" />
@@ -346,7 +356,7 @@ export function Contact() {
               </p>
               <div className="flex items-center gap-2 text-sm text-slate-400">
                 <div className="w-2 h-2 bg-[#06B6D4] rounded-full animate-pulse"></div>
-                <span>Senior team available Mon-Fri, 9:00-18:00 CET</span>
+                <span>Engineering team available Mon–Fri, 9:00–18:00 CET</span>
               </div>
             </div>
           </div>
@@ -380,13 +390,14 @@ export function Contact() {
                   onClick={() => setScheduleOpen(false)}
                   aria-label="Close"
                 >
-                  ×
+                  <X className="h-5 w-5" strokeWidth={2} aria-hidden />
                 </button>
               </div>
 
               {scheduleSubmitted && (
-                <div className="mb-6 p-4 bg-green-500/10 border border-green-500/30 rounded-lg text-green-300">
-                  ✓ Request sent! We’ll confirm shortly.
+                <div className="mb-6 flex items-start gap-3 rounded-lg border border-green-500/30 bg-green-500/10 p-4 text-green-300">
+                  <CircleCheck className="mt-0.5 h-5 w-5 shrink-0 text-green-400" strokeWidth={2} aria-hidden />
+                  <span>Request sent! We&apos;ll confirm shortly.</span>
                 </div>
               )}
 

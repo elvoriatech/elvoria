@@ -85,18 +85,18 @@ export function Services() {
   return (
     <section
       id="services"
-      className="py-24 bg-linear-to-b from-[#1E293B] to-[#0F172A]"
+      className="py-24 bg-background dark:bg-linear-to-b dark:from-[#1E293B] dark:to-[#0F172A]"
     >
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-16">
           <div className="inline-block px-4 py-2 bg-[#06B6D4]/10 border border-[#06B6D4]/30 rounded-full mb-6">
             <span className="text-sm text-[#06B6D4] font-semibold">CORE CAPABILITIES</span>
           </div>
-          <h2 className="text-5xl md:text-6xl mb-6 bg-linear-to-r from-[#F8FAFC] to-[#06B6D4] bg-clip-text text-transparent font-bold">
+          <h2 className="text-5xl md:text-6xl mb-6 bg-linear-to-r from-foreground to-[#06B6D4] bg-clip-text text-transparent font-bold">
             Enterprise Services
           </h2>
-          <p className="text-xl text-slate-300 max-w-3xl mx-auto font-light">
-            Senior-level expertise in AI, cloud architecture, SaaS platforms, and mission-critical
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto font-light">
+            Deep expertise from experienced engineers in AI, cloud architecture, SaaS platforms, and mission-critical
             systems
           </p>
         </div>
@@ -105,7 +105,7 @@ export function Services() {
           {services.map((service, index) => (
             <div
               key={index}
-              className="group p-8 bg-linear-to-br from-[#1E293B] to-[#0F172A] border border-slate-700/50 rounded-xl hover:border-[#06B6D4]/50 transition-all duration-300"
+              className="group p-8 bg-card border border-border/60 rounded-xl hover:border-[#06B6D4]/50 transition-all duration-300 dark:bg-linear-to-br dark:from-[#1E293B] dark:to-[#0F172A] dark:border-slate-700/50"
             >
               <div
                 className={`w-14 h-14 rounded-xl bg-linear-to-br ${service.gradient} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}
@@ -113,8 +113,8 @@ export function Services() {
                 <service.icon className="w-7 h-7 text-white" />
               </div>
 
-              <h3 className="text-2xl font-bold text-[#F8FAFC] mb-3">{service.name}</h3>
-              <p className="text-slate-300 mb-6 leading-relaxed">{service.description}</p>
+              <h3 className="text-2xl font-bold text-foreground mb-3">{service.name}</h3>
+              <p className="text-muted-foreground mb-6 leading-relaxed">{service.description}</p>
 
               <div className="space-y-2">
                 <div className="text-sm font-semibold text-[#06B6D4] mb-3">
@@ -122,7 +122,7 @@ export function Services() {
                 </div>
                 <ul className="space-y-2">
                   {service.capabilities.map((capability, i) => (
-                    <li key={i} className="flex items-start gap-2 text-slate-400">
+                    <li key={i} className="flex items-start gap-2 text-muted-foreground dark:text-slate-400">
                       <span className="text-[#06B6D4] mt-1">•</span>
                       <span>{capability}</span>
                     </li>

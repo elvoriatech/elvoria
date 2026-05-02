@@ -53,7 +53,7 @@ function renderEmailShell(params: { title: string; preheader: string; contentHtm
                         <img src="cid:elvoria-mark" alt="" width="36" height="36" style="display:block;border-radius:10px;" />
                         <div>
                           <div style="font-size:14px;font-weight:700;letter-spacing:0.3px;color:#ffffff;">Elvoriatech</div>
-                          <div style="font-size:12px;color:#94a3b8;">AI‑First Development Partner</div>
+                          <div style="font-size:12px;color:#94a3b8;">AI-First Digital &amp; Software Development Partner</div>
                         </div>
                       </div>
                     </td>
