@@ -6,33 +6,49 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
+type HeroSlide = {
+  eyebrow: string;
+  title: string;
+  subtitle: string;
+  body: string;
+  image: string;
+  primaryCta: { label: string; targetId: string };
+  secondaryCta: { label: string; targetId: string };
+};
+
 export function Hero() {
-  const slides = useMemo(
+  const slides = useMemo<HeroSlide[]>(
     () => [
       {
-        eyebrow: 'AI-First Digital & Software Development Partner',
-        title: 'Architecting the Future\nof Global Enterprise',
+        eyebrow: 'AI-first engineering · clear delivery',
+        title: 'AI-First Software Engineering for Scalable Digital Products',
         subtitle:
-          'Experienced engineering teams building AI-first, cloud-native SaaS and marketplace platforms for mission-critical global systems',
+          'We design and build cloud-native SaaS platforms, marketplaces, and automation systems using modern AI and full-stack technologies.',
         body: '',
+        primaryCta: { label: 'Start Your Project', targetId: 'contact' },
+        secondaryCta: { label: 'View Our Work', targetId: 'portfolio' },
         image:
           'https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&w=2400&q=80',
       },
       {
-        eyebrow: 'AI-First Digital & Software Development Partner',
-        title: 'Architecting the Future\nof Global Enterprise',
+        eyebrow: 'For startups & growing businesses',
+        title: 'Build Faster. Scale Smarter. Ship AI-Driven Products.',
         subtitle:
-          'Experienced engineering teams building AI-first, cloud-native SaaS and marketplace platforms for mission-critical global systems',
+          'From idea to production, we help startups and businesses launch high-performance applications powered by modern cloud and AI technologies.',
         body: '',
+        primaryCta: { label: 'Get a Free Consultation', targetId: 'contact' },
+        secondaryCta: { label: 'See Case Studies', targetId: 'portfolio' },
         image:
           'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=2400&q=80',
       },
       {
-        eyebrow: 'AI-First Digital & Software Development Partner',
-        title: 'Architecting the Future\nof Global Enterprise',
+        eyebrow: 'Premium partnerships · long-term thinking',
+        title: 'Engineering Intelligent Systems for the Next Generation of Businesses',
         subtitle:
-          'Experienced engineering teams building AI-first, cloud-native SaaS and marketplace platforms for mission-critical global systems',
+          'We partner with forward-thinking teams to build AI-powered platforms, scalable architectures, and mission-critical digital experiences.',
         body: '',
+        primaryCta: { label: "Let's Build Together", targetId: 'contact' },
+        secondaryCta: { label: 'Explore Our Work', targetId: 'portfolio' },
         image:
           'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=2400&q=80',
       },
@@ -155,26 +171,28 @@ export function Hero() {
           {slide.subtitle}
         </p>
 
-        <p className="mx-auto mb-8 max-w-3xl text-sm text-slate-500 sm:mb-10 sm:text-base md:mb-12 md:text-lg dark:text-slate-400">
-          {slide.body}
-        </p>
+        {slide.body ? (
+          <p className="mx-auto mb-8 max-w-3xl text-sm text-slate-500 sm:mb-10 sm:text-base md:mb-12 md:text-lg dark:text-slate-400">
+            {slide.body}
+          </p>
+        ) : null}
 
         <div className="flex w-full max-w-md flex-col items-stretch justify-center gap-3 sm:max-w-none sm:flex-row sm:items-center sm:gap-4">
           <button
             className="group flex w-full items-center justify-center gap-2 rounded-lg bg-linear-to-r from-(--brand-accent) to-(--brand-primary) px-5 py-3 text-base transition-all duration-300 hover:shadow-lg hover:shadow-(color:--brand-primary)/35 focus:outline-none focus-visible:ring-2 focus-visible:ring-(--brand-primary)/60 sm:w-auto sm:px-8 sm:py-4 sm:text-lg"
-            onClick={() => scrollToId('contact')}
+            onClick={() => scrollToId(slide.primaryCta.targetId)}
             type="button"
           >
-            <span>Start Your Project</span>
+            <span>{slide.primaryCta.label}</span>
             <ArrowRight className="h-5 w-5 shrink-0 transition-transform group-hover:translate-x-1" />
           </button>
 
           <button
             className="w-full rounded-lg border border-border/60 bg-foreground/5 px-5 py-3 text-base transition-all duration-300 hover:bg-foreground/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-(--brand-primary)/60 sm:w-auto sm:px-8 sm:py-4 sm:text-lg"
-            onClick={() => scrollToId('portfolio')}
+            onClick={() => scrollToId(slide.secondaryCta.targetId)}
             type="button"
           >
-            View Our Work
+            {slide.secondaryCta.label}
           </button>
         </div>
 

@@ -67,18 +67,24 @@ export function ThemeSwitcher() {
   }, [mode]);
 
   return (
-    <div className="fixed right-4 bottom-4 z-70">
+    <div className="fixed bottom-4 left-4 z-70">
       <button
         type="button"
         onClick={toggle}
-        className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200/90 bg-white/90 text-slate-800 shadow-lg backdrop-blur-md transition-colors hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-(--brand-primary)/60 dark:border-white/10 dark:bg-slate-950/90 dark:text-slate-100 dark:hover:bg-slate-900/90"
+        className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200/90 bg-white/90 text-slate-800 shadow-lg backdrop-blur-md transition-[transform,box-shadow,background-color,color] duration-200 ease-out hover:bg-slate-50 hover:shadow-xl motion-safe:hover:scale-105 motion-safe:active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-(--brand-primary)/60 dark:border-white/10 dark:bg-slate-950/90 dark:text-slate-100 dark:hover:bg-slate-900/90"
         aria-label={mode === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
       >
-        {mode === 'dark' ? (
-          <Sun className="h-5 w-5" strokeWidth={2} aria-hidden />
-        ) : (
-          <Moon className="h-5 w-5" strokeWidth={2} aria-hidden />
-        )}
+        <span
+          key={mode}
+          className="theme-switcher-icon-in inline-flex items-center justify-center"
+          aria-hidden
+        >
+          {mode === 'dark' ? (
+            <Sun className="h-5 w-5" strokeWidth={2} />
+          ) : (
+            <Moon className="h-5 w-5" strokeWidth={2} />
+          )}
+        </span>
       </button>
     </div>
   );

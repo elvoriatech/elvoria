@@ -13,12 +13,7 @@
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+/* No prefers-color-scheme overrides: theme is class-driven on <html> (see app/theme.css + ThemeSwitcher). */
 
 html {
   -webkit-text-size-adjust: 100%;

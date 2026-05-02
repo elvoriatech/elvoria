@@ -1,4 +1,6 @@
-import { Github, Linkedin, Mail, Shield } from 'lucide-react';
+import { Github, Linkedin, Mail } from 'lucide-react';
+import { TRUST_PILLARS } from '@/lib/trustPillars';
+import { TrustPillarIconBox } from './TrustPillarIconBox';
 import Image from 'next/image';
 
 export function Footer() {
@@ -99,26 +101,18 @@ export function Footer() {
         </div>
 
         <div className="mb-6 rounded-xl border border-border/60 bg-linear-to-r from-[#06B6D4]/10 to-[#8B5CF6]/10 p-4 sm:mb-8 sm:p-6 dark:border-[#06B6D4]/30">
-          <div className="flex flex-col items-center justify-center gap-4 sm:flex-row sm:flex-wrap sm:gap-6 md:gap-8">
-            <div className="flex items-center gap-2">
-              <Shield className="w-5 h-5 text-[#06B6D4]" />
-              <span className="text-sm font-semibold text-foreground dark:text-[#F8FAFC]">Global Experienced Teams</span>
-            </div>
-            <div className="hidden h-6 w-px bg-border/60 sm:block dark:bg-slate-700" aria-hidden />
-            <div className="flex items-center gap-2">
-              <Shield className="w-5 h-5 text-[#06B6D4]" />
-              <span className="text-sm font-semibold text-foreground dark:text-[#F8FAFC]">GDPR Compliant</span>
-            </div>
-            <div className="hidden h-6 w-px bg-border/60 sm:block dark:bg-slate-700" aria-hidden />
-            <div className="flex items-center gap-2">
-              <Shield className="w-5 h-5 text-[#06B6D4]" />
-              <span className="text-sm font-semibold text-foreground dark:text-[#F8FAFC]">Enterprise Security</span>
-            </div>
-            <div className="hidden h-6 w-px bg-border/60 sm:block dark:bg-slate-700" aria-hidden />
-            <div className="flex items-center gap-2">
-              <Shield className="w-5 h-5 text-[#06B6D4]" />
-              <span className="text-sm font-semibold text-foreground dark:text-[#F8FAFC]">World-Class Quality</span>
-            </div>
+          <div className="grid grid-cols-1 gap-4 min-[420px]:grid-cols-2 sm:gap-5 lg:grid-cols-4">
+            {TRUST_PILLARS.map((item, index) => (
+              <div key={item.title} className="flex gap-2.5">
+                <TrustPillarIconBox iconId={item.icon} index={index} size="sm" />
+                <div className="min-w-0">
+                  <div className="text-xs font-semibold text-foreground sm:text-sm dark:text-[#F8FAFC]">{item.title}</div>
+                  <p className="mt-1 text-[10px] leading-snug text-muted-foreground sm:text-[11px] dark:text-slate-400">
+                    {item.description}
+                  </p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 

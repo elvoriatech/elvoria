@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { IBM_Plex_Sans, Inter } from "next/font/google";
 import { ThemeSwitcher } from "./components/ThemeSwitcher";
 import { ProposalChatWidget } from "./components/ProposalChatWidget";
@@ -16,6 +17,8 @@ const plexSans = IBM_Plex_Sans({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
 });
+
+const THEME_INIT = `(function(){try{var k='elvoriatech:theme';var v=localStorage.getItem(k)||'elvoria-dark';if(v!=='elvoria-light')v='elvoria-dark';var root=document.documentElement;['dark','theme-elvoria'].forEach(function(c){root.classList.remove(c);});root.classList.add('theme-elvoria');if(v==='elvoria-light'){root.classList.remove('dark');}else{root.classList.add('dark');}}catch(e){}})();`;
 
 export const metadata: Metadata = {
   title: {
@@ -41,6 +44,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      data-scroll-behavior="smooth"
       className={`${inter.variable} ${plexSans.variable} theme-elvoria dark h-full antialiased scroll-smooth`}
       suppressHydrationWarning
     >
@@ -48,14 +52,13 @@ export default function RootLayout({
         <link rel="icon" type="image/png" href="/elvoria.png" />
         <link rel="shortcut icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" href="/elvoria.png" />
-        <script
-          // Apply theme before paint to avoid flash.
-          dangerouslySetInnerHTML={{
-            __html: `(function(){try{var k='elvoriatech:theme';var v=localStorage.getItem(k)||'elvoria-dark';if(v!=='elvoria-light')v='elvoria-dark';var root=document.documentElement;['dark','theme-elvoria'].forEach(function(c){root.classList.remove(c);});root.classList.add('theme-elvoria');if(v==='elvoria-light'){root.classList.remove('dark');}else{root.classList.add('dark');}}catch(e){}})();`,
-          }}
-        />
       </head>
       <body className="min-h-full overflow-x-hidden flex flex-col">
+        <Script
+          id="elvoria-theme-init"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{ __html: THEME_INIT }}
+        />
         {children}
         <ProposalChatWidget />
         <ThemeSwitcher />

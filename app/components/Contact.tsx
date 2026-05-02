@@ -1,7 +1,8 @@
 'use client';
 
 import { Calendar, CircleCheck, Mail, MapPin, MessageSquare, Phone, Send, X } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { ScheduleConsultationTrigger } from './ScheduleConsultationTrigger';
 
 export function Contact() {
   const [formData, setFormData] = useState({
@@ -34,6 +35,76 @@ export function Contact() {
   const [scheduleLoading, setScheduleLoading] = useState(false);
   const [scheduleSubmitted, setScheduleSubmitted] = useState(false);
   const [scheduleError, setScheduleError] = useState('');
+
+  type ScheduleSlot = { start: string; end: string; label: string };
+  const [scheduleBookingMode, setScheduleBookingMode] = useState<'unknown' | 'slots' | 'email'>('unknown');
+  const [slotsLoading, setSlotsLoading] = useState(false);
+  const [slots, setSlots] = useState<ScheduleSlot[]>([]);
+  const [selectedSlot, setSelectedSlot] = useState<ScheduleSlot | null>(null);
+
+  useEffect(() => {
+    const openSchedule = () => {
+      setScheduleError('');
+      setScheduleOpen(true);
+    };
+    window.addEventListener('elvoria:open-schedule', openSchedule);
+    return () => window.removeEventListener('elvoria:open-schedule', openSchedule);
+  }, []);
+
+  useEffect(() => {
+    if (!scheduleOpen) return;
+    setScheduleBookingMode('unknown');
+    setSelectedSlot(null);
+    setSlots([]);
+    setScheduleData((prev) => {
+      if (prev.preferredDate) return prev;
+      const d = new Date();
+      const pad = (n: number) => String(n).padStart(2, '0');
+      return {
+        ...prev,
+        preferredDate: `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`,
+      };
+    });
+  }, [scheduleOpen]);
+
+  useEffect(() => {
+    if (!scheduleOpen || !scheduleData.preferredDate) return;
+    let cancelled = false;
+    setSlotsLoading(true);
+    const tz = scheduleData.timeZone?.trim() || 'Europe/Berlin';
+    const params = new URLSearchParams({ date: scheduleData.preferredDate, timeZone: tz });
+
+    (async () => {
+      try {
+        const res = await fetch(`/api/availability?${params}`);
+        const json = (await res.json()) as {
+          useEmailFallback?: boolean;
+          slots?: ScheduleSlot[];
+        };
+        if (cancelled) return;
+        if (json.useEmailFallback) {
+          setScheduleBookingMode('email');
+          setSlots([]);
+        } else {
+          setScheduleBookingMode('slots');
+          setSlots(Array.isArray(json.slots) ? json.slots : []);
+        }
+        setSelectedSlot(null);
+      } catch {
+        if (!cancelled) {
+          setScheduleBookingMode('email');
+          setSlots([]);
+          setSelectedSlot(null);
+        }
+      } finally {
+        if (!cancelled) setSlotsLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [scheduleOpen, scheduleData.preferredDate, scheduleData.timeZone]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -95,6 +166,58 @@ export function Contact() {
     setScheduleError('');
 
     try {
+      if (scheduleBookingMode === 'slots') {
+        if (!selectedSlot) {
+          setScheduleError('Please choose an available time slot.');
+          return;
+        }
+        const response = await fetch('/api/bookings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: scheduleData.name,
+            email: scheduleData.email,
+            company: scheduleData.company,
+            notes: scheduleData.notes,
+            startTime: selectedSlot.start,
+            endTime: selectedSlot.end,
+            timeZone: scheduleData.timeZone || 'Europe/Berlin',
+            meetingTypeSlug: 'consultation',
+          }),
+        });
+
+        if (response.status === 409) {
+          setScheduleError('That time was just taken. Pick another slot.');
+          const tz = scheduleData.timeZone?.trim() || 'Europe/Berlin';
+          const params = new URLSearchParams({ date: scheduleData.preferredDate, timeZone: tz });
+          const r2 = await fetch(`/api/availability?${params}`);
+          const j2 = (await r2.json()) as { slots?: ScheduleSlot[] };
+          setSlots(Array.isArray(j2.slots) ? j2.slots : []);
+          setSelectedSlot(null);
+          return;
+        }
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.error || 'Could not complete booking');
+        }
+
+        setScheduleSubmitted(true);
+        setScheduleData((prev) => ({
+          ...prev,
+          preferredDate: '',
+          preferredTime: '',
+          notes: '',
+        }));
+        setSelectedSlot(null);
+
+        setTimeout(() => {
+          setScheduleSubmitted(false);
+          setScheduleOpen(false);
+        }, 2500);
+        return;
+      }
+
       const response = await fetch('/api/schedule', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -314,19 +437,12 @@ export function Contact() {
               <h4 className="text-xl font-bold text-[#F8FAFC] mb-4">Quick Actions</h4>
 
               <div className="space-y-3">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setScheduleError('');
-                    setScheduleOpen(true);
-                  }}
-                  className="w-full px-6 py-4 bg-[#1E293B] border border-slate-700 rounded-lg hover:border-[#06B6D4] transition-all flex items-center gap-3 group"
-                >
+                <ScheduleConsultationTrigger className="w-full px-6 py-4 bg-[#1E293B] border border-slate-700 rounded-lg hover:border-[#06B6D4] transition-all flex items-center gap-3 group">
                   <Calendar className="w-5 h-5 text-[#06B6D4]" />
                   <span className="text-[#F8FAFC] group-hover:text-[#06B6D4] font-semibold">
                     Schedule 30-Min Consultation
                   </span>
-                </button>
+                </ScheduleConsultationTrigger>
 
                 <button
                   type="button"
@@ -373,7 +489,7 @@ export function Contact() {
         >
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
           <div
-            className="relative w-full max-w-xl rounded-2xl border border-white/10 bg-slate-950/95 shadow-2xl"
+            className="relative w-full max-w-2xl rounded-2xl border border-white/10 bg-slate-950/95 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="p-6 sm:p-8">
@@ -381,7 +497,9 @@ export function Contact() {
                 <div>
                   <h3 className="text-2xl text-white">Schedule a free consultation</h3>
                   <p className="text-slate-400 mt-1">
-                    Pick a preferred time and we’ll email you to confirm.
+                    {scheduleBookingMode === 'slots'
+                      ? 'Choose a date, then pick a 30-minute slot (Mon–Fri, business hours).'
+                      : 'Pick a preferred time and we’ll email you to confirm.'}
                   </p>
                 </div>
                 <button
@@ -447,7 +565,7 @@ export function Contact() {
                   />
                 </div>
 
-                <div className="grid sm:grid-cols-3 gap-5">
+                <div className="grid gap-5 sm:grid-cols-3">
                   <div className="sm:col-span-1">
                     <label className="block text-sm mb-2 text-slate-300">Date *</label>
                     <input
@@ -455,22 +573,81 @@ export function Contact() {
                       name="preferredDate"
                       value={scheduleData.preferredDate}
                       onChange={handleScheduleChange}
+                      min={(() => {
+                        const d = new Date();
+                        const pad = (n: number) => String(n).padStart(2, '0');
+                        return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+                      })()}
                       required
                       className="w-full px-4 py-3 bg-slate-900 border border-slate-800 rounded-lg focus:border-purple-500 focus:outline-none text-slate-200"
                     />
                   </div>
-                  <div className="sm:col-span-1">
-                    <label className="block text-sm mb-2 text-slate-300">Time *</label>
-                    <input
-                      type="time"
-                      name="preferredTime"
-                      value={scheduleData.preferredTime}
-                      onChange={handleScheduleChange}
-                      required
-                      className="w-full px-4 py-3 bg-slate-900 border border-slate-800 rounded-lg focus:border-purple-500 focus:outline-none text-slate-200"
-                    />
-                  </div>
-                  <div className="sm:col-span-1">
+                  {scheduleBookingMode === 'email' ? (
+                    <div className="sm:col-span-1">
+                      <label className="block text-sm mb-2 text-slate-300">Time *</label>
+                      <input
+                        type="time"
+                        name="preferredTime"
+                        value={scheduleData.preferredTime}
+                        onChange={handleScheduleChange}
+                        required
+                        className="w-full px-4 py-3 bg-slate-900 border border-slate-800 rounded-lg focus:border-purple-500 focus:outline-none text-slate-200"
+                      />
+                    </div>
+                  ) : (
+                    <div className="sm:col-span-2 min-h-12">
+                      {slotsLoading || scheduleBookingMode === 'unknown' ? (
+                        <p className="text-sm text-slate-400 pt-8 sm:pt-10">Loading available times…</p>
+                      ) : scheduleBookingMode === 'slots' ? (
+                        <div>
+                          <div className="mb-2 text-sm text-slate-300">Available times *</div>
+                          {slots.length === 0 ? (
+                            <div className="space-y-2">
+                              <p className="text-sm text-slate-400">
+                                No 30-minute openings on this day. Choose another weekday (Mon–Fri) or adjust your
+                                time zone.
+                              </p>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setScheduleBookingMode('email');
+                                  setSelectedSlot(null);
+                                }}
+                                className="text-sm font-medium text-[#06B6D4] hover:text-[#22d3ee] underline-offset-2 hover:underline"
+                              >
+                                Suggest a time by email instead
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="flex flex-wrap gap-2">
+                              {slots.map((slot) => {
+                                const active = selectedSlot?.start === slot.start;
+                                return (
+                                  <button
+                                    key={slot.start}
+                                    type="button"
+                                    onClick={() => setSelectedSlot(slot)}
+                                    className={`rounded-lg border px-3 py-2 text-sm font-medium transition-colors ${
+                                      active
+                                        ? 'border-[#06B6D4] bg-[#06B6D4]/20 text-[#F8FAFC]'
+                                        : 'border-slate-700 bg-slate-900 text-slate-200 hover:border-[#06B6D4]/60'
+                                    }`}
+                                  >
+                                    {slot.label}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </div>
+                      ) : null}
+                    </div>
+                  )}
+                  <div
+                    className={
+                      scheduleBookingMode === 'email' ? 'sm:col-span-1' : 'sm:col-span-3 sm:max-w-md'
+                    }
+                  >
                     <label className="block text-sm mb-2 text-slate-300">Time zone</label>
                     <input
                       type="text"
@@ -498,10 +675,20 @@ export function Contact() {
                 <div className="flex flex-col sm:flex-row gap-3 pt-2">
                   <button
                     type="submit"
-                    disabled={scheduleLoading}
+                    disabled={
+                      scheduleLoading ||
+                      slotsLoading ||
+                      scheduleBookingMode === 'unknown' ||
+                      (scheduleBookingMode === 'slots' &&
+                        (!slots.length || !selectedSlot))
+                    }
                     className="flex-1 px-6 py-3 bg-linear-to-r from-purple-600 to-blue-600 rounded-lg hover:shadow-lg hover:shadow-purple-500/40 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {scheduleLoading ? 'Sending...' : 'Request time'}
+                    {scheduleLoading
+                      ? 'Sending...'
+                      : scheduleBookingMode === 'slots'
+                        ? 'Confirm booking'
+                        : 'Request time'}
                   </button>
                   <button
                     type="button"

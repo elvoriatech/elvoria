@@ -14,6 +14,10 @@ export type ProposalFinalizeLogEntry = {
   pdfStatus: 'ready' | 'failed' | 'queued';
   pdfError?: string;
   finalizedAt: string;
+  /** When PDF was not ready: whether the visitor received the “we’ll follow up with a PDF” email (if mail is configured). */
+  visitorNotifiedPdfIssue?: boolean;
+  /** When admin used “Send PDF by email” successfully. */
+  pdfEmailedByAdminAt?: string;
 };
 
 export type AdminProposalQueueRow = ProposalFinalizeLogEntry & {
@@ -28,6 +32,19 @@ async function pdfExistsOnDisk(versionId: string): Promise<boolean> {
   } catch {
     return false;
   }
+}
+
+export async function updateProposalFinalizeLogEntry(
+  versionId: string,
+  patch: Partial<Pick<ProposalFinalizeLogEntry, 'pdfEmailedByAdminAt' | 'visitorNotifiedPdfIssue'>>
+): Promise<boolean> {
+  const entries = await readProposalFinalizeLog();
+  const idx = entries.findIndex((e) => e.versionId === versionId);
+  if (idx === -1) return false;
+  entries[idx] = { ...entries[idx], ...patch };
+  await fs.mkdir(path.dirname(LOG_FILE), { recursive: true });
+  await fs.writeFile(LOG_FILE, JSON.stringify(entries, null, 2), 'utf8');
+  return true;
 }
 
 export async function appendProposalFinalizeLog(entry: ProposalFinalizeLogEntry): Promise<void> {

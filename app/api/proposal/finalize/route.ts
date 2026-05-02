@@ -205,6 +205,7 @@ export async function POST(request: NextRequest) {
       pdfStatus: version.pdf.status,
       pdfError: version.pdf.status === 'failed' ? version.pdf.error : undefined,
       finalizedAt: new Date().toISOString(),
+      visitorNotifiedPdfIssue: version.pdf.status !== 'ready' ? followUpEmailSent : undefined,
     });
 
     return NextResponse.json({

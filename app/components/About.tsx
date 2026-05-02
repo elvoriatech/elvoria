@@ -10,25 +10,24 @@ export function About() {
               <span className="text-sm text-[#8B5CF6] font-semibold">ABOUT ELVORIA TECH</span>
             </div>
             <h2 className="mb-5 bg-linear-to-r from-foreground to-[#8B5CF6] bg-clip-text text-3xl font-bold text-transparent sm:mb-6 sm:text-4xl md:text-5xl">
-              World-Class Engineering Meets Modern Innovation
+              Engineering AI-First Cloud Platforms for Modern Businesses
             </h2>
             <div className="space-y-4 text-base leading-relaxed text-muted-foreground sm:text-lg">
               <p>
-                Elvoria Tech is an <strong className="text-[#06B6D4]">experienced-engineer-led firm</strong>{' '}
-                specializing in AI-first, cloud-native platforms for global enterprises. We combine
-                world-class engineering excellence with modern agile practices, serving mission-critical
-                systems across 35+ countries.
+                Elvoria Tech is an engineering-led software development team focused on building AI-first,
+                cloud-native applications for startups and growing businesses.
               </p>
               <p>
-                Our team consists exclusively of{' '}
-                <strong className="text-[#06B6D4]">experienced engineers with 15+ years</strong> of experience
-                in scaling platforms to millions of users. We avoid legacy-only stacks and prioritize depth
-                over rotating junior benches.
+                We design and develop scalable platforms, SaaS products, and backend systems using modern
+                engineering practices and cloud infrastructure.
               </p>
               <p>
-                We believe in <strong className="text-[#06B6D4]">security and privacy by design</strong>:
-                GDPR-compliant architecture, enterprise-grade security practices, and transparent
-                development processes as our foundation.
+                Our work spans distributed systems, API-driven architectures, and automation-focused
+                applications built for reliability and performance.
+              </p>
+              <p>
+                We follow security-first and privacy-conscious development practices, aligning with GDPR
+                standards and enterprise security requirements where applicable.
               </p>
             </div>
           </div>
@@ -40,10 +39,10 @@ export function About() {
                   <Target className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-foreground mb-2">Mission</h3>
+                  <h3 className="mb-2 text-xl font-bold text-foreground">Mission</h3>
                   <p className="text-muted-foreground dark:text-slate-300">
-                    To architect the digital backbone of global enterprise with AI-first, cloud-native
-                    solutions that combine engineering excellence with modern agility.
+                    To design and build secure, scalable AI-first and cloud-native systems that help businesses
+                    modernize their digital infrastructure.
                   </p>
                 </div>
               </div>
@@ -55,10 +54,10 @@ export function About() {
                   <Map className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-foreground mb-2">Vision</h3>
+                  <h3 className="mb-2 text-xl font-bold text-foreground">Vision</h3>
                   <p className="text-muted-foreground dark:text-slate-300">
-                    To become the most trusted technology partner for enterprises worldwide seeking
-                    secure, scalable, and innovative digital transformation.
+                    To be a long-term engineering partner for companies building reliable, high-performance
+                    software systems in the cloud and AI era.
                   </p>
                 </div>
               </div>
@@ -66,16 +65,36 @@ export function About() {
 
             <div className="rounded-xl border border-border/60 bg-card p-4 sm:p-6 dark:bg-linear-to-br dark:from-[#1E293B] dark:to-[#0F172A] dark:border-[#3B82F6]/30">
               <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-lg bg-linear-to-br from-[#3B82F6] to-[#8B5CF6] flex items-center justify-center shrink-0">
-                  <Award className="w-6 h-6 text-white" />
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-linear-to-br from-[#3B82F6] to-[#8B5CF6]">
+                  <Award className="h-6 w-6 text-white" />
                 </div>
-                <div>
-                  <h3 className="text-xl font-bold text-foreground mb-2">Values</h3>
-                  <ul className="text-muted-foreground dark:text-slate-300 space-y-1">
-                    <li>• Reliability &amp; Excellence above all</li>
-                    <li>• Security &amp; GDPR compliance by design</li>
-                    <li>• Experienced expert teams</li>
-                    <li>• Transparent, long-term partnerships</li>
+                <div className="min-w-0 flex-1">
+                  <h3 className="mb-3 text-xl font-bold text-foreground">Values</h3>
+                  <ul className="list-none space-y-1.5 text-sm leading-snug text-muted-foreground sm:text-base dark:text-slate-300">
+                    <li className="flex gap-2.5">
+                      <span className="shrink-0 font-semibold text-[#06B6D4]" aria-hidden>
+                        •
+                      </span>
+                      <span>Reliability &amp; Excellence above all</span>
+                    </li>
+                    <li className="flex gap-2.5">
+                      <span className="shrink-0 font-semibold text-[#8B5CF6]" aria-hidden>
+                        •
+                      </span>
+                      <span>Security &amp; GDPR compliance by design</span>
+                    </li>
+                    <li className="flex gap-2.5">
+                      <span className="shrink-0 font-semibold text-[#3B82F6]" aria-hidden>
+                        •
+                      </span>
+                      <span>Experienced expert teams</span>
+                    </li>
+                    <li className="flex gap-2.5">
+                      <span className="shrink-0 font-semibold text-[#06B6D4]" aria-hidden>
+                        •
+                      </span>
+                      <span>Transparent, long-term partnerships</span>
+                    </li>
                   </ul>
                 </div>
               </div>
@@ -88,47 +107,33 @@ export function About() {
             <Users className="mt-1 h-7 w-7 shrink-0 text-[#06B6D4] sm:h-8 sm:w-8" />
             <div className="min-w-0">
               <h3 className="mb-3 text-xl font-bold text-foreground sm:mb-4 sm:text-2xl">What Sets Us Apart</h3>
-              <div className="grid md:grid-cols-2 gap-4 text-muted-foreground dark:text-slate-300">
+              <div className="grid gap-4 text-muted-foreground md:grid-cols-2 dark:text-slate-300">
                 <div className="flex items-start gap-2">
                   <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#06B6D4]" strokeWidth={2.5} aria-hidden />
                   <span>
-                    <strong className="text-foreground dark:text-[#F8FAFC]">Experienced engineers:</strong> 15+ years avg.
-                    experience; depth over churn
+                    <strong className="text-foreground dark:text-[#F8FAFC]">Engineering-led:</strong> AI-first,
+                    cloud-native applications for startups and growing businesses
                   </span>
                 </div>
                 <div className="flex items-start gap-2">
                   <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#06B6D4]" strokeWidth={2.5} aria-hidden />
                   <span>
-                    <strong className="text-foreground dark:text-[#F8FAFC]">Global Expertise:</strong> Experienced engineers,
-                    distributed worldwide
+                    <strong className="text-foreground dark:text-[#F8FAFC]">Platforms &amp; SaaS:</strong> Scalable
+                    products and backend systems on modern cloud infrastructure
                   </span>
                 </div>
                 <div className="flex items-start gap-2">
                   <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#06B6D4]" strokeWidth={2.5} aria-hidden />
                   <span>
-                    <strong className="text-foreground dark:text-[#F8FAFC]">AI-First Architecture:</strong> GPT-4, Claude,
-                    LangChain integrated by default
+                    <strong className="text-foreground dark:text-[#F8FAFC]">Distributed systems &amp; APIs:</strong>{' '}
+                    Automation-focused apps built for reliability and performance
                   </span>
                 </div>
                 <div className="flex items-start gap-2">
                   <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#06B6D4]" strokeWidth={2.5} aria-hidden />
                   <span>
-                    <strong className="text-foreground dark:text-[#F8FAFC]">Mission-Critical Focus:</strong> Aviation,
-                    restaurant tech, e-commerce
-                  </span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#06B6D4]" strokeWidth={2.5} aria-hidden />
-                  <span>
-                    <strong className="text-foreground dark:text-[#F8FAFC]">Cloud-Native by Default:</strong> AWS Lambda,
-                    serverless, auto-scaling
-                  </span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#06B6D4]" strokeWidth={2.5} aria-hidden />
-                  <span>
-                    <strong className="text-foreground dark:text-[#F8FAFC]">Reliability First:</strong> 99.99% uptime,
-                    enterprise-grade security
+                    <strong className="text-foreground dark:text-[#F8FAFC]">Security &amp; privacy:</strong> GDPR-aware
+                    practices and enterprise expectations where your project needs them
                   </span>
                 </div>
               </div>

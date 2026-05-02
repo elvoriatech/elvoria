@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises';
 import { NextRequest, NextResponse } from 'next/server';
 import { proposalPdfPath } from '@/lib/localStore';
-import { getLogEntryByVersionId } from '@/lib/proposalFinalizeLog';
+import { getLogEntryByVersionId, updateProposalFinalizeLogEntry } from '@/lib/proposalFinalizeLog';
 import { sendProposalPdfToVisitorFromAdmin } from '@/lib/proposalPdfAdminDeliveryEmail';
 import { requireAdminSession } from '@/lib/requireAdminSession';
 
@@ -51,6 +51,10 @@ export async function POST(request: NextRequest) {
         : r.detail || 'Failed to send email';
     return NextResponse.json({ error: msg }, { status: 500 });
   }
+
+  await updateProposalFinalizeLogEntry(versionId, {
+    pdfEmailedByAdminAt: new Date().toISOString(),
+  });
 
   return NextResponse.json({ ok: true, to });
 }

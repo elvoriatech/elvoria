@@ -1,4 +1,5 @@
 import { ArrowRight, Briefcase, CheckCircle, X } from 'lucide-react';
+import { ScheduleConsultationTrigger } from './ScheduleConsultationTrigger';
 
 type EngagementCard = {
   name: string;
@@ -161,8 +162,7 @@ export function EngagementModels() {
                 <span>{model.idealLine}</span>
               </p>
 
-              <button
-                type="button"
+              <ScheduleConsultationTrigger
                 className={`mt-auto w-full py-4 rounded-lg font-semibold transition-all ${
                   model.highlight
                     ? 'bg-linear-to-r from-[#06B6D4] to-[#3B82F6] text-white hover:shadow-lg hover:shadow-[#06B6D4]/30'
@@ -170,7 +170,7 @@ export function EngagementModels() {
                 }`}
               >
                 {model.cta}
-              </button>
+              </ScheduleConsultationTrigger>
             </div>
           ))}
         </div>
@@ -181,12 +181,9 @@ export function EngagementModels() {
             Schedule a free 30-minute consultation with our team to discuss your project requirements and find the
             right engagement model.
           </p>
-          <button
-            type="button"
-            className="px-8 py-4 bg-linear-to-r from-[#06B6D4] to-[#3B82F6] rounded-lg font-semibold text-white hover:shadow-lg hover:shadow-[#06B6D4]/30 transition-all"
-          >
+          <ScheduleConsultationTrigger className="px-8 py-4 bg-linear-to-r from-[#06B6D4] to-[#3B82F6] rounded-lg font-semibold text-white hover:shadow-lg hover:shadow-[#06B6D4]/30 transition-all">
             Schedule Free Consultation
-          </button>
+          </ScheduleConsultationTrigger>
         </div>
       </div>
     </section>
