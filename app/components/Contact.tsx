@@ -127,24 +127,24 @@ export function Contact() {
   };
 
   return (
-    <section id="contact" className="py-24 bg-background dark:bg-[#0F172A]">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center mb-16">
-          <div className="inline-block px-4 py-2 bg-[#06B6D4]/10 border border-[#06B6D4]/30 rounded-full mb-6">
-            <span className="text-sm text-[#06B6D4] font-semibold">GET IN TOUCH</span>
+    <section id="contact" className="bg-background py-16 sm:py-20 md:py-24 dark:bg-[#0F172A]">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mb-12 text-center sm:mb-16">
+          <div className="mb-5 inline-block rounded-full border border-[#06B6D4]/30 bg-[#06B6D4]/10 px-3 py-1.5 sm:mb-6 sm:px-4 sm:py-2">
+            <span className="text-xs font-semibold text-[#06B6D4] sm:text-sm">GET IN TOUCH</span>
           </div>
-          <h2 className="text-5xl md:text-6xl mb-6 bg-linear-to-r from-foreground to-[#06B6D4] bg-clip-text text-transparent font-bold">
+          <h2 className="mb-5 bg-linear-to-r from-foreground to-[#06B6D4] bg-clip-text text-3xl font-bold text-transparent sm:mb-6 sm:text-4xl md:text-5xl lg:text-6xl">
             Start Your Project
           </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto font-light">
+          <p className="mx-auto max-w-3xl text-base font-light text-muted-foreground sm:text-lg md:text-xl">
             Let&apos;s discuss how we can architect your global digital transformation
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-12">
+        <div className="grid gap-8 lg:grid-cols-2 lg:gap-12">
           {/* Contact Form */}
-          <div className="p-8 bg-linear-to-br from-[#1E293B] to-[#0F172A] border border-slate-700/50 rounded-2xl">
-            <h3 className="text-2xl font-bold text-[#F8FAFC] mb-6">Project Inquiry</h3>
+          <div className="rounded-2xl border border-slate-700/50 bg-linear-to-br from-[#1E293B] to-[#0F172A] p-4 sm:p-6 md:p-8">
+            <h3 className="mb-4 text-xl font-bold text-[#F8FAFC] sm:mb-6 sm:text-2xl">Project Inquiry</h3>
 
             {submitted && (
               <div className="mb-6 flex items-start gap-3 rounded-lg border border-green-500/30 bg-green-500/10 p-4 text-green-300">
@@ -271,7 +271,7 @@ export function Contact() {
 
           {/* Contact Info */}
           <div className="space-y-8">
-            <div className="p-8 bg-linear-to-br from-[#1E293B] to-[#0F172A] border border-slate-700/50 rounded-2xl">
+            <div className="rounded-2xl border border-slate-700/50 bg-linear-to-br from-[#1E293B] to-[#0F172A] p-4 sm:p-6 md:p-8">
               <h3 className="text-2xl font-bold text-[#F8FAFC] mb-6">Contact Information</h3>
 
               <div className="space-y-6">
@@ -310,7 +310,7 @@ export function Contact() {
               </div>
             </div>
 
-            <div className="p-8 bg-linear-to-r from-[#06B6D4]/10 to-[#8B5CF6]/10 border border-[#06B6D4]/30 rounded-2xl">
+            <div className="rounded-2xl border border-[#06B6D4]/30 bg-linear-to-r from-[#06B6D4]/10 to-[#8B5CF6]/10 p-4 sm:p-6 md:p-8">
               <h4 className="text-xl font-bold text-[#F8FAFC] mb-4">Quick Actions</h4>
 
               <div className="space-y-3">
@@ -348,7 +348,7 @@ export function Contact() {
               </div>
             </div>
 
-            <div className="p-8 bg-linear-to-br from-[#1E293B] to-[#0F172A] border border-slate-700/50 rounded-2xl">
+            <div className="rounded-2xl border border-slate-700/50 bg-linear-to-br from-[#1E293B] to-[#0F172A] p-4 sm:p-6 md:p-8">
               <h4 className="text-xl font-bold text-[#F8FAFC] mb-4">Response Time</h4>
               <p className="text-slate-300 mb-4">
                 Enterprise inquiries receive priority attention. Our solution architects typically

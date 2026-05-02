@@ -88,17 +88,17 @@ export function Portfolio() {
   return (
     <section
       id="portfolio"
-      className="py-24 bg-background dark:bg-linear-to-b dark:from-[#0F172A] dark:to-[#1E293B]"
+      className="bg-background py-16 sm:py-20 md:py-24 dark:bg-linear-to-b dark:from-[#0F172A] dark:to-[#1E293B]"
     >
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center mb-16">
-          <div className="inline-block px-4 py-2 bg-[#06B6D4]/10 border border-[#06B6D4]/30 rounded-full mb-6">
-            <span className="text-sm text-[#06B6D4] font-semibold">PROVEN IMPACT</span>
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mb-12 text-center sm:mb-16">
+          <div className="mb-5 inline-block rounded-full border border-[#06B6D4]/30 bg-[#06B6D4]/10 px-3 py-1.5 sm:mb-6 sm:px-4 sm:py-2">
+            <span className="text-xs font-semibold text-[#06B6D4] sm:text-sm">PROVEN IMPACT</span>
           </div>
-          <h2 className="text-5xl md:text-6xl mb-6 bg-linear-to-r from-foreground to-[#06B6D4] bg-clip-text text-transparent font-bold">
+          <h2 className="mb-5 bg-linear-to-r from-foreground to-[#06B6D4] bg-clip-text text-3xl font-bold text-transparent sm:mb-6 sm:text-4xl md:text-5xl lg:text-6xl">
             Enterprise Success Stories
           </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto font-light">
+          <p className="mx-auto max-w-3xl text-base font-light text-muted-foreground sm:text-lg md:text-xl">
             KPI-driven results from mission-critical systems deployed across global enterprises
           </p>
         </div>
@@ -107,9 +107,9 @@ export function Portfolio() {
           {caseStudies.map((study, index) => (
             <div
               key={index}
-              className="group p-8 bg-card border border-border/60 rounded-2xl hover:border-[#06B6D4]/50 transition-all duration-300 dark:bg-linear-to-br dark:from-[#1E293B] dark:to-[#0F172A] dark:border-slate-700/50"
+              className="group rounded-2xl border border-border/60 bg-card p-4 transition-all duration-300 hover:border-[#06B6D4]/50 sm:p-6 md:p-8 dark:bg-linear-to-br dark:from-[#1E293B] dark:to-[#0F172A] dark:border-slate-700/50"
             >
-              <div className="grid lg:grid-cols-5 gap-8">
+              <div className="grid gap-6 lg:grid-cols-5 lg:gap-8">
                 <div className="lg:col-span-2">
                   <div className="flex items-start gap-4 mb-6">
                     <div
@@ -118,19 +118,19 @@ export function Portfolio() {
                       <study.icon className="w-8 h-8 text-white" />
                     </div>
                     <div>
-                      <h3 className="text-2xl font-bold text-foreground mb-1">{study.name}</h3>
+                      <h3 className="mb-1 text-xl font-bold text-foreground sm:text-2xl">{study.name}</h3>
                       <div className="text-sm text-[#06B6D4] font-semibold mb-2">{study.industry}</div>
                       <div className="text-muted-foreground italic">{study.tagline}</div>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-2 sm:gap-4">
                     {study.kpis.map((kpi, i) => (
-                      <div key={i} className="p-4 bg-muted/40 border border-border/60 rounded-lg dark:bg-[#0F172A]/50 dark:border-slate-700/30">
-                        <div className="flex items-center gap-2 mb-1">
-                          <kpi.icon className="w-4 h-4 text-[#06B6D4]" />
+                      <div key={i} className="rounded-lg border border-border/60 bg-muted/40 p-2.5 sm:p-4 dark:bg-[#0F172A]/50 dark:border-slate-700/30">
+                        <div className="mb-1 flex items-center gap-1.5 sm:gap-2">
+                          <kpi.icon className="h-3.5 w-3.5 shrink-0 text-[#06B6D4] sm:h-4 sm:w-4" />
                           <div
-                            className={`text-2xl font-bold bg-linear-to-r ${study.gradient} bg-clip-text text-transparent`}
+                            className={`text-lg font-bold bg-linear-to-r sm:text-2xl ${study.gradient} bg-clip-text text-transparent`}
                           >
                             {kpi.value}
                           </div>
@@ -159,16 +159,16 @@ export function Portfolio() {
                     </div>
                   </div>
 
-                  <div className="flex gap-3 flex-wrap">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                     <button
                       type="button"
-                      className={`px-6 py-3 bg-linear-to-r ${study.gradient} rounded-lg font-semibold text-white hover:shadow-lg hover:shadow-[#06B6D4]/30 transition-all`}
+                      className={`w-full rounded-lg bg-linear-to-r px-5 py-2.5 text-sm font-semibold text-white transition-all hover:shadow-lg hover:shadow-[#06B6D4]/30 sm:w-auto sm:px-6 sm:py-3 sm:text-base ${study.gradient}`}
                     >
                       View Full Case Study
                     </button>
                     <button
                       type="button"
-                      className="px-6 py-3 bg-[#1E293B] border border-slate-700 rounded-lg font-semibold text-[#F8FAFC] hover:border-[#06B6D4]/50 transition-all"
+                      className="w-full rounded-lg border border-slate-700 bg-[#1E293B] px-5 py-2.5 text-sm font-semibold text-[#F8FAFC] transition-all hover:border-[#06B6D4]/50 sm:w-auto sm:px-6 sm:py-3 sm:text-base"
                     >
                       Technical Architecture
                     </button>

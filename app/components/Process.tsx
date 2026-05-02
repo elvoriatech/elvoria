@@ -47,13 +47,13 @@ const steps = [
 
 export function Process() {
   return (
-    <section className="py-24 bg-background dark:bg-slate-950">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center mb-16">
-          <h2 className="text-5xl mb-6 bg-linear-to-r from-(--brand-primary) to-(--brand-accent) bg-clip-text text-transparent">
+    <section className="bg-background py-16 sm:py-20 md:py-24 dark:bg-slate-950">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mb-12 text-center sm:mb-16">
+          <h2 className="mb-5 bg-linear-to-r from-(--brand-primary) to-(--brand-accent) bg-clip-text text-3xl text-transparent sm:mb-6 sm:text-4xl md:text-5xl lg:text-6xl">
             Our Development Process
           </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+          <p className="mx-auto max-w-3xl text-base text-muted-foreground sm:text-lg md:text-xl">
             Agile methodology meets strategic planning. Transparent, collaborative,
             and designed to deliver exceptional results on time and on budget.
           </p>

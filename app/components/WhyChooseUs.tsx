@@ -36,23 +36,23 @@ export function WhyChooseUs() {
   ];
 
   return (
-    <section className="py-24 bg-background dark:bg-linear-to-b dark:from-slate-900 dark:to-slate-950">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center mb-16">
-          <h2 className="text-5xl mb-6 bg-linear-to-r from-(--brand-primary) to-(--brand-accent) bg-clip-text text-transparent">
+    <section className="bg-background py-16 sm:py-20 md:py-24 dark:bg-linear-to-b dark:from-slate-900 dark:to-slate-950">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mb-12 text-center sm:mb-16">
+          <h2 className="mb-5 bg-linear-to-r from-(--brand-primary) to-(--brand-accent) bg-clip-text text-3xl text-transparent sm:mb-6 sm:text-4xl md:text-5xl lg:text-6xl">
             Why Choose Elvoriatech
           </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+          <p className="mx-auto max-w-3xl text-base text-muted-foreground sm:text-lg md:text-xl">
             We&apos;re not your typical software agency. Here&apos;s what makes us different
             in a crowded market of mediocre development shops.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+        <div className="mb-12 grid gap-6 md:mb-16 md:grid-cols-2 md:gap-8 lg:grid-cols-3">
           {reasons.map((reason, index) => (
             <div
               key={index}
-              className="p-6 rounded-xl border border-border/60 bg-card/90 hover:bg-card transition-all group dark:bg-linear-to-br dark:from-slate-900 dark:to-slate-800 dark:border-white/10"
+              className="group rounded-xl border border-border/60 bg-card/90 p-4 transition-all hover:bg-card sm:p-6 dark:bg-linear-to-br dark:from-slate-900 dark:to-slate-800 dark:border-white/10"
             >
               <div className="w-12 h-12 bg-linear-to-br from-(--brand-accent) to-(--brand-primary) rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                 <reason.icon className="w-6 h-6 text-white" />
@@ -63,26 +63,26 @@ export function WhyChooseUs() {
           ))}
         </div>
 
-        <div className="p-8 rounded-2xl border border-border/60 bg-card/80 dark:bg-linear-to-r dark:from-purple-900/30 dark:to-blue-900/30 dark:border-white/10">
-          <h3 className="text-3xl mb-6 text-center text-foreground">
+        <div className="rounded-2xl border border-border/60 bg-card/80 p-4 sm:p-6 md:p-8 dark:bg-linear-to-r dark:from-purple-900/30 dark:to-blue-900/30 dark:border-white/10">
+          <h3 className="mb-5 text-center text-2xl text-foreground sm:mb-6 sm:text-3xl">
             The Elvoriatech Advantage
           </h3>
 
-          <div className="grid md:grid-cols-3 gap-8 mb-8">
+          <div className="mb-8 grid gap-6 md:grid-cols-3 md:gap-8">
             <div className="text-center">
-              <div className="text-4xl mb-2 bg-linear-to-r from-(--brand-primary) to-(--brand-accent) bg-clip-text text-transparent">
+              <div className="mb-2 bg-linear-to-r from-(--brand-primary) to-(--brand-accent) bg-clip-text text-2xl text-transparent sm:text-3xl md:text-4xl">
                 50% Faster
               </div>
               <div className="text-muted-foreground">Time to market vs traditional agencies</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl mb-2 bg-linear-to-r from-(--brand-primary) to-(--brand-accent) bg-clip-text text-transparent">
+              <div className="mb-2 bg-linear-to-r from-(--brand-primary) to-(--brand-accent) bg-clip-text text-2xl text-transparent sm:text-3xl md:text-4xl">
                 3x Better
               </div>
               <div className="text-muted-foreground">Performance than industry average</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl mb-2 bg-linear-to-r from-(--brand-primary) to-(--brand-accent) bg-clip-text text-transparent">
+              <div className="mb-2 bg-linear-to-r from-(--brand-primary) to-(--brand-accent) bg-clip-text text-2xl text-transparent sm:text-3xl md:text-4xl">
                 98% Success
               </div>
               <div className="text-muted-foreground">Project completion rate on time & budget</div>

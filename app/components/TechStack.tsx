@@ -184,27 +184,27 @@ export function TechStack() {
   const active = techCategories.find((cat) => cat.id === activeCategory);
 
   return (
-    <section className="py-24 bg-background dark:bg-[#0F172A]">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center mb-16">
-          <div className="inline-block px-4 py-2 bg-[#8B5CF6]/10 border border-[#8B5CF6]/30 rounded-full mb-6">
-            <span className="text-sm text-[#8B5CF6] font-semibold">MODERN STACK</span>
+    <section className="bg-background py-16 sm:py-20 md:py-24 dark:bg-[#0F172A]">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mb-12 text-center sm:mb-16">
+          <div className="mb-5 inline-block rounded-full border border-[#8B5CF6]/30 bg-[#8B5CF6]/10 px-3 py-1.5 sm:mb-6 sm:px-4 sm:py-2">
+            <span className="text-xs font-semibold text-[#8B5CF6] sm:text-sm">MODERN STACK</span>
           </div>
-          <h2 className="text-5xl md:text-6xl mb-6 bg-linear-to-r from-foreground to-[#8B5CF6] bg-clip-text text-transparent font-bold">
+          <h2 className="mb-5 bg-linear-to-r from-foreground to-[#8B5CF6] bg-clip-text text-3xl font-bold text-transparent sm:mb-6 sm:text-4xl md:text-5xl lg:text-6xl">
             Production-Ready Technology
           </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto font-light">
+          <p className="mx-auto max-w-3xl text-base font-light text-muted-foreground sm:text-lg md:text-xl">
             Enterprise-grade tools and frameworks trusted by global industry leaders
           </p>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-12">
+        <div className="mb-10 grid grid-cols-2 gap-2 sm:mb-12 sm:gap-4 md:grid-cols-3 lg:grid-cols-6">
           {techCategories.map((category) => (
             <button
               key={category.id}
               onClick={() => setActiveCategory(category.id)}
               type="button"
-              className={`p-4 rounded-xl border-2 transition-all duration-300 ${
+              className={`rounded-xl border-2 p-2.5 transition-all duration-300 sm:p-4 ${
                 activeCategory === category.id
                   ? 'border-[#06B6D4] bg-[#06B6D4]/10'
                   : 'border-border/60 bg-card hover:bg-muted/30 dark:border-slate-700/50 dark:bg-[#1E293B] dark:hover:border-slate-600'

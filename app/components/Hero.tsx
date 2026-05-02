@@ -79,7 +79,7 @@ export function Hero() {
   return (
     <section
       id="top"
-      className="relative min-h-[calc(100vh-4rem)] flex items-center justify-center overflow-hidden bg-slate-50 dark:bg-linear-to-br dark:from-[#0F172A] dark:via-[#1E293B] dark:to-[#0F172A]"
+      className="relative flex min-h-[calc(100dvh-4rem)] items-center justify-center overflow-hidden bg-slate-50 dark:bg-linear-to-br dark:from-[#0F172A] dark:via-[#1E293B] dark:to-[#0F172A]"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onFocusCapture={() => setPaused(true)}
@@ -108,15 +108,15 @@ export function Hero() {
           style={{
             backgroundImage:
               'linear-gradient(to right, rgb(6 182 212 / 0.45) 1px, transparent 1px), linear-gradient(to bottom, rgb(6 182 212 / 0.45) 1px, transparent 1px)',
-            backgroundSize: '80px 80px',
+            backgroundSize: 'min(12vw, 80px) min(12vw, 80px)',
           }}
         />
       </div>
 
       {/* Gradient Orbs — normal blend in light so text stays readable */}
-      <div className="absolute top-1/4 right-1/4 w-96 h-96 rounded-full bg-violet-300/50 mix-blend-normal filter blur-[128px] opacity-40 animate-pulse dark:bg-[#8B5CF6] dark:mix-blend-multiply dark:opacity-20" />
+      <div className="absolute top-1/4 right-1/4 h-48 w-48 rounded-full bg-violet-300/50 mix-blend-normal opacity-40 blur-[72px] filter animate-pulse sm:h-72 sm:w-72 sm:blur-[96px] md:h-96 md:w-96 md:blur-[128px] dark:bg-[#8B5CF6] dark:mix-blend-multiply dark:opacity-20" />
       <div
-        className="absolute bottom-1/4 left-1/4 w-96 h-96 rounded-full bg-cyan-300/45 mix-blend-normal filter blur-[128px] opacity-40 animate-pulse dark:bg-[#06B6D4] dark:mix-blend-multiply dark:opacity-20"
+        className="absolute bottom-1/4 left-1/4 h-48 w-48 rounded-full bg-cyan-300/45 mix-blend-normal opacity-40 blur-[72px] filter animate-pulse sm:h-72 sm:w-72 sm:blur-[96px] md:h-96 md:w-96 md:blur-[128px] dark:bg-[#06B6D4] dark:mix-blend-multiply dark:opacity-20"
         style={{ animationDelay: '1s' }}
       />
 
@@ -128,14 +128,14 @@ export function Hero() {
       {/* Scrim: strong light wash for readable type; dark keeps cinematic bottom weight */}
       <div className="absolute inset-0 bg-linear-to-b from-white/90 via-white/55 to-slate-100 dark:from-[#0F172A]/90 dark:via-[#0F172A]/50 dark:to-[#0F172A]" />
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-24 text-center">
-        <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#06B6D4]/10 border border-[#06B6D4]/30 rounded-full mb-8 backdrop-blur-sm">
-          <Sparkles className="w-4 h-4 text-[#06B6D4]" />
-          <span className="text-sm text-[#06B6D4] font-semibold">{slide.eyebrow}</span>
+      <div className="relative z-10 mx-auto max-w-7xl px-4 py-12 text-center sm:px-6 sm:py-16 md:px-8 md:py-20 lg:py-24">
+        <div className="mb-5 inline-flex max-w-[95vw] items-center gap-2 rounded-full border border-[#06B6D4]/30 bg-[#06B6D4]/10 px-3 py-1.5 backdrop-blur-sm sm:mb-8 sm:px-4 sm:py-2">
+          <Sparkles className="h-4 w-4 shrink-0 text-[#06B6D4]" />
+          <span className="text-left text-xs font-semibold text-[#06B6D4] sm:text-sm">{slide.eyebrow}</span>
         </div>
 
-        <h1 className="mb-6 font-bold tracking-tight min-h-[12.6rem] flex flex-col items-center justify-start pt-2">
-          <div className="flex flex-col items-center gap-4">
+        <h1 className="mb-5 flex flex-col items-center font-bold tracking-tight sm:mb-6">
+          <div className="flex max-w-full flex-col items-center gap-3 sm:gap-4">
             <span className="sr-only">Elvoriatech</span>
             <Image
               src="/elvoria.png"
@@ -143,43 +143,43 @@ export function Hero() {
               width={96}
               height={96}
               priority
-              className="h-20 w-20 sm:h-24 sm:w-24"
+              className="h-16 w-16 sm:h-20 sm:w-20 md:h-24 md:w-24"
             />
-            <span className="block text-[6rem] whitespace-pre-line leading-[1.05] bg-linear-to-r from-slate-900 via-[#0e7490] to-[#5b21b6] bg-clip-text text-transparent dark:from-[#F8FAFC] dark:via-[#06B6D4] dark:to-[#8B5CF6]">
+            <span className="block max-w-full whitespace-pre-line bg-linear-to-r from-slate-900 via-[#0e7490] to-[#5b21b6] bg-clip-text px-1 text-2xl leading-[1.12] text-transparent sm:px-0 sm:text-4xl sm:leading-[1.08] md:text-5xl lg:text-6xl xl:text-7xl dark:from-[#F8FAFC] dark:via-[#06B6D4] dark:to-[#8B5CF6]">
               {slide.title}
             </span>
           </div>
         </h1>
 
-        <p className="text-xl md:text-2xl font-light text-slate-600 dark:text-slate-300 mb-8 max-w-4xl mx-auto min-h-18">
+        <p className="mx-auto mb-6 max-w-4xl text-base font-light text-slate-600 sm:mb-8 sm:text-lg md:text-xl lg:text-2xl dark:text-slate-300">
           {slide.subtitle}
         </p>
 
-        <p className="text-lg text-slate-500 dark:text-slate-400 mb-12 max-w-3xl mx-auto min-h-18">
+        <p className="mx-auto mb-8 max-w-3xl text-sm text-slate-500 sm:mb-10 sm:text-base md:mb-12 md:text-lg dark:text-slate-400">
           {slide.body}
         </p>
 
-        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+        <div className="flex w-full max-w-md flex-col items-stretch justify-center gap-3 sm:max-w-none sm:flex-row sm:items-center sm:gap-4">
           <button
-            className="group px-8 py-4 bg-linear-to-r from-(--brand-accent) to-(--brand-primary) rounded-lg hover:shadow-lg hover:shadow-(color:--brand-primary)/35 transition-all duration-300 flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-(--brand-primary)/60"
+            className="group flex w-full items-center justify-center gap-2 rounded-lg bg-linear-to-r from-(--brand-accent) to-(--brand-primary) px-5 py-3 text-base transition-all duration-300 hover:shadow-lg hover:shadow-(color:--brand-primary)/35 focus:outline-none focus-visible:ring-2 focus-visible:ring-(--brand-primary)/60 sm:w-auto sm:px-8 sm:py-4 sm:text-lg"
             onClick={() => scrollToId('contact')}
             type="button"
           >
-            <span className="text-lg">Start Your Project</span>
-            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            <span>Start Your Project</span>
+            <ArrowRight className="h-5 w-5 shrink-0 transition-transform group-hover:translate-x-1" />
           </button>
 
           <button
-            className="px-8 py-4 bg-foreground/5 border border-border/60 rounded-lg hover:bg-foreground/10 transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-(--brand-primary)/60"
+            className="w-full rounded-lg border border-border/60 bg-foreground/5 px-5 py-3 text-base transition-all duration-300 hover:bg-foreground/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-(--brand-primary)/60 sm:w-auto sm:px-8 sm:py-4 sm:text-lg"
             onClick={() => scrollToId('portfolio')}
             type="button"
           >
-            <span className="text-lg">View Our Work</span>
+            View Our Work
           </button>
         </div>
 
         {/* Carousel controls */}
-        <div className="mt-10 flex items-center justify-center gap-3">
+        <div className="mt-8 flex items-center justify-center gap-3 sm:mt-10">
           <button
             type="button"
             className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border/60 bg-foreground/5 hover:bg-foreground/10 text-foreground transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-(--brand-primary)/60"
@@ -216,30 +216,30 @@ export function Hero() {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-24 max-w-4xl mx-auto">
+        <div className="mx-auto mt-12 grid max-w-4xl grid-cols-2 gap-4 sm:mt-16 sm:gap-6 md:mt-20 md:grid-cols-4 md:gap-8 lg:mt-24">
           <div>
-            <div className="text-4xl font-bold mb-2 bg-linear-to-r from-[#7c3aed] to-[#0891b2] bg-clip-text text-transparent dark:from-purple-400 dark:to-blue-400">
+            <div className="mb-1 bg-linear-to-r from-[#7c3aed] to-[#0891b2] bg-clip-text text-2xl font-bold text-transparent sm:mb-2 sm:text-3xl md:text-4xl dark:from-purple-400 dark:to-blue-400">
               150+
             </div>
-            <div className="text-slate-600 dark:text-muted-foreground">Projects Delivered</div>
+            <div className="text-xs text-slate-600 sm:text-sm dark:text-muted-foreground">Projects Delivered</div>
           </div>
           <div>
-            <div className="text-4xl font-bold mb-2 bg-linear-to-r from-[#7c3aed] to-[#0891b2] bg-clip-text text-transparent dark:from-purple-400 dark:to-blue-400">
+            <div className="mb-1 bg-linear-to-r from-[#7c3aed] to-[#0891b2] bg-clip-text text-2xl font-bold text-transparent sm:mb-2 sm:text-3xl md:text-4xl dark:from-purple-400 dark:to-blue-400">
               98%
             </div>
-            <div className="text-slate-600 dark:text-muted-foreground">Client Satisfaction</div>
+            <div className="text-xs text-slate-600 sm:text-sm dark:text-muted-foreground">Client Satisfaction</div>
           </div>
           <div>
-            <div className="text-4xl font-bold mb-2 bg-linear-to-r from-[#7c3aed] to-[#0891b2] bg-clip-text text-transparent dark:from-purple-400 dark:to-blue-400">
+            <div className="mb-1 bg-linear-to-r from-[#7c3aed] to-[#0891b2] bg-clip-text text-2xl font-bold text-transparent sm:mb-2 sm:text-3xl md:text-4xl dark:from-purple-400 dark:to-blue-400">
               50+
             </div>
-            <div className="text-slate-600 dark:text-muted-foreground">Expert Developers</div>
+            <div className="text-xs text-slate-600 sm:text-sm dark:text-muted-foreground">Expert Developers</div>
           </div>
           <div>
-            <div className="text-4xl font-bold mb-2 bg-linear-to-r from-[#7c3aed] to-[#0891b2] bg-clip-text text-transparent dark:from-purple-400 dark:to-blue-400">
+            <div className="mb-1 bg-linear-to-r from-[#7c3aed] to-[#0891b2] bg-clip-text text-2xl font-bold text-transparent sm:mb-2 sm:text-3xl md:text-4xl dark:from-purple-400 dark:to-blue-400">
               24/7
             </div>
-            <div className="text-slate-600 dark:text-muted-foreground">Support Available</div>
+            <div className="text-xs text-slate-600 sm:text-sm dark:text-muted-foreground">Support Available</div>
           </div>
         </div>
       </div>

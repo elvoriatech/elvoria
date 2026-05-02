@@ -10,16 +10,16 @@ export function SovereigntyBar() {
 
   return (
     <div className="bg-card border-y border-border/60 dark:bg-[#1E293B] dark:border-slate-700/50">
-      <div className="max-w-7xl mx-auto px-6 py-4">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+      <div className="mx-auto max-w-7xl px-4 py-3 sm:px-6 sm:py-4 lg:px-8">
+        <div className="grid grid-cols-1 gap-4 min-[420px]:grid-cols-2 md:grid-cols-4 md:gap-6">
           {sovereignty.map((item, index) => (
-            <div key={index} className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-linear-to-br from-[#06B6D4] to-[#3B82F6] flex items-center justify-center shrink-0">
-                <item.icon className="w-5 h-5 text-white" />
+            <div key={index} className="flex items-center gap-2.5 sm:gap-3">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-linear-to-br from-[#06B6D4] to-[#3B82F6] sm:h-10 sm:w-10">
+                <item.icon className="h-4 w-4 text-white sm:h-5 sm:w-5" />
               </div>
-              <div>
-                <div className="text-sm font-semibold text-foreground dark:text-[#F8FAFC]">{item.text}</div>
-                <div className="text-xs text-muted-foreground dark:text-slate-400">{item.subtext}</div>
+              <div className="min-w-0">
+                <div className="text-xs font-semibold text-foreground sm:text-sm dark:text-[#F8FAFC]">{item.text}</div>
+                <div className="text-[11px] text-muted-foreground sm:text-xs dark:text-slate-400">{item.subtext}</div>
               </div>
             </div>
           ))}

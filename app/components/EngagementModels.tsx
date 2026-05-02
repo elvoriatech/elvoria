@@ -73,26 +73,26 @@ export function EngagementModels() {
   ];
 
   return (
-    <section className="py-24 bg-background dark:bg-linear-to-b dark:from-[#1E293B] dark:to-[#0F172A]">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#8B5CF6]/10 border border-[#8B5CF6]/30 rounded-full mb-6">
-            <Briefcase className="w-4 h-4 text-[#8B5CF6]" aria-hidden />
-            <span className="text-sm text-[#8B5CF6] font-semibold tracking-wide">ENGAGEMENT MODELS</span>
+    <section className="bg-background py-16 sm:py-20 md:py-24 dark:bg-linear-to-b dark:from-[#1E293B] dark:to-[#0F172A]">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mb-12 text-center sm:mb-16">
+          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#8B5CF6]/30 bg-[#8B5CF6]/10 px-3 py-1.5 sm:mb-6 sm:px-4 sm:py-2">
+            <Briefcase className="h-4 w-4 text-[#8B5CF6]" aria-hidden />
+            <span className="text-xs font-semibold tracking-wide text-[#8B5CF6] sm:text-sm">ENGAGEMENT MODELS</span>
           </div>
-          <h2 className="text-5xl md:text-6xl mb-6 bg-linear-to-r from-foreground to-[#3B82F6] bg-clip-text text-transparent font-bold">
+          <h2 className="mb-5 bg-linear-to-r from-foreground to-[#3B82F6] bg-clip-text text-3xl font-bold text-transparent sm:mb-6 sm:text-4xl md:text-5xl lg:text-6xl">
             Choose Your Engagement Model
           </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto font-light">
+          <p className="mx-auto max-w-3xl text-base font-light text-muted-foreground sm:text-lg md:text-xl">
             Flexible collaboration tailored to your product, timeline, and budget
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid gap-6 md:grid-cols-3 md:gap-8">
           {models.map((model, index) => (
             <div
               key={index}
-              className={`relative flex flex-col p-8 rounded-2xl border-2 transition-all duration-300 ${
+              className={`relative flex flex-col rounded-2xl border-2 p-5 transition-all duration-300 sm:p-6 md:p-8 ${
                 model.highlight
                   ? 'border-[#06B6D4] bg-linear-to-b from-[#06B6D4]/10 to-muted/30 shadow-xl shadow-[#06B6D4]/10 dark:to-[#1E293B] dark:shadow-[#06B6D4]/20'
                   : 'border-border/60 bg-card hover:border-border dark:border-slate-700/50 dark:bg-[#1E293B] dark:hover:border-slate-600'

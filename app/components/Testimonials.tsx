@@ -40,23 +40,23 @@ const testimonials = [
 
 export function Testimonials() {
   return (
-    <section className="py-24 bg-background dark:bg-slate-950">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center mb-16">
-          <h2 className="text-5xl mb-6 bg-linear-to-r from-(--brand-primary) to-(--brand-accent) bg-clip-text text-transparent">
+    <section className="bg-background py-16 sm:py-20 md:py-24 dark:bg-slate-950">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mb-12 text-center sm:mb-16">
+          <h2 className="mb-5 bg-linear-to-r from-(--brand-primary) to-(--brand-accent) bg-clip-text text-3xl text-transparent sm:mb-6 sm:text-4xl md:text-5xl lg:text-6xl">
             Client Success Stories
           </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+          <p className="mx-auto max-w-3xl text-base text-muted-foreground sm:text-lg md:text-xl">
             Don&apos;t just take our word for it. Here&apos;s what our clients say about
             working with Elvoriatech.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid gap-6 md:grid-cols-2 md:gap-8 lg:grid-cols-3">
           {testimonials.map((testimonial, index) => (
             <div
               key={index}
-              className="p-6 rounded-xl border border-border/60 bg-card/90 hover:bg-card transition-all dark:bg-linear-to-br dark:from-slate-900 dark:to-slate-800 dark:border-white/10"
+              className="rounded-xl border border-border/60 bg-card/90 p-4 transition-all hover:bg-card sm:p-6 dark:bg-linear-to-br dark:from-slate-900 dark:to-slate-800 dark:border-white/10"
             >
               <div className="flex items-center gap-1 mb-4">
                 {[...Array(testimonial.rating)].map((_, i) => (

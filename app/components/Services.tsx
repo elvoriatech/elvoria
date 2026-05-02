@@ -85,27 +85,27 @@ export function Services() {
   return (
     <section
       id="services"
-      className="py-24 bg-background dark:bg-linear-to-b dark:from-[#1E293B] dark:to-[#0F172A]"
+      className="bg-background py-16 sm:py-20 md:py-24 dark:bg-linear-to-b dark:from-[#1E293B] dark:to-[#0F172A]"
     >
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center mb-16">
-          <div className="inline-block px-4 py-2 bg-[#06B6D4]/10 border border-[#06B6D4]/30 rounded-full mb-6">
-            <span className="text-sm text-[#06B6D4] font-semibold">CORE CAPABILITIES</span>
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mb-12 text-center sm:mb-16">
+          <div className="mb-5 inline-block rounded-full border border-[#06B6D4]/30 bg-[#06B6D4]/10 px-3 py-1.5 sm:mb-6 sm:px-4 sm:py-2">
+            <span className="text-xs font-semibold text-[#06B6D4] sm:text-sm">CORE CAPABILITIES</span>
           </div>
-          <h2 className="text-5xl md:text-6xl mb-6 bg-linear-to-r from-foreground to-[#06B6D4] bg-clip-text text-transparent font-bold">
+          <h2 className="mb-5 bg-linear-to-r from-foreground to-[#06B6D4] bg-clip-text text-3xl font-bold text-transparent sm:mb-6 sm:text-4xl md:text-5xl lg:text-6xl">
             Enterprise Services
           </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto font-light">
+          <p className="mx-auto max-w-3xl text-base font-light text-muted-foreground sm:text-lg md:text-xl">
             Deep expertise from experienced engineers in AI, cloud architecture, SaaS platforms, and mission-critical
             systems
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid gap-6 md:grid-cols-2 md:gap-8 lg:grid-cols-3">
           {services.map((service, index) => (
             <div
               key={index}
-              className="group p-8 bg-card border border-border/60 rounded-xl hover:border-[#06B6D4]/50 transition-all duration-300 dark:bg-linear-to-br dark:from-[#1E293B] dark:to-[#0F172A] dark:border-slate-700/50"
+              className="group rounded-xl border border-border/60 bg-card p-5 transition-all duration-300 hover:border-[#06B6D4]/50 sm:p-6 md:p-8 dark:bg-linear-to-br dark:from-[#1E293B] dark:to-[#0F172A] dark:border-slate-700/50"
             >
               <div
                 className={`w-14 h-14 rounded-xl bg-linear-to-br ${service.gradient} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}
@@ -113,7 +113,7 @@ export function Services() {
                 <service.icon className="w-7 h-7 text-white" />
               </div>
 
-              <h3 className="text-2xl font-bold text-foreground mb-3">{service.name}</h3>
+              <h3 className="mb-3 text-xl font-bold text-foreground sm:text-2xl">{service.name}</h3>
               <p className="text-muted-foreground mb-6 leading-relaxed">{service.description}</p>
 
               <div className="space-y-2">
