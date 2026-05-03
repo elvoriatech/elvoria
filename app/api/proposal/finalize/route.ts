@@ -5,6 +5,7 @@ import { emptyDraft, normalizeDraft, readiness, type ProposalDraft } from '@/lib
 import { sendChat, type ChatMessage } from '@/lib/openrouter';
 import { estimateRough } from '@/lib/estimator';
 import { renderProposalPdf } from '@/lib/pdfGenerator';
+import { loadProposalPdfServerAssets } from '@/lib/proposalPdfServerAssets';
 import { signDownloadToken } from '@/lib/pdfToken';
 import { getSalesEngineerContextBlock } from '@/lib/companyContext';
 import { getProposalArchitectRoleBlock } from '@/lib/aiProposalArchitect';
@@ -105,6 +106,7 @@ export async function POST(request: NextRequest) {
         '',
         'Diagrams:',
         '- Include 2 Mermaid fenced code blocks (`mermaid`): (1) flowchart high-level architecture, (2) sequenceDiagram for the primary user/system flow.',
+        '- After ```mermaid put a newline before the diagram keyword (flowchart / sequenceDiagram / graph). Use simple ASCII node IDs (A, B, C); avoid slashes or spaces inside participant names.',
         '',
         'Commercial:',
         '- Map engagement options to company PRICING where helpful (dedicated team / fixed scope / hourly).',
@@ -160,16 +162,19 @@ export async function POST(request: NextRequest) {
 
     const outPdf = proposalPdfPath(versionId);
     try {
+      const pdfAssets = await loadProposalPdfServerAssets();
       await renderProposalPdf({
         markdown,
         outPath: outPdf,
         branding: {
           companyName: process.env.COMPANY_NAME || 'Elvoriatech',
           siteUrl: process.env.SITE_URL || 'https://elvoriatech.com',
-          logoUrl: `file://${process.cwd()}/public/elvoria.png`,
-          primary: '#06b6d4',
-          secondary: '#8b5cf6',
+          /* Align with app/theme.css `.theme-elvoria.dark` (cyan + indigo) */
+          primary: '#22d3ee',
+          secondary: '#6366f1',
         },
+        logoDataUri: pdfAssets.logoDataUri,
+        mermaidScript: pdfAssets.mermaidScript,
       });
       version.pdf = { status: 'ready', path: outPdf };
     } catch (e) {
@@ -190,6 +195,8 @@ export async function POST(request: NextRequest) {
         to: visitorEmail,
         visitorName: visitorName || 'there',
         siteUrl,
+        versionId,
+        downloadToken: token,
       });
       followUpEmailSent = mail.sent;
       if (!mail.sent) {
@@ -212,6 +219,10 @@ export async function POST(request: NextRequest) {
       versionId,
       pdfStatus: version.pdf.status,
       download: version.pdf.status === 'ready' ? { url: `/api/proposal/version/${versionId}/download?token=${token}` } : null,
+      preview:
+        version.pdf.status !== 'ready'
+          ? { url: `/api/proposal/version/${versionId}/preview?token=${encodeURIComponent(token)}` }
+          : null,
       readiness: r,
       estimate,
       followUpEmailSent,

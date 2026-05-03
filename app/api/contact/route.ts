@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import nodemailer from 'nodemailer';
 import { NextRequest, NextResponse } from 'next/server';
+import { escapeHtmlEmail as escapeHtml, renderElvoriaEmailShell } from '@/lib/emailShell';
 
 function toPublicEmailError(error: unknown) {
   const e = error as { code?: string; responseCode?: number; message?: string };
@@ -15,106 +16,6 @@ function toPublicEmailError(error: unknown) {
   const code = e?.code ? ` (${e.code})` : '';
   const msg = e?.message ? `: ${String(e.message)}` : '';
   return { status: 500, message: `Failed to send email${code}${msg}` };
-}
-
-function escapeHtml(input: string) {
-  return input
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#039;');
-}
-
-function renderEmailShell(params: {
-  title: string;
-  preheader: string;
-  contentHtml: string;
-  showTimestamp?: boolean;
-}) {
-  const { title, preheader, contentHtml, showTimestamp = true } = params;
-
-  return `
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <meta name="x-apple-disable-message-reformatting" />
-    <title>${escapeHtml(title)}</title>
-    <style>
-      @media (max-width: 480px) {
-        .container { padding: 20px 12px !important; }
-        .card { padding: 16px !important; }
-        .h1 { font-size: 18px !important; }
-        .p { font-size: 13px !important; }
-        .grid td { display:block !important; width:100% !important; }
-        .grid td + td { margin-top:10px !important; }
-      }
-    </style>
-  </head>
-  <body style="margin:0;padding:0;background:#070b14;color:#e5e7eb;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Inter,Arial,sans-serif;">
-    <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">${escapeHtml(preheader)}</div>
-    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;background:#070b14;">
-      <tr>
-        <td align="center" class="container" style="padding:32px 16px;">
-          <table role="presentation" width="640" cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;max-width:640px;">
-            <tr>
-              <td style="padding:0 0 16px 0;">
-                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;">
-                  <tr>
-                    <td style="vertical-align:middle;">
-                      <table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;">
-                        <tr>
-                          <td style="vertical-align:middle;padding-right:12px;">
-                            <img src="cid:elvoria-mark" alt="" width="36" height="36" style="display:block;border-radius:10px;box-shadow:0 10px 26px rgba(34,211,238,0.18);" />
-                          </td>
-                          <td style="vertical-align:middle;">
-                            <div style="font-size:14px;font-weight:700;letter-spacing:0.3px;color:#ffffff;line-height:1.2;">
-                              Elvoriatech
-                            </div>
-                            <div style="font-size:12px;color:#94a3b8;line-height:1.2;margin-top:2px;">
-                              AI-First Digital &amp; Software Development Partner
-                            </div>
-                          </td>
-                        </tr>
-                      </table>
-                    </td>
-                    ${
-                      showTimestamp
-                        ? `<td align="right" style="vertical-align:middle;">
-                      <div style="font-size:12px;color:#94a3b8;">${new Date().toLocaleString()}</div>
-                    </td>`
-                        : `<td align="right" style="vertical-align:middle;"></td>`
-                    }
-                  </tr>
-                </table>
-              </td>
-            </tr>
-
-            <tr>
-              <td class="card" style="background:linear-gradient(135deg, rgba(139,92,246,0.16), rgba(6,182,212,0.10));border:1px solid rgba(255,255,255,0.10);border-radius:18px;padding:22px 22px 18px 22px;box-shadow:0 20px 60px rgba(0,0,0,0.35);">
-                ${contentHtml}
-              </td>
-            </tr>
-
-            <tr>
-              <td style="padding:14px 4px 0 4px;">
-                <div style="font-size:12px;color:#94a3b8;line-height:1.6;">
-                  You’re receiving this email because a message was submitted via your website contact form.
-                </div>
-                <div style="margin-top:10px;font-size:11px;color:#64748b;line-height:1.6;">
-                  © ${new Date().getFullYear()} Elvoriatech. All rights reserved.
-                </div>
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-    </table>
-  </body>
-  </html>
-`;
 }
 
 export async function POST(request: NextRequest) {
@@ -194,10 +95,13 @@ export async function POST(request: NextRequest) {
       from: fromAddress,
       to: contactEmail,
       subject: `New Contact Form Submission — ${name}`,
-      html: renderEmailShell({
+      html: renderElvoriaEmailShell({
         title: 'New Contact Form Submission',
         preheader: `New contact form submission from ${name}.`,
         showTimestamp: true,
+        logoImgSrc: 'cid:elvoria-mark',
+        footerNoteHtml:
+          'You’re receiving this email because a message was submitted via your website contact form.',
         contentHtml: `
           <div class="h1" style="font-size:18px;font-weight:800;color:#ffffff;margin:0 0 10px 0;">New Contact Form Submission</div>
           <div class="p" style="font-size:13px;color:#cbd5e1;line-height:1.7;margin:0 0 14px 0;">
@@ -275,10 +179,13 @@ export async function POST(request: NextRequest) {
           to: email,
           subject: `Thank you for contacting ${companyName}`,
           replyTo: contactEmail,
-          html: renderEmailShell({
+          html: renderElvoriaEmailShell({
             title: 'We received your message',
             preheader: 'Thanks — we’ll get back to you shortly.',
             showTimestamp: false,
+            logoImgSrc: 'cid:elvoria-mark',
+            footerNoteHtml:
+              'You’re receiving this email because you used the contact form on our website.',
             contentHtml: `
             <div class="h1" style="font-size:18px;font-weight:800;color:#ffffff;margin:0 0 10px 0;">Thank you for reaching out</div>
             <div class="p" style="font-size:13px;color:#cbd5e1;line-height:1.7;margin:0 0 14px 0;">

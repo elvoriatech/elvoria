@@ -234,6 +234,7 @@ export function ProposalChatWidget() {
         error?: string;
         readiness?: { missing?: string[] };
         download?: { url?: string };
+        preview?: { url?: string };
         pdfStatus?: string;
         followUpEmailSent?: boolean;
       };
@@ -244,6 +245,11 @@ export function ProposalChatWidget() {
       if (data?.download?.url) setDownloadUrl(data.download.url);
       const pdfReady = data?.pdfStatus === 'ready';
       const emailed = Boolean(data?.followUpEmailSent);
+      const previewPath = data?.preview?.url?.trim();
+      const previewLine =
+        !pdfReady && previewPath
+          ? `\n\n[**Open your full proposal in the browser**](${window.location.origin}${previewPath.startsWith('/') ? previewPath : `/${previewPath}`}) — you can read, print, or save as PDF from your browser.`
+          : '';
       setMessages((m) => [
         ...m,
         {
@@ -251,8 +257,8 @@ export function ProposalChatWidget() {
           content: pdfReady
             ? 'Your PDF is ready. Use the download button below.'
             : emailed
-              ? 'The proposal was saved, but the automatic PDF could not be created right now. You will receive an email shortly with next steps, and another message with the PDF once our team sends it — please check your inbox and spam folder.'
-              : 'The proposal was saved, but the automatic PDF could not be created right now. You should still receive an email from us shortly if mail is configured; otherwise, please contact us on the site and mention “proposal PDF”.',
+              ? `The proposal was saved, but the automatic PDF could not be created right now. Check your email for a **professional summary** with a secure link to read the full proposal online. Our team can still email you the official PDF — check spam if needed.${previewLine}`
+              : `The proposal was saved, but the automatic PDF could not be created right now. If outbound mail is configured, you may receive an email with a link; otherwise use the link below or contact us on the site and mention “proposal PDF”.${previewLine}`,
         },
       ]);
     } catch (e) {
