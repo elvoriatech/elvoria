@@ -1,19 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { randomUUID } from 'node:crypto';
-import { readJson, writeJson, conversationPath } from '@/lib/localStore';
+import { loadConversationSnapshot, saveConversationSnapshot, type ConversationSnapshot } from '@/lib/crmStore';
+import { crmErrorResponse } from '@/lib/crmApiError';
 import { emptyDraft, normalizeDraft, readiness, type ProposalDraft } from '@/lib/proposalSchema';
 import { sendChat, type ChatMessage } from '@/lib/openrouter';
 import { getSalesEngineerContextBlock } from '@/lib/companyContext';
 import { getProposalArchitectRoleBlock } from '@/lib/aiProposalArchitect';
 import { PROPOSAL_CHAT_MAX_USER_MESSAGES } from '@/lib/proposalChatLimits';
+import { rateLimitOrThrow } from '@/lib/rateLimit';
 
-type StoredConversation = {
-  id: string;
-  createdAt: string;
-  updatedAt: string;
-  messages: Array<{ role: 'user' | 'assistant'; content: string; ts: string }>;
-  draft: ProposalDraft;
-};
+type StoredConversation = ConversationSnapshot;
 
 function safeParseJson<T>(text: string): T | null {
   try {
@@ -46,6 +42,12 @@ function formatTranscript(messages: StoredConversation['messages']): string {
 }
 
 export async function POST(request: NextRequest) {
+  const limited = await rateLimitOrThrow({
+    req: request,
+    config: { name: 'proposal_chat', limit: 30, windowSeconds: 60 },
+  });
+  if (limited) return limited;
+
   try {
     const body = (await request.json().catch(() => ({}))) as {
       conversationId?: string;
@@ -58,10 +60,9 @@ export async function POST(request: NextRequest) {
     }
 
     const conversationId = body.conversationId || randomUUID();
-    const filePath = conversationPath(conversationId);
     const now = new Date().toISOString();
 
-    const existing = await readJson<StoredConversation | null>(filePath, null);
+    const existing = await loadConversationSnapshot(conversationId);
     const convo: StoredConversation =
       existing ??
       ({
@@ -177,7 +178,7 @@ export async function POST(request: NextRequest) {
     convo.draft = mergedDraft;
     convo.updatedAt = new Date().toISOString();
 
-    await writeJson(filePath, convo);
+    await saveConversationSnapshot(convo);
 
     const r = readiness(convo.draft);
     return NextResponse.json({
@@ -187,6 +188,8 @@ export async function POST(request: NextRequest) {
       readiness: r,
     });
   } catch (err) {
+    const crm = crmErrorResponse(err);
+    if (crm) return crm;
     console.error('Chat API error:', err);
     const message = err instanceof Error ? err.message : 'Chat failed';
     return NextResponse.json({ error: message }, { status: 500 });

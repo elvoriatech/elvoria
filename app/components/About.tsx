@@ -1,4 +1,11 @@
-import { Award, Check, Map, Target, Users } from 'lucide-react';
+import { Award, Check, Map, MapPin, Target, Users } from 'lucide-react';
+import Image from 'next/image';
+
+const COMPANY_BRANCH = {
+  name: 'Elvoria Tech',
+  office: 'Koblenz, Germany',
+  tagline: 'Engineering-led · AI-first · Cloud-native',
+} as const;
 
 export function About() {
   return (
@@ -32,7 +39,44 @@ export function About() {
             </div>
           </div>
 
-          <div className="space-y-6">
+          <div className="flex h-64 flex-col justify-between rounded-2xl border border-border/60 bg-card p-6 sm:h-80 sm:p-8 lg:h-96 dark:border-[#06B6D4]/25 dark:bg-linear-to-br dark:from-[#1E293B] dark:to-[#0F172A]">
+            <div className="flex items-center gap-4">
+              <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-2xl border border-[#06B6D4]/30 bg-[#0F172A] shadow-lg shadow-[#06B6D4]/10 sm:h-20 sm:w-20">
+                <Image
+                  src="/elvoria.png"
+                  alt={`${COMPANY_BRANCH.name} logo`}
+                  width={80}
+                  height={80}
+                  className="h-full w-full object-cover"
+                  priority
+                />
+              </div>
+              <div className="min-w-0">
+                <p className="bg-linear-to-r from-[#06B6D4] to-[#8B5CF6] bg-clip-text text-xl font-bold text-transparent sm:text-2xl">
+                  {COMPANY_BRANCH.name}
+                </p>
+                <p className="mt-1 text-sm text-muted-foreground dark:text-slate-400">{COMPANY_BRANCH.tagline}</p>
+              </div>
+            </div>
+
+            <div className="rounded-xl border border-border/60 bg-background/80 p-4 dark:border-slate-700/80 dark:bg-[#0F172A]/60">
+              <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-[#06B6D4]">
+                <MapPin className="h-4 w-4 shrink-0" aria-hidden />
+                Branch office
+              </div>
+              <p className="text-lg font-semibold text-foreground dark:text-[#F8FAFC]">{COMPANY_BRANCH.office}</p>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground dark:text-slate-400">
+                Remote-first delivery for clients across 35+ countries, with our engineering hub in Germany.
+              </p>
+            </div>
+
+            <p className="text-sm text-muted-foreground dark:text-slate-500">
+              Experienced engineering teams · GDPR-aware practices · Long-term partnerships
+            </p>
+          </div>
+        </div>
+
+        <div className="space-y-6">
             <div className="rounded-xl border border-border/60 bg-card p-4 sm:p-6 dark:bg-linear-to-br dark:from-[#1E293B] dark:to-[#0F172A] dark:border-[#06B6D4]/30">
               <div className="flex items-start gap-4">
                 <div className="w-12 h-12 rounded-lg bg-linear-to-br from-[#06B6D4] to-[#3B82F6] flex items-center justify-center shrink-0">
@@ -100,9 +144,8 @@ export function About() {
               </div>
             </div>
           </div>
-        </div>
 
-        <div className="rounded-2xl border border-border/60 bg-linear-to-r from-[#06B6D4]/10 to-[#8B5CF6]/10 p-4 sm:p-6 md:p-8 dark:border-[#06B6D4]/30">
+        <div className="mt-10 rounded-2xl border border-border/60 bg-linear-to-r from-[#06B6D4]/10 to-[#8B5CF6]/10 p-4 sm:mt-12 sm:p-6 md:mt-14 md:p-8 dark:border-[#06B6D4]/30">
           <div className="flex items-start gap-3 sm:gap-4">
             <Users className="mt-1 h-7 w-7 shrink-0 text-[#06B6D4] sm:h-8 sm:w-8" />
             <div className="min-w-0">

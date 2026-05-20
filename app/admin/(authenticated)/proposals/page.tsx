@@ -1,8 +1,10 @@
+import { isCrmReady, isCrmSchemaApplied } from '@/lib/crmStore';
 import { readProposalFinalizeLogForAdmin } from '@/lib/proposalFinalizeLog';
 import { AdminProposalQueue } from '../../_components/AdminProposalQueue';
 
 export default async function AdminAiProposalsPage() {
-  const proposalRows = await readProposalFinalizeLogForAdmin();
+  const canQuery = isCrmReady() && (await isCrmSchemaApplied());
+  const proposalRows = canQuery ? await readProposalFinalizeLogForAdmin() : [];
 
   return (
     <div className="space-y-6">

@@ -2,10 +2,27 @@
 
 import { Loader2, Maximize2, Minimize2 } from 'lucide-react';
 import { marked } from 'marked';
+import DOMPurify from 'dompurify';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { readiness, type ProposalDraft } from '@/lib/proposalSchema';
 import { PROPOSAL_CHAT_MAX_USER_MESSAGES } from '@/lib/proposalChatLimits';
+import type { ProposalChatSource } from '@/lib/elvoriaEvents';
 import type { SupportLeadSource } from '@/lib/supportLeads';
+
+const PROPOSAL_CHAT_SOURCES: SupportLeadSource[] = [
+  'proposal_widget',
+  'contact_technical_proposal',
+  'hero_start_project',
+  'hero_build_together',
+  'contact_start_project',
+];
+
+function toLeadSource(src: string | undefined): SupportLeadSource {
+  if (src && PROPOSAL_CHAT_SOURCES.includes(src as SupportLeadSource)) {
+    return src as SupportLeadSource;
+  }
+  return 'proposal_widget';
+}
 
 type ChatMsg = { role: 'user' | 'assistant'; content: string };
 
@@ -20,7 +37,14 @@ const MD_WRAPPER_CLASS =
 
 function assistantHtml(markdown: string): string {
   try {
-    return marked.parse(markdown, { gfm: true, breaks: true, async: false }) as string;
+    const raw = marked.parse(markdown, { gfm: true, breaks: true, async: false }) as string;
+    return DOMPurify.sanitize(raw, {
+      USE_PROFILES: { html: true },
+      // Basic hardening: keep links safe even if model emits odd markup.
+      ADD_ATTR: ['target', 'rel'],
+      FORBID_TAGS: ['style', 'script', 'iframe', 'object', 'embed'],
+      FORBID_ATTR: ['style', 'onerror', 'onload', 'onclick'],
+    });
   } catch {
     return `<p>${markdown.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')}</p>`;
   }
@@ -105,13 +129,18 @@ export function ProposalChatWidget() {
     if (saved) setConversationId(saved);
   }, []);
 
+  useEffect(() => {
+    if (open && !conversationId) {
+      setConversationId(crypto.randomUUID());
+    }
+  }, [open, conversationId]);
+
   /** Open from elsewhere (e.g. Contact “Request Technical Proposal”). */
   useEffect(() => {
     const ev = 'elvoria:open-proposal-chat';
     function onOpenProposal(e: Event) {
-      const ce = e as CustomEvent<{ source?: string }>;
-      const src = ce.detail?.source;
-      setLeadSource(src === 'contact_technical_proposal' ? 'contact_technical_proposal' : 'proposal_widget');
+      const ce = e as CustomEvent<{ source?: ProposalChatSource }>;
+      setLeadSource(toLeadSource(ce.detail?.source));
       setOpen(true);
     }
     window.addEventListener(ev, onOpenProposal as EventListener);
@@ -131,11 +160,14 @@ export function ProposalChatWidget() {
   async function submitLead() {
     setLeadError('');
     setLeadBusy(true);
+    const cid = conversationId ?? crypto.randomUUID();
+    if (!conversationId) setConversationId(cid);
     try {
       const res = await fetch('/api/support-lead', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          conversationId: cid,
           fullName: leadForm.fullName.trim(),
           email: leadForm.email.trim(),
           company: leadForm.company.trim(),
@@ -143,8 +175,9 @@ export function ProposalChatWidget() {
           source: leadSource,
         }),
       });
-      const data = (await readJsonBody(res)) as { error?: string };
+      const data = (await readJsonBody(res)) as { error?: string; conversationId?: string };
       if (!res.ok) throw new Error(data?.error || 'Could not save your details');
+      if (data.conversationId) setConversationId(data.conversationId);
       localStorage.setItem(
         LEAD_STORAGE_KEY,
         JSON.stringify({
@@ -278,7 +311,7 @@ export function ProposalChatWidget() {
     'w-full rounded-xl border border-white/10 bg-transparent px-3 py-2 text-sm text-foreground outline-none placeholder:text-muted-foreground focus:border-cyan-400/60';
 
   return (
-    <div className="fixed bottom-4 right-4 z-[60]">
+    <div className={clsx('fixed bottom-4 right-4', open ? 'z-[80]' : 'z-[60]')}>
       {!open ? (
         <button
           type="button"

@@ -1,7 +1,9 @@
 'use client';
 
-import { Calendar, CircleCheck, Mail, MapPin, MessageSquare, Phone, Send, X } from 'lucide-react';
+import { Calendar, CircleCheck, Mail, MapPin, MessageSquare, Send } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import type { ContactInquiryPreset } from '@/lib/elvoriaEvents';
+import { OpenProposalChatTrigger } from './OpenProposalChatTrigger';
 import { ScheduleConsultationTrigger } from './ScheduleConsultationTrigger';
 
 export function Contact() {
@@ -19,92 +21,20 @@ export function Contact() {
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
 
-  const [scheduleOpen, setScheduleOpen] = useState(false);
-  const [scheduleData, setScheduleData] = useState({
-    name: '',
-    email: '',
-    company: '',
-    preferredDate: '',
-    preferredTime: '',
-    timeZone:
-      typeof Intl !== 'undefined'
-        ? Intl.DateTimeFormat().resolvedOptions().timeZone || ''
-        : '',
-    notes: '',
-  });
-  const [scheduleLoading, setScheduleLoading] = useState(false);
-  const [scheduleSubmitted, setScheduleSubmitted] = useState(false);
-  const [scheduleError, setScheduleError] = useState('');
-
-  type ScheduleSlot = { start: string; end: string; label: string };
-  const [scheduleBookingMode, setScheduleBookingMode] = useState<'unknown' | 'slots' | 'email'>('unknown');
-  const [slotsLoading, setSlotsLoading] = useState(false);
-  const [slots, setSlots] = useState<ScheduleSlot[]>([]);
-  const [selectedSlot, setSelectedSlot] = useState<ScheduleSlot | null>(null);
-
   useEffect(() => {
-    const openSchedule = () => {
-      setScheduleError('');
-      setScheduleOpen(true);
-    };
-    window.addEventListener('elvoria:open-schedule', openSchedule);
-    return () => window.removeEventListener('elvoria:open-schedule', openSchedule);
-  }, []);
-
-  useEffect(() => {
-    if (!scheduleOpen) return;
-    setScheduleBookingMode('unknown');
-    setSelectedSlot(null);
-    setSlots([]);
-    setScheduleData((prev) => {
-      if (prev.preferredDate) return prev;
-      const d = new Date();
-      const pad = (n: number) => String(n).padStart(2, '0');
-      return {
+    function onOpenInquiry(e: Event) {
+      const ce = e as CustomEvent<ContactInquiryPreset>;
+      const preset = ce.detail ?? {};
+      setFormData((prev) => ({
         ...prev,
-        preferredDate: `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`,
-      };
-    });
-  }, [scheduleOpen]);
-
-  useEffect(() => {
-    if (!scheduleOpen || !scheduleData.preferredDate) return;
-    let cancelled = false;
-    setSlotsLoading(true);
-    const tz = scheduleData.timeZone?.trim() || 'Europe/Berlin';
-    const params = new URLSearchParams({ date: scheduleData.preferredDate, timeZone: tz });
-
-    (async () => {
-      try {
-        const res = await fetch(`/api/availability?${params}`);
-        const json = (await res.json()) as {
-          useEmailFallback?: boolean;
-          slots?: ScheduleSlot[];
-        };
-        if (cancelled) return;
-        if (json.useEmailFallback) {
-          setScheduleBookingMode('email');
-          setSlots([]);
-        } else {
-          setScheduleBookingMode('slots');
-          setSlots(Array.isArray(json.slots) ? json.slots : []);
-        }
-        setSelectedSlot(null);
-      } catch {
-        if (!cancelled) {
-          setScheduleBookingMode('email');
-          setSlots([]);
-          setSelectedSlot(null);
-        }
-      } finally {
-        if (!cancelled) setSlotsLoading(false);
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [scheduleOpen, scheduleData.preferredDate, scheduleData.timeZone]);
+        projectType: preset.projectType ?? prev.projectType,
+        budget: preset.budget ?? prev.budget,
+        message: prev.message.trim() ? prev.message : preset.messageSeed ?? prev.message,
+      }));
+    }
+    window.addEventListener('elvoria:open-contact-inquiry', onOpenInquiry);
+    return () => window.removeEventListener('elvoria:open-contact-inquiry', onOpenInquiry);
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -112,13 +42,6 @@ export function Contact() {
       ...prev,
       [name]: value
     }));
-  };
-
-  const handleScheduleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setScheduleData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -160,95 +83,6 @@ export function Contact() {
     }
   };
 
-  const handleScheduleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setScheduleLoading(true);
-    setScheduleError('');
-
-    try {
-      if (scheduleBookingMode === 'slots') {
-        if (!selectedSlot) {
-          setScheduleError('Please choose an available time slot.');
-          return;
-        }
-        const response = await fetch('/api/bookings', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            name: scheduleData.name,
-            email: scheduleData.email,
-            company: scheduleData.company,
-            notes: scheduleData.notes,
-            startTime: selectedSlot.start,
-            endTime: selectedSlot.end,
-            timeZone: scheduleData.timeZone || 'Europe/Berlin',
-            meetingTypeSlug: 'consultation',
-          }),
-        });
-
-        if (response.status === 409) {
-          setScheduleError('That time was just taken. Pick another slot.');
-          const tz = scheduleData.timeZone?.trim() || 'Europe/Berlin';
-          const params = new URLSearchParams({ date: scheduleData.preferredDate, timeZone: tz });
-          const r2 = await fetch(`/api/availability?${params}`);
-          const j2 = (await r2.json()) as { slots?: ScheduleSlot[] };
-          setSlots(Array.isArray(j2.slots) ? j2.slots : []);
-          setSelectedSlot(null);
-          return;
-        }
-
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          throw new Error(errorData.error || 'Could not complete booking');
-        }
-
-        setScheduleSubmitted(true);
-        setScheduleData((prev) => ({
-          ...prev,
-          preferredDate: '',
-          preferredTime: '',
-          notes: '',
-        }));
-        setSelectedSlot(null);
-
-        setTimeout(() => {
-          setScheduleSubmitted(false);
-          setScheduleOpen(false);
-        }, 2500);
-        return;
-      }
-
-      const response = await fetch('/api/schedule', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(scheduleData),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || 'Failed to send scheduling request');
-      }
-
-      setScheduleSubmitted(true);
-      setScheduleData((prev) => ({
-        ...prev,
-        preferredDate: '',
-        preferredTime: '',
-        notes: '',
-      }));
-
-      setTimeout(() => {
-        setScheduleSubmitted(false);
-        setScheduleOpen(false);
-      }, 2500);
-    } catch (err) {
-      setScheduleError(err instanceof Error ? err.message : 'Failed to send request. Please try again.');
-      console.error(err);
-    } finally {
-      setScheduleLoading(false);
-    }
-  };
-
   return (
     <section id="contact" className="bg-background py-16 sm:py-20 md:py-24 dark:bg-[#0F172A]">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -262,11 +96,22 @@ export function Contact() {
           <p className="mx-auto max-w-3xl text-base font-light text-muted-foreground sm:text-lg md:text-xl">
             Let&apos;s discuss how we can architect your global digital transformation
           </p>
+          <OpenProposalChatTrigger
+            source="contact_start_project"
+            className="group mx-auto mt-6 inline-flex items-center gap-2 rounded-lg border border-[#8B5CF6]/40 bg-[#8B5CF6]/10 px-5 py-3 text-sm font-semibold text-foreground transition-all hover:border-[#8B5CF6] hover:bg-[#8B5CF6]/15 sm:mt-8 sm:text-base dark:text-[#F8FAFC]"
+            aria-label="Start your project with AI proposal chat"
+          >
+            <MessageSquare className="h-5 w-5 text-[#8B5CF6]" aria-hidden />
+            <span>Start with AI proposal chat</span>
+          </OpenProposalChatTrigger>
         </div>
 
         <div className="grid gap-8 lg:grid-cols-2 lg:gap-12">
           {/* Contact Form */}
-          <div className="rounded-2xl border border-slate-700/50 bg-linear-to-br from-[#1E293B] to-[#0F172A] p-4 sm:p-6 md:p-8">
+          <div
+            id="project-inquiry-form"
+            className="scroll-mt-24 rounded-2xl border border-slate-700/50 bg-linear-to-br from-[#1E293B] to-[#0F172A] p-4 sm:p-6 md:p-8 ring-offset-2 transition-[box-shadow] focus-within:ring-2 focus-within:ring-[#06B6D4]/40"
+          >
             <h3 className="mb-4 text-xl font-bold text-[#F8FAFC] sm:mb-6 sm:text-2xl">Project Inquiry</h3>
 
             {submitted && (
@@ -404,19 +249,27 @@ export function Contact() {
                   </div>
                   <div>
                     <div className="text-slate-400 mb-1">Email</div>
-                    <div className="text-slate-200">contact@elvoriatech.com</div>
-                    <div className="text-slate-200">info@elvoriatech.com</div>
+                    <a
+                      href="mailto:info@elvoriatech.com"
+                      className="text-slate-200 hover:text-[#06B6D4] transition-colors"
+                    >
+                      info@elvoriatech.com
+                    </a>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 rounded-lg bg-linear-to-br from-[#06B6D4] to-[#3B82F6] flex items-center justify-center shrink-0">
-                    <Phone className="w-6 h-6 text-white" />
+                    <Mail className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <div className="text-slate-400 mb-1">Phone</div>
-                    <div className="text-slate-200">+1 (555) 123-4567</div>
-                    <div className="text-slate-400 text-sm">Mon-Fri, 9AM-6PM EST</div>
+                    <div className="text-slate-400 mb-1">Contact</div>
+                    <a
+                      href="mailto:contact@elvoriatech.com"
+                      className="text-slate-200 hover:text-[#06B6D4] transition-colors"
+                    >
+                      contact@elvoriatech.com
+                    </a>
                   </div>
                 </div>
 
@@ -426,14 +279,16 @@ export function Contact() {
                   </div>
                   <div>
                     <div className="text-slate-400 mb-1">Office</div>
-                    <div className="text-slate-200">123 Innovation Drive</div>
-                    <div className="text-slate-200">San Francisco, CA 94103</div>
+                    <div className="text-slate-200">Koblenz, Germany</div>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="rounded-2xl border border-[#06B6D4]/30 bg-linear-to-r from-[#06B6D4]/10 to-[#8B5CF6]/10 p-4 sm:p-6 md:p-8">
+            <div
+              id="schedule-consultation"
+              className="scroll-mt-24 rounded-2xl border border-[#06B6D4]/30 bg-linear-to-r from-[#06B6D4]/10 to-[#8B5CF6]/10 p-4 sm:p-6 md:p-8"
+            >
               <h4 className="text-xl font-bold text-[#F8FAFC] mb-4">Quick Actions</h4>
 
               <div className="space-y-3">
@@ -444,23 +299,12 @@ export function Contact() {
                   </span>
                 </ScheduleConsultationTrigger>
 
-                <button
-                  type="button"
-                  onClick={() => {
-                    window.dispatchEvent(
-                      new CustomEvent('elvoria:open-proposal-chat', {
-                        detail: { source: 'contact_technical_proposal' },
-                      })
-                    );
-                    document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                  }}
-                  className="w-full px-6 py-4 bg-[#1E293B] border border-slate-700 rounded-lg hover:border-[#8B5CF6] transition-all flex items-center gap-3 group"
-                >
-                  <MessageSquare className="w-5 h-5 text-[#8B5CF6]" />
-                  <span className="text-[#F8FAFC] group-hover:text-[#8B5CF6] font-semibold">
+                <OpenProposalChatTrigger className="group flex w-full items-center gap-3 rounded-lg border border-slate-700 bg-[#1E293B] px-6 py-4 transition-all hover:border-[#8B5CF6]">
+                  <MessageSquare className="h-5 w-5 text-[#8B5CF6]" />
+                  <span className="font-semibold text-[#F8FAFC] group-hover:text-[#8B5CF6]">
                     Request Technical Proposal
                   </span>
-                </button>
+                </OpenProposalChatTrigger>
               </div>
             </div>
 
@@ -478,231 +322,6 @@ export function Contact() {
           </div>
         </div>
       </div>
-
-      {scheduleOpen && (
-        <div
-          className="fixed inset-0 z-60 flex items-center justify-center p-4"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Schedule a consultation"
-          onClick={() => setScheduleOpen(false)}
-        >
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-          <div
-            className="relative w-full max-w-2xl rounded-2xl border border-white/10 bg-slate-950/95 shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="p-6 sm:p-8">
-              <div className="flex items-start justify-between gap-4 mb-6">
-                <div>
-                  <h3 className="text-2xl text-white">Schedule a free consultation</h3>
-                  <p className="text-slate-400 mt-1">
-                    {scheduleBookingMode === 'slots'
-                      ? 'Choose a date, then pick a 30-minute slot (Mon–Fri, business hours).'
-                      : 'Pick a preferred time and we’ll email you to confirm.'}
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  className="rounded-lg p-2 text-slate-300 hover:text-white hover:bg-white/5 transition-colors"
-                  onClick={() => setScheduleOpen(false)}
-                  aria-label="Close"
-                >
-                  <X className="h-5 w-5" strokeWidth={2} aria-hidden />
-                </button>
-              </div>
-
-              {scheduleSubmitted && (
-                <div className="mb-6 flex items-start gap-3 rounded-lg border border-green-500/30 bg-green-500/10 p-4 text-green-300">
-                  <CircleCheck className="mt-0.5 h-5 w-5 shrink-0 text-green-400" strokeWidth={2} aria-hidden />
-                  <span>Request sent! We&apos;ll confirm shortly.</span>
-                </div>
-              )}
-
-              {scheduleError && (
-                <div className="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-lg text-red-300">
-                  {scheduleError}
-                </div>
-              )}
-
-              <form onSubmit={handleScheduleSubmit} className="space-y-5">
-                <div className="grid sm:grid-cols-2 gap-5">
-                  <div>
-                    <label className="block text-sm mb-2 text-slate-300">Full Name *</label>
-                    <input
-                      type="text"
-                      name="name"
-                      value={scheduleData.name}
-                      onChange={handleScheduleChange}
-                      required
-                      placeholder="John Doe"
-                      className="w-full px-4 py-3 bg-slate-900 border border-slate-800 rounded-lg focus:border-purple-500 focus:outline-none text-slate-200 placeholder:text-slate-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm mb-2 text-slate-300">Email *</label>
-                    <input
-                      type="email"
-                      name="email"
-                      value={scheduleData.email}
-                      onChange={handleScheduleChange}
-                      required
-                      placeholder="john@company.com"
-                      className="w-full px-4 py-3 bg-slate-900 border border-slate-800 rounded-lg focus:border-purple-500 focus:outline-none text-slate-200 placeholder:text-slate-500"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm mb-2 text-slate-300">Company</label>
-                  <input
-                    type="text"
-                    name="company"
-                    value={scheduleData.company}
-                    onChange={handleScheduleChange}
-                    placeholder="Your Company"
-                    className="w-full px-4 py-3 bg-slate-900 border border-slate-800 rounded-lg focus:border-purple-500 focus:outline-none text-slate-200 placeholder:text-slate-500"
-                  />
-                </div>
-
-                <div className="grid gap-5 sm:grid-cols-3">
-                  <div className="sm:col-span-1">
-                    <label className="block text-sm mb-2 text-slate-300">Date *</label>
-                    <input
-                      type="date"
-                      name="preferredDate"
-                      value={scheduleData.preferredDate}
-                      onChange={handleScheduleChange}
-                      min={(() => {
-                        const d = new Date();
-                        const pad = (n: number) => String(n).padStart(2, '0');
-                        return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-                      })()}
-                      required
-                      className="w-full px-4 py-3 bg-slate-900 border border-slate-800 rounded-lg focus:border-purple-500 focus:outline-none text-slate-200"
-                    />
-                  </div>
-                  {scheduleBookingMode === 'email' ? (
-                    <div className="sm:col-span-1">
-                      <label className="block text-sm mb-2 text-slate-300">Time *</label>
-                      <input
-                        type="time"
-                        name="preferredTime"
-                        value={scheduleData.preferredTime}
-                        onChange={handleScheduleChange}
-                        required
-                        className="w-full px-4 py-3 bg-slate-900 border border-slate-800 rounded-lg focus:border-purple-500 focus:outline-none text-slate-200"
-                      />
-                    </div>
-                  ) : (
-                    <div className="sm:col-span-2 min-h-12">
-                      {slotsLoading || scheduleBookingMode === 'unknown' ? (
-                        <p className="text-sm text-slate-400 pt-8 sm:pt-10">Loading available times…</p>
-                      ) : scheduleBookingMode === 'slots' ? (
-                        <div>
-                          <div className="mb-2 text-sm text-slate-300">Available times *</div>
-                          {slots.length === 0 ? (
-                            <div className="space-y-2">
-                              <p className="text-sm text-slate-400">
-                                No 30-minute openings on this day. Choose another weekday (Mon–Fri) or adjust your
-                                time zone.
-                              </p>
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setScheduleBookingMode('email');
-                                  setSelectedSlot(null);
-                                }}
-                                className="text-sm font-medium text-[#06B6D4] hover:text-[#22d3ee] underline-offset-2 hover:underline"
-                              >
-                                Suggest a time by email instead
-                              </button>
-                            </div>
-                          ) : (
-                            <div className="flex flex-wrap gap-2">
-                              {slots.map((slot) => {
-                                const active = selectedSlot?.start === slot.start;
-                                return (
-                                  <button
-                                    key={slot.start}
-                                    type="button"
-                                    onClick={() => setSelectedSlot(slot)}
-                                    className={`rounded-lg border px-3 py-2 text-sm font-medium transition-colors ${
-                                      active
-                                        ? 'border-[#06B6D4] bg-[#06B6D4]/20 text-[#F8FAFC]'
-                                        : 'border-slate-700 bg-slate-900 text-slate-200 hover:border-[#06B6D4]/60'
-                                    }`}
-                                  >
-                                    {slot.label}
-                                  </button>
-                                );
-                              })}
-                            </div>
-                          )}
-                        </div>
-                      ) : null}
-                    </div>
-                  )}
-                  <div
-                    className={
-                      scheduleBookingMode === 'email' ? 'sm:col-span-1' : 'sm:col-span-3 sm:max-w-md'
-                    }
-                  >
-                    <label className="block text-sm mb-2 text-slate-300">Time zone</label>
-                    <input
-                      type="text"
-                      name="timeZone"
-                      value={scheduleData.timeZone}
-                      onChange={handleScheduleChange}
-                      placeholder="e.g. Europe/Berlin"
-                      className="w-full px-4 py-3 bg-slate-900 border border-slate-800 rounded-lg focus:border-purple-500 focus:outline-none text-slate-200 placeholder:text-slate-500"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm mb-2 text-slate-300">Notes</label>
-                  <textarea
-                    name="notes"
-                    rows={4}
-                    value={scheduleData.notes}
-                    onChange={handleScheduleChange}
-                    placeholder="What would you like to discuss?"
-                    className="w-full px-4 py-3 bg-slate-900 border border-slate-800 rounded-lg focus:border-purple-500 focus:outline-none text-slate-200 placeholder:text-slate-500 resize-none"
-                  />
-                </div>
-
-                <div className="flex flex-col sm:flex-row gap-3 pt-2">
-                  <button
-                    type="submit"
-                    disabled={
-                      scheduleLoading ||
-                      slotsLoading ||
-                      scheduleBookingMode === 'unknown' ||
-                      (scheduleBookingMode === 'slots' &&
-                        (!slots.length || !selectedSlot))
-                    }
-                    className="flex-1 px-6 py-3 bg-linear-to-r from-purple-600 to-blue-600 rounded-lg hover:shadow-lg hover:shadow-purple-500/40 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {scheduleLoading
-                      ? 'Sending...'
-                      : scheduleBookingMode === 'slots'
-                        ? 'Confirm booking'
-                        : 'Request time'}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setScheduleOpen(false)}
-                    className="flex-1 px-6 py-3 bg-slate-900 border border-slate-800 rounded-lg hover:bg-slate-800 transition-colors"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      )}
     </section>
   );
 }

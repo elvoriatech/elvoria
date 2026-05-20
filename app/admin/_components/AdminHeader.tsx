@@ -6,7 +6,10 @@ import { usePathname } from 'next/navigation';
 
 const nav = [
   { href: '/admin/dashboard', label: 'Overview' },
+  { href: '/admin/analytics', label: 'Site analytics' },
+  { href: '/admin/conversations', label: 'Conversations' },
   { href: '/admin/proposals', label: 'AI proposals' },
+  { href: '/admin/email-marketing', label: 'Email Marketing' },
 ] as const;
 
 export function AdminHeader() {
@@ -36,7 +39,7 @@ export function AdminHeader() {
           </Link>
           <div className="min-w-0">
             <h1 className="text-lg font-bold tracking-tight text-foreground sm:text-xl">Admin</h1>
-            <p className="mt-0.5 truncate text-sm text-muted-foreground">Support leads and AI proposal PDFs</p>
+            <p className="mt-0.5 truncate text-sm text-muted-foreground">Leads, conversations, proposals, email marketing</p>
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2 sm:justify-end">

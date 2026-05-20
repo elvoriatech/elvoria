@@ -1,7 +1,13 @@
 import { Github, Linkedin, Mail } from 'lucide-react';
 import { TRUST_PILLARS } from '@/lib/trustPillars';
+import { ScheduleConsultationTrigger } from './ScheduleConsultationTrigger';
 import { TrustPillarIconBox } from './TrustPillarIconBox';
 import Image from 'next/image';
+
+const socialIconClass =
+  'flex h-10 w-10 items-center justify-center rounded-lg border border-border/60 bg-card transition-all dark:border-slate-700 dark:bg-[#1E293B]';
+const socialIconDisabledClass = `${socialIconClass} cursor-not-allowed opacity-40`;
+const socialIconActiveClass = `${socialIconClass} hover:border-[#06B6D4] hover:bg-muted/30 dark:hover:bg-[#1E293B]/80`;
 
 export function Footer() {
   return (
@@ -26,24 +32,26 @@ export function Footer() {
               Experienced engineering teams delivering mission-critical systems across 35+ countries worldwide.
             </p>
             <div className="flex items-center gap-4">
-              <a
-                href="#"
-                className="w-10 h-10 bg-card border border-border/60 rounded-lg flex items-center justify-center hover:border-[#06B6D4] hover:bg-muted/30 transition-all dark:bg-[#1E293B] dark:border-slate-700 dark:hover:bg-[#1E293B]/80"
+              <span
+                className={socialIconDisabledClass}
+                aria-hidden="true"
+                title="LinkedIn — coming soon"
               >
-                <Linkedin className="w-5 h-5 text-muted-foreground hover:text-[#06B6D4] dark:text-slate-400" />
-              </a>
-              <a
-                href="#"
-                className="w-10 h-10 bg-card border border-border/60 rounded-lg flex items-center justify-center hover:border-[#06B6D4] hover:bg-muted/30 transition-all dark:bg-[#1E293B] dark:border-slate-700 dark:hover:bg-[#1E293B]/80"
+                <Linkedin className="h-5 w-5 text-muted-foreground dark:text-slate-500" />
+              </span>
+              <span
+                className={socialIconDisabledClass}
+                aria-hidden="true"
+                title="GitHub — coming soon"
               >
-                <Github className="w-5 h-5 text-muted-foreground hover:text-[#06B6D4] dark:text-slate-400" />
-              </a>
-              <a
-                href="#"
-                className="w-10 h-10 bg-card border border-border/60 rounded-lg flex items-center justify-center hover:border-[#06B6D4] hover:bg-muted/30 transition-all dark:bg-[#1E293B] dark:border-slate-700 dark:hover:bg-[#1E293B]/80"
+                <Github className="h-5 w-5 text-muted-foreground dark:text-slate-500" />
+              </span>
+              <ScheduleConsultationTrigger
+                className={socialIconActiveClass}
+                aria-label="Schedule a consultation"
               >
-                <Mail className="w-5 h-5 text-muted-foreground hover:text-[#06B6D4] dark:text-slate-400" />
-              </a>
+                <Mail className="h-5 w-5 text-muted-foreground hover:text-[#06B6D4] dark:text-slate-400" />
+              </ScheduleConsultationTrigger>
             </div>
           </div>
 

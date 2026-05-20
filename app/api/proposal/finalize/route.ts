@@ -1,6 +1,8 @@
+import fs from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
 import { NextRequest, NextResponse } from 'next/server';
 import { randomUUID } from 'node:crypto';
-import { readJson, writeJson, conversationPath, proposalPdfPath } from '@/lib/localStore';
 import { emptyDraft, normalizeDraft, readiness, type ProposalDraft } from '@/lib/proposalSchema';
 import { sendChat, type ChatMessage } from '@/lib/openrouter';
 import { estimateRough } from '@/lib/estimator';
@@ -9,42 +11,33 @@ import { loadProposalPdfServerAssets } from '@/lib/proposalPdfServerAssets';
 import { signDownloadToken } from '@/lib/pdfToken';
 import { getSalesEngineerContextBlock } from '@/lib/companyContext';
 import { getProposalArchitectRoleBlock } from '@/lib/aiProposalArchitect';
-import { appendProposalFinalizeLog } from '@/lib/proposalFinalizeLog';
 import { sendProposalPdfNotReadyVisitorEmail } from '@/lib/proposalPdfFollowupEmail';
+import { rateLimitOrThrow } from '@/lib/rateLimit';
+import { crmErrorResponse } from '@/lib/crmApiError';
+import {
+  createProposalVersion,
+  getLeadIdByConversation,
+  loadConversationSnapshot,
+  type ConversationSnapshot,
+  updateProposalVersionPdf,
+  uploadProposalPdf,
+} from '@/lib/crmStore';
 
 const VISITOR_EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-type StoredConversation = {
-  id: string;
-  createdAt: string;
-  updatedAt: string;
-  messages: Array<{ role: 'user' | 'assistant'; content: string; ts: string }>;
-  draft: ProposalDraft;
-};
-
-type StoredProposalVersion = {
-  id: string;
-  conversationId: string;
-  createdAt: string;
-  expiresAt: string;
-  archivedAt?: string;
-  draftSnapshot: ProposalDraft;
-  estimate: ReturnType<typeof estimateRough>;
-  markdown: string;
-  pdf: { status: 'queued' | 'ready' | 'failed'; path?: string; error?: string };
-};
-
-function versionsPath(conversationId: string) {
-  return `data/proposals/${conversationId}.versions.json`;
-}
-
-function formatTranscript(messages: StoredConversation['messages']): string {
+function formatTranscript(messages: ConversationSnapshot['messages']): string {
   return messages
     .map((m) => `${m.role === 'user' ? 'User' : 'Assistant'}: ${m.content}`)
     .join('\n\n');
 }
 
 export async function POST(request: NextRequest) {
+  const limited = await rateLimitOrThrow({
+    req: request,
+    config: { name: 'proposal_finalize', limit: 6, windowSeconds: 60 },
+  });
+  if (limited) return limited;
+
   try {
     const body = (await request.json().catch(() => ({}))) as {
       conversationId?: string;
@@ -56,7 +49,7 @@ export async function POST(request: NextRequest) {
     const visitorName = typeof body.visitorName === 'string' ? body.visitorName.trim() : '';
     if (!conversationId) return NextResponse.json({ error: 'Missing conversationId' }, { status: 400 });
 
-    const convo = await readJson<StoredConversation | null>(conversationPath(conversationId), null);
+    const convo = await loadConversationSnapshot(conversationId);
     const draft = normalizeDraft(convo?.draft ?? emptyDraft);
     const r = readiness(draft);
     if (r.missing.length) {
@@ -141,55 +134,54 @@ export async function POST(request: NextRequest) {
 
     const versionId = randomUUID();
     const now = new Date();
-    const createdAt = now.toISOString();
     const expiresAt = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString();
+    const leadId = await getLeadIdByConversation(conversationId);
 
-    const version: StoredProposalVersion = {
-      id: versionId,
+    await createProposalVersion({
+      versionId,
       conversationId,
-      createdAt,
-      expiresAt,
+      visitorEmail,
+      visitorName,
       draftSnapshot: draft,
       estimate,
       markdown,
-      pdf: { status: 'queued' },
-    };
+      expiresAt,
+      leadId,
+    });
 
-    const versionsFile = versionsPath(conversationId);
-    const list = await readJson<StoredProposalVersion[]>(versionsFile, []);
-    list.unshift(version);
-    await writeJson(versionsFile, list);
+    let pdfStatus: 'ready' | 'failed' | 'queued' = 'queued';
+    let pdfError: string | undefined;
+    const tmpPath = path.join(os.tmpdir(), `proposal-${versionId}.pdf`);
 
-    const outPdf = proposalPdfPath(versionId);
     try {
       const pdfAssets = await loadProposalPdfServerAssets();
       await renderProposalPdf({
         markdown,
-        outPath: outPdf,
+        outPath: tmpPath,
         branding: {
           companyName: process.env.COMPANY_NAME || 'Elvoriatech',
           siteUrl: process.env.SITE_URL || 'https://elvoriatech.com',
-          /* Align with app/theme.css `.theme-elvoria.dark` (cyan + indigo) */
           primary: '#22d3ee',
           secondary: '#6366f1',
         },
         logoDataUri: pdfAssets.logoDataUri,
         mermaidScript: pdfAssets.mermaidScript,
       });
-      version.pdf = { status: 'ready', path: outPdf };
+      const pdfBytes = await fs.readFile(tmpPath);
+      await uploadProposalPdf(versionId, pdfBytes);
+      pdfStatus = 'ready';
     } catch (e) {
-      version.pdf = { status: 'failed', error: (e as Error)?.message || 'PDF generation failed' };
+      pdfStatus = 'failed';
+      pdfError = (e as Error)?.message || 'PDF generation failed';
+      await updateProposalVersionPdf(versionId, { pdfStatus: 'failed', pdfError });
+    } finally {
+      await fs.unlink(tmpPath).catch(() => undefined);
     }
-
-    const updatedList = await readJson<StoredProposalVersion[]>(versionsFile, []);
-    const idx = updatedList.findIndex((v) => v.id === versionId);
-    if (idx !== -1) updatedList[idx] = version;
-    await writeJson(versionsFile, updatedList);
 
     const token = signDownloadToken(versionId);
 
     let followUpEmailSent = false;
-    if (version.pdf.status !== 'ready' && visitorEmail && VISITOR_EMAIL_RE.test(visitorEmail)) {
+    if (pdfStatus !== 'ready' && visitorEmail && VISITOR_EMAIL_RE.test(visitorEmail)) {
       const siteUrl = process.env.SITE_URL || 'https://elvoriatech.com';
       const mail = await sendProposalPdfNotReadyVisitorEmail({
         to: visitorEmail,
@@ -199,28 +191,19 @@ export async function POST(request: NextRequest) {
         downloadToken: token,
       });
       followUpEmailSent = mail.sent;
-      if (!mail.sent) {
+      if (mail.sent) {
+        await updateProposalVersionPdf(versionId, { visitorNotifiedPdfIssue: true });
+      } else {
         console.warn('[finalize] visitor follow-up email not sent:', mail.reason, 'detail' in mail ? mail.detail : '');
       }
     }
 
-    await appendProposalFinalizeLog({
-      versionId,
-      conversationId,
-      visitorEmail,
-      visitorName,
-      pdfStatus: version.pdf.status,
-      pdfError: version.pdf.status === 'failed' ? version.pdf.error : undefined,
-      finalizedAt: new Date().toISOString(),
-      visitorNotifiedPdfIssue: version.pdf.status !== 'ready' ? followUpEmailSent : undefined,
-    });
-
     return NextResponse.json({
       versionId,
-      pdfStatus: version.pdf.status,
-      download: version.pdf.status === 'ready' ? { url: `/api/proposal/version/${versionId}/download?token=${token}` } : null,
+      pdfStatus,
+      download: pdfStatus === 'ready' ? { url: `/api/proposal/version/${versionId}/download?token=${token}` } : null,
       preview:
-        version.pdf.status !== 'ready'
+        pdfStatus !== 'ready'
           ? { url: `/api/proposal/version/${versionId}/preview?token=${encodeURIComponent(token)}` }
           : null,
       readiness: r,
@@ -228,9 +211,10 @@ export async function POST(request: NextRequest) {
       followUpEmailSent,
     });
   } catch (err) {
+    const crm = crmErrorResponse(err);
+    if (crm) return crm;
     console.error('Finalize error:', err);
     const message = err instanceof Error ? err.message : 'Finalize failed';
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
-

@@ -1,7 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { appendSupportLead, type SupportLeadSource } from '@/lib/supportLeads';
+import { appendSupportLead, CrmNotConfiguredError, type SupportLeadSource } from '@/lib/supportLeads';
+import { crmErrorResponse } from '@/lib/crmApiError';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+const VALID_SOURCES = new Set<SupportLeadSource>([
+  'proposal_widget',
+  'contact_technical_proposal',
+  'hero_start_project',
+  'hero_build_together',
+  'contact_start_project',
+]);
 
 function trimStr(s: unknown, max: number): string {
   const t = typeof s === 'string' ? s.trim() : '';
@@ -16,10 +27,15 @@ export async function POST(request: NextRequest) {
     const email = trimStr(body.email, 254).toLowerCase();
     const company = trimStr(body.company, 200);
     const phone = trimStr(body.phone, 60);
+    const conversationId = trimStr(body.conversationId, 64);
     const rawSource = typeof body.source === 'string' ? body.source : '';
-    const source: SupportLeadSource =
-      rawSource === 'contact_technical_proposal' ? 'contact_technical_proposal' : 'proposal_widget';
+    const source: SupportLeadSource = VALID_SOURCES.has(rawSource as SupportLeadSource)
+      ? (rawSource as SupportLeadSource)
+      : 'proposal_widget';
 
+    if (!conversationId || !UUID_RE.test(conversationId)) {
+      return NextResponse.json({ error: 'Valid conversationId is required' }, { status: 400 });
+    }
     if (!fullName) {
       return NextResponse.json({ error: 'Full name is required' }, { status: 400 });
     }
@@ -31,6 +47,7 @@ export async function POST(request: NextRequest) {
     }
 
     await appendSupportLead({
+      conversationId,
       source,
       fullName,
       email,
@@ -38,8 +55,13 @@ export async function POST(request: NextRequest) {
       phone: phone || '',
     });
 
-    return NextResponse.json({ ok: true });
+    return NextResponse.json({ ok: true, conversationId });
   } catch (e) {
+    const crm = crmErrorResponse(e);
+    if (crm) return crm;
+    if (e instanceof CrmNotConfiguredError) {
+      return NextResponse.json({ error: e.message, code: 'CRM_NOT_CONFIGURED' }, { status: 503 });
+    }
     console.error('[support-lead]', e);
     return NextResponse.json({ error: 'Could not save your details' }, { status: 500 });
   }

@@ -1,0 +1,43 @@
+{
+  "id": "f5dbec02-973f-4de1-8a9b-1360d6a01d35",
+  "createdAt": "2026-05-06T10:44:27.740Z",
+  "updatedAt": "2026-05-06T10:44:31.861Z",
+  "messages": [
+    {
+      "role": "user",
+      "content": "hello",
+      "ts": "2026-05-06T10:44:27.740Z"
+    },
+    {
+      "role": "assistant",
+      "content": "Hi there! I’m theAI Technical Proposal Architect for Elvoria Tech. We specialize in building AI‑first, cloud‑native solutions using modern stacks like Next.js, NestJS, AWS, and large language models.  \n\nIf you have a product idea you’d like to explore—whether it’s a SaaS platform, marketplace, or mission‑critical system—I’d love to hear about it and see how we can help turn it into a technical roadmap.  \n\nWould you like to schedule a quick 30‑minute free consultation to discuss your vision? Just let me know a bit about what you’re aiming to build, and we can dive into the details.",
+      "ts": "2026-05-06T10:44:31.861Z"
+    }
+  ],
+  "draft": {
+    "project": {
+      "summary": ""
+    },
+    "platforms": {
+      "web": false,
+      "ios": false,
+      "android": false,
+      "desktop": false
+    },
+    "mustHave": [],
+    "niceToHave": [],
+    "integrations": [],
+    "nonFunctional": {
+      "securityLevel": "standard",
+      "scaleTarget": "mvp",
+      "compliance": []
+    },
+    "keyFlows": [],
+    "assumptions": [],
+    "outOfScope": [],
+    "risks": [],
+    "additionalContext": [
+      "User greeted and opened conversation; ready to discuss product idea and schedule a free 30‑minute consultation."
+    ]
+  }
+}

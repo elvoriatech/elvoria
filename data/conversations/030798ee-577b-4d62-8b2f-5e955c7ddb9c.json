@@ -1,0 +1,43 @@
+{
+  "id": "030798ee-577b-4d62-8b2f-5e955c7ddb9c",
+  "createdAt": "2026-05-06T10:44:31.879Z",
+  "updatedAt": "2026-05-06T10:44:36.228Z",
+  "messages": [
+    {
+      "role": "user",
+      "content": "hello",
+      "ts": "2026-05-06T10:44:31.879Z"
+    },
+    {
+      "role": "assistant",
+      "content": "Hello! 👋 I’m happy to help you explore how Elvoria Tech can bring your next idea to life with an AI‑first, cloud‑native solution. \n\nTo get started, could you tell me a little about the product or service you have in mind? What problem are you trying to solve, and who would be using it? The more context you share, the better I can design a tailored architecture, roadmap, and estimate. \n\nFeel free to dive into any details—features, target audience, preferred platforms, or even rough timelines. If you’re not sure where to start, just let me know the high‑level goal and we can sketch out a quick concept together. \n\nLooking forward to hearing your idea! 🚀",
+      "ts": "2026-05-06T10:44:36.228Z"
+    }
+  ],
+  "draft": {
+    "project": {
+      "summary": ""
+    },
+    "platforms": {
+      "web": false,
+      "ios": false,
+      "android": false,
+      "desktop": false
+    },
+    "mustHave": [],
+    "niceToHave": [],
+    "integrations": [],
+    "nonFunctional": {
+      "securityLevel": "standard",
+      "scaleTarget": "mvp",
+      "compliance": []
+    },
+    "keyFlows": [],
+    "assumptions": [],
+    "outOfScope": [],
+    "risks": [],
+    "additionalContext": [
+      "User greeted and indicated willingness to discuss idea; no specifics provided yet."
+    ]
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "id": "52cb3837-cbfe-4759-8656-1fa3ee29a6bf",
+  "createdAt": "2026-05-06T10:44:57.959Z",
+  "updatedAt": "2026-05-06T10:44:59.521Z",
+  "messages": [
+    {
+      "role": "user",
+      "content": "hello",
+      "ts": "2026-05-06T10:44:57.959Z"
+    },
+    {
+      "role": "assistant",
+      "content": "Hello! 👋 I’m the AI Technical Proposal Architect at Elvoria Tech.  \nHow can I help you today? If you have a product idea or a challenge you’d like to explore, I’m happy to walk through a quick, no‑obligation 30‑minute consultation to discuss how we can build an AI‑first solution for you.",
+      "ts": "2026-05-06T10:44:59.521Z"
+    }
+  ],
+  "draft": {
+    "project": {
+      "summary": ""
+    },
+    "platforms": {
+      "web": false,
+      "ios": false,
+      "android": false,
+      "desktop": false
+    },
+    "mustHave": [],
+    "niceToHave": [],
+    "integrations": [],
+    "nonFunctional": {
+      "securityLevel": "standard",
+      "scaleTarget": "mvp",
+      "compliance": []
+    },
+    "keyFlows": [],
+    "assumptions": [],
+    "outOfScope": [],
+    "risks": [],
+    "additionalContext": []
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "id": "a1f47b0e-e207-49e7-9203-254ffea5a031",
+  "createdAt": "2026-05-06T10:44:44.612Z",
+  "updatedAt": "2026-05-06T10:44:50.870Z",
+  "messages": [
+    {
+      "role": "user",
+      "content": "hello",
+      "ts": "2026-05-06T10:44:44.612Z"
+    },
+    {
+      "role": "assistant",
+      "content": "Hi there!👋 I’m the AI Technical Proposal Architect at **Elvoria Tech**—we help companies build AI‑first, cloud‑native solutions with a solid engineering pedigree.\n\nTo get started, could you tell me a bit about the product or service you have in mind? Specifically:\n\n1. **What problem are you trying to solve?** (Who are the users and why is it needed now?)  \n2. **What core features or outcomes do you envision?** (e.g., automation, recommendations, data analysis, etc.)  \n3. Any **technology or platform preferences** you already have (web, mobile, SaaS, marketplace, etc.)?\n\nThe more detail you can share, the better I can sketch an AI‑powered architecture, roadmap, and rough effort estimate for you. If you’d like, we can also set up a quick 30‑minute consultation to dive deeper. Just let me know what works for you!",
+      "ts": "2026-05-06T10:44:50.870Z"
+    }
+  ],
+  "draft": {
+    "project": {
+      "summary": ""
+    },
+    "platforms": {
+      "web": false,
+      "ios": false,
+      "android": false,
+      "desktop": false
+    },
+    "mustHave": [],
+    "niceToHave": [],
+    "integrations": [],
+    "nonFunctional": {
+      "securityLevel": "standard",
+      "scaleTarget": "mvp",
+      "compliance": []
+    },
+    "keyFlows": [],
+    "assumptions": [],
+    "outOfScope": [],
+    "risks": [],
+    "additionalContext": []
+  }
+}

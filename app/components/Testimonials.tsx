@@ -1,4 +1,5 @@
 import { Quote, Star, User } from 'lucide-react';
+import Image from 'next/image';
 
 const testimonials = [
   {
@@ -7,6 +8,7 @@ const testimonials = [
     company: 'TechFlow Solutions',
     text: "Elvoriatech transformed our legacy system into a modern, scalable SaaS platform. The AI automation they built saved us over €400K annually in operational costs. Their team's expertise in cloud architecture and AI integration is unmatched.",
     rating: 5,
+    image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80',
   },
   {
     name: 'Michael Rodriguez',
@@ -14,6 +16,7 @@ const testimonials = [
     company: 'FinanceHub',
     text: "We've worked with 5+ development agencies over the years. Elvoriatech is the first one that truly understands modern architecture. They delivered a microservices platform that handles 10M+ requests daily with 99.99% uptime. Exceptional work.",
     rating: 5,
+    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
   },
   {
     name: 'Jennifer Park',
@@ -21,6 +24,7 @@ const testimonials = [
     company: 'MediConnect',
     text: "What impressed us most was their business-first approach. They didn't just build what we asked for—they challenged our assumptions and proposed solutions that actually moved our key metrics. Our conversion rate increased 42% after launch.",
     rating: 5,
+    image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=200&q=80',
   },
   {
     name: 'David Thompson',
@@ -28,6 +32,7 @@ const testimonials = [
     company: 'RetailX',
     text: "The team's expertise in performance optimization is incredible. They reduced our page load times from 4.2s to 0.8s, which directly translated to a 28% increase in mobile revenue. Best investment we've made in our tech stack.",
     rating: 5,
+    image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=200&q=80',
   },
   {
     name: 'Amanda Williams',
@@ -35,6 +40,7 @@ const testimonials = [
     company: 'CloudSync',
     text: 'Communication and transparency were outstanding. Daily updates, shared Slack channel, and access to all project management tools. We always knew exactly where we stood. The code quality and documentation exceeded our expectations.',
     rating: 5,
+    image: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=200&q=80',
   },
 ];
 
@@ -69,11 +75,14 @@ export function Testimonials() {
               <p className="text-muted-foreground mb-6 italic">&quot;{testimonial.text}&quot;</p>
 
               <div className="flex items-center gap-4 pt-4 border-t border-border/60 dark:border-slate-700">
-                <div
-                  className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-border/60 bg-linear-to-br from-(--brand-primary)/25 to-(--brand-accent)/20 text-(--brand-primary) dark:border-white/10 dark:from-purple-500/30 dark:to-cyan-500/25 dark:text-cyan-200"
-                  aria-hidden
-                >
-                  <User className="h-5 w-5 opacity-90" strokeWidth={2} />
+                <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full border-2 border-border/60 dark:border-white/10">
+                  <Image
+                    src={testimonial.image}
+                    alt={testimonial.name}
+                    fill
+                    sizes="48px"
+                    className="object-cover"
+                  />
                 </div>
                 <div className="min-w-0">
                   <div className="font-medium text-foreground">{testimonial.name}</div>

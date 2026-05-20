@@ -22,8 +22,10 @@ function modeToId(mode: ThemeMode): 'elvoria-dark' | 'elvoria-light' {
 
 function applyMode(mode: ThemeMode) {
   const root = document.documentElement;
+  console.log('applyMode: Applying mode:', mode, 'Current classes:', root.className);
   root.classList.add('theme-elvoria');
   root.classList.toggle('dark', mode === 'dark');
+  console.log('applyMode: After applying, classes:', root.className);
 }
 
 function withThemeTransition(run: () => void) {
@@ -44,33 +46,60 @@ function withThemeTransition(run: () => void) {
 }
 
 export function ThemeSwitcher() {
-  const [mode, setMode] = useState<ThemeMode>('dark');
+  const [mode, setMode] = useState<ThemeMode>('light');
 
   useLayoutEffect(() => {
+    // Clear any existing theme and start fresh
+    const root = document.documentElement;
+    root.classList.remove('dark');
+
     let raw = window.localStorage.getItem(STORAGE_KEY);
-    if (raw === 'elvoria-system') {
-      window.localStorage.setItem(STORAGE_KEY, 'elvoria-dark');
-      raw = 'elvoria-dark';
+    if (!raw || raw === 'elvoria-system') {
+      raw = 'elvoria-light';
+      window.localStorage.setItem(STORAGE_KEY, raw);
     }
+
     const next = idToMode(normalizeStoredId(raw));
+    console.log('ThemeSwitcher: Initializing with mode:', next, 'from localStorage:', raw);
     setMode(next);
-    applyMode(next);
+
+    // Apply the theme
+    root.classList.add('theme-elvoria');
+    if (next === 'dark') {
+      root.classList.add('dark');
+    }
+    console.log('ThemeSwitcher: Applied classes:', root.className);
   }, []);
 
   const toggle = useCallback(() => {
     const next: ThemeMode = mode === 'dark' ? 'light' : 'dark';
-    withThemeTransition(() => {
-      applyMode(next);
-      window.localStorage.setItem(STORAGE_KEY, modeToId(next));
-      setMode(next);
-    });
+    console.log('ThemeSwitcher: Toggling from', mode, 'to', next);
+
+    const root = document.documentElement;
+    root.classList.add('theme-elvoria');
+
+    if (next === 'dark') {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+
+    window.localStorage.setItem(STORAGE_KEY, modeToId(next));
+    setMode(next);
+
+    console.log('ThemeSwitcher: After toggle, classes:', root.className);
   }, [mode]);
 
   return (
-    <div className="fixed bottom-4 left-4 z-70">
+    <div className="fixed bottom-4 left-4 z-[100]">
       <button
         type="button"
-        onClick={toggle}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          console.log('ThemeSwitcher: Button clicked, current mode:', mode);
+          toggle();
+        }}
         className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200/90 bg-white/90 text-slate-800 shadow-lg backdrop-blur-md transition-[transform,box-shadow,background-color,color] duration-200 ease-out hover:bg-slate-50 hover:shadow-xl motion-safe:hover:scale-105 motion-safe:active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-(--brand-primary)/60 dark:border-white/10 dark:bg-slate-950/90 dark:text-slate-100 dark:hover:bg-slate-900/90"
         aria-label={mode === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
       >

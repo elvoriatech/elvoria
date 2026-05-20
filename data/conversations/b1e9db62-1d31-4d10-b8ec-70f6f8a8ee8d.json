@@ -1,0 +1,41 @@
+{
+  "id": "b1e9db62-1d31-4d10-b8ec-70f6f8a8ee8d",
+  "createdAt": "2026-05-06T10:44:40.968Z",
+  "updatedAt": "2026-05-06T10:44:44.585Z",
+  "messages": [
+    {
+      "role": "user",
+      "content": "hello",
+      "ts": "2026-05-06T10:44:40.968Z"
+    },
+    {
+      "role": "assistant",
+      "content": "Hello! I’m the AI Technical Proposal Architect for Elvoria Tech. We help founders like you turn innovative ideas into scalable, AI‑first products using a modern stack—Next.js, NestJS, AWS Lambda, Kubernetes, and more.\n\nIf you’d like to explore how we could build a solution for your project, I’d be happy to set up a free 30‑minute consultation. Just let me know a bit about your idea and any specific goals you have, and we can dive into the details.",
+      "ts": "2026-05-06T10:44:44.585Z"
+    }
+  ],
+  "draft": {
+    "project": {
+      "summary": ""
+    },
+    "platforms": {
+      "web": false,
+      "ios": false,
+      "android": false,
+      "desktop": false
+    },
+    "mustHave": [],
+    "niceToHave": [],
+    "integrations": [],
+    "nonFunctional": {
+      "securityLevel": "standard",
+      "scaleTarget": "mvp",
+      "compliance": []
+    },
+    "keyFlows": [],
+    "assumptions": [],
+    "outOfScope": [],
+    "risks": [],
+    "additionalContext": []
+  }
+}

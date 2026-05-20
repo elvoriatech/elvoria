@@ -1,0 +1,43 @@
+{
+  "id": "95c43b80-31e7-41e9-b63f-fd9dc7f2a1cf",
+  "createdAt": "2026-05-06T10:44:50.985Z",
+  "updatedAt": "2026-05-06T10:44:54.004Z",
+  "messages": [
+    {
+      "role": "user",
+      "content": "hello",
+      "ts": "2026-05-06T10:44:50.985Z"
+    },
+    {
+      "role": "assistant",
+      "content": "Hello!I’m the AI Technical Proposal Architect at Elvoria Tech.  \nNice to meet you – what kind of product or service are you envisioning? Any details you can share about the problem you want to solve, your target users, or key goals would help me design the right AI‑first solution for you.",
+      "ts": "2026-05-06T10:44:54.004Z"
+    }
+  ],
+  "draft": {
+    "project": {
+      "summary": ""
+    },
+    "platforms": {
+      "web": false,
+      "ios": false,
+      "android": false,
+      "desktop": false
+    },
+    "mustHave": [],
+    "niceToHave": [],
+    "integrations": [],
+    "nonFunctional": {
+      "securityLevel": "standard",
+      "scaleTarget": "mvp",
+      "compliance": []
+    },
+    "keyFlows": [],
+    "assumptions": [],
+    "outOfScope": [],
+    "risks": [],
+    "additionalContext": [
+      "User greeted and expressed interest in discussing a product idea; seeking AI‑first solution design."
+    ]
+  }
+}

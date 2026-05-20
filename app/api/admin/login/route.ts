@@ -1,8 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { isAdminConfigured } from '@/lib/adminEnv';
 import { ADMIN_SESSION_COOKIE, adminCredentialsMatch, signAdminSession } from '@/lib/adminSession';
+import { rateLimitOrThrow } from '@/lib/rateLimit';
 
 export async function POST(request: NextRequest) {
+  const limited = await rateLimitOrThrow({
+    req: request,
+    config: { name: 'admin_login', limit: 8, windowSeconds: 60 },
+  });
+  if (limited) return limited;
+
   if (!isAdminConfigured()) {
     return NextResponse.json({ error: 'Admin is not configured on this server' }, { status: 503 });
   }

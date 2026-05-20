@@ -1,0 +1,41 @@
+{
+  "id": "0b8d3b4b-eed6-4155-bcb6-3f9b530cb7e0",
+  "createdAt": "2026-05-06T10:44:54.028Z",
+  "updatedAt": "2026-05-06T10:44:57.941Z",
+  "messages": [
+    {
+      "role": "user",
+      "content": "hello",
+      "ts": "2026-05-06T10:44:54.028Z"
+    },
+    {
+      "role": "assistant",
+      "content": "Hello! I’m the AITechnical Proposal Architect here at Elvoria Tech. I help turn product ideas into clear, AI‑first solution designs and give you a realistic view of what it takes to build them.  \n\nWhat are you envisioning for your product? Feel free to share the core concept, who it’s for, and any key goals you have in mind. That’ll let me outline a focused architecture and next steps for you.",
+      "ts": "2026-05-06T10:44:57.941Z"
+    }
+  ],
+  "draft": {
+    "project": {
+      "summary": ""
+    },
+    "platforms": {
+      "web": false,
+      "ios": false,
+      "android": false,
+      "desktop": false
+    },
+    "mustHave": [],
+    "niceToHave": [],
+    "integrations": [],
+    "nonFunctional": {
+      "securityLevel": "standard",
+      "scaleTarget": "mvp",
+      "compliance": []
+    },
+    "keyFlows": [],
+    "assumptions": [],
+    "outOfScope": [],
+    "risks": [],
+    "additionalContext": []
+  }
+}

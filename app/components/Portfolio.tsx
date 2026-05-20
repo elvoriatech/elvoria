@@ -9,6 +9,7 @@ import {
   Users,
   UtensilsCrossed,
 } from 'lucide-react';
+import Image from 'next/image';
 
 const caseStudies = [
   {
@@ -26,6 +27,7 @@ const caseStudies = [
     ],
     technologies: ['Next.js', 'NestJS', 'AWS Lambda', 'PostgreSQL', 'Redis'],
     gradient: 'from-[#06B6D4] to-[#3B82F6]',
+    image: 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=1200&q=80',
   },
   {
     icon: Briefcase,
@@ -42,6 +44,7 @@ const caseStudies = [
     ],
     technologies: ['React', 'OpenAI GPT-4', 'Node.js', 'MongoDB', 'AWS'],
     gradient: 'from-[#8B5CF6] to-[#06B6D4]',
+    image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&q=80',
   },
   {
     icon: UtensilsCrossed,
@@ -65,6 +68,7 @@ const caseStudies = [
       'Real-time DB',
     ],
     gradient: 'from-[#8B5CF6] to-[#06B6D4]',
+    image: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1200&q=80',
   },
   {
     icon: Car,
@@ -81,6 +85,7 @@ const caseStudies = [
     ],
     technologies: ['Next.js', 'Microservices', 'AWS Lambda', 'DynamoDB', 'CloudFront'],
     gradient: 'from-[#3B82F6] to-[#8B5CF6]',
+    image: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=1200&q=80',
   },
 ] as const;
 
@@ -107,10 +112,21 @@ export function Portfolio() {
           {caseStudies.map((study, index) => (
             <div
               key={index}
-              className="group rounded-2xl border border-border/60 bg-card p-4 transition-all duration-300 hover:border-[#06B6D4]/50 sm:p-6 md:p-8 dark:bg-linear-to-br dark:from-[#1E293B] dark:to-[#0F172A] dark:border-slate-700/50"
+              className="group rounded-2xl border border-border/60 bg-card overflow-hidden transition-all duration-300 hover:border-[#06B6D4]/50 sm:p-6 md:p-8 dark:bg-linear-to-br dark:from-[#1E293B] dark:to-[#0F172A] dark:border-slate-700/50"
             >
               <div className="grid gap-6 lg:grid-cols-5 lg:gap-8">
                 <div className="lg:col-span-2">
+                  <div className="relative h-48 mb-6 overflow-hidden rounded-xl">
+                    <Image
+                      src={study.image}
+                      alt={study.name}
+                      fill
+                      sizes="(max-width: 1024px) 100vw, 40vw"
+                      className="object-cover transition-transform duration-300 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                  </div>
+
                   <div className="flex items-start gap-4 mb-6">
                     <div
                       className={`w-16 h-16 rounded-xl bg-linear-to-br ${study.gradient} flex items-center justify-center shrink-0`}

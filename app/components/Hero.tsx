@@ -5,6 +5,12 @@ import { ArrowRight, Sparkles } from 'lucide-react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import {
+  openProposalChat,
+  openScheduleConsultation,
+  openUnderConstruction,
+  type ProposalChatSource,
+} from '@/lib/elvoriaEvents';
 
 type HeroSlide = {
   eyebrow: string;
@@ -12,8 +18,8 @@ type HeroSlide = {
   subtitle: string;
   body: string;
   image: string;
-  primaryCta: { label: string; targetId: string };
-  secondaryCta: { label: string; targetId: string };
+  primaryCta: { label: string; action: 'chat' | 'schedule'; chatSource?: ProposalChatSource };
+  secondaryCta: { label: string; action: 'under-construction' };
 };
 
 export function Hero() {
@@ -25,8 +31,8 @@ export function Hero() {
         subtitle:
           'We design and build cloud-native SaaS platforms, marketplaces, and automation systems using modern AI and full-stack technologies.',
         body: '',
-        primaryCta: { label: 'Start Your Project', targetId: 'contact' },
-        secondaryCta: { label: 'View Our Work', targetId: 'portfolio' },
+        primaryCta: { label: 'Start Your Project', action: 'chat', chatSource: 'hero_start_project' },
+        secondaryCta: { label: 'View Our Work', action: 'under-construction' },
         image:
           'https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&w=2400&q=80',
       },
@@ -36,8 +42,8 @@ export function Hero() {
         subtitle:
           'From idea to production, we help startups and businesses launch high-performance applications powered by modern cloud and AI technologies.',
         body: '',
-        primaryCta: { label: 'Get a Free Consultation', targetId: 'contact' },
-        secondaryCta: { label: 'See Case Studies', targetId: 'portfolio' },
+        primaryCta: { label: 'Get a Free Consultation', action: 'schedule' },
+        secondaryCta: { label: 'See Case Studies', action: 'under-construction' },
         image:
           'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=2400&q=80',
       },
@@ -47,8 +53,8 @@ export function Hero() {
         subtitle:
           'We partner with forward-thinking teams to build AI-powered platforms, scalable architectures, and mission-critical digital experiences.',
         body: '',
-        primaryCta: { label: "Let's Build Together", targetId: 'contact' },
-        secondaryCta: { label: 'Explore Our Work', targetId: 'portfolio' },
+        primaryCta: { label: "Let's Build Together", action: 'chat', chatSource: 'hero_build_together' },
+        secondaryCta: { label: 'Explore Our Work', action: 'under-construction' },
         image:
           'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=2400&q=80',
       },
@@ -85,9 +91,20 @@ export function Hero() {
     setActive((v) => (v + delta + slides.length) % slides.length);
   }
 
-  function scrollToId(id: string) {
-    const element = document.getElementById(id);
-    element?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  function handlePrimaryCta(cta: HeroSlide['primaryCta']) {
+    if (cta.action === 'chat') {
+      openProposalChat(cta.chatSource ?? 'hero_start_project');
+      return;
+    }
+    openScheduleConsultation();
+  }
+
+  function handleSecondaryCta() {
+    openUnderConstruction({
+      title: 'Portfolio & case studies',
+      description:
+        'We are preparing in-depth case studies with architecture notes, outcomes, and delivery metrics. In the meantime, start your project with our AI proposal architect.',
+    });
   }
 
   const slide = slides[active];
@@ -180,7 +197,7 @@ export function Hero() {
         <div className="flex w-full max-w-md flex-col items-stretch justify-center gap-3 sm:max-w-none sm:flex-row sm:items-center sm:gap-4">
           <button
             className="group flex w-full items-center justify-center gap-2 rounded-lg bg-linear-to-r from-(--brand-accent) to-(--brand-primary) px-5 py-3 text-base transition-all duration-300 hover:shadow-lg hover:shadow-(color:--brand-primary)/35 focus:outline-none focus-visible:ring-2 focus-visible:ring-(--brand-primary)/60 sm:w-auto sm:px-8 sm:py-4 sm:text-lg"
-            onClick={() => scrollToId(slide.primaryCta.targetId)}
+            onClick={() => handlePrimaryCta(slide.primaryCta)}
             type="button"
           >
             <span>{slide.primaryCta.label}</span>
@@ -189,7 +206,7 @@ export function Hero() {
 
           <button
             className="w-full rounded-lg border border-border/60 bg-foreground/5 px-5 py-3 text-base transition-all duration-300 hover:bg-foreground/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-(--brand-primary)/60 sm:w-auto sm:px-8 sm:py-4 sm:text-lg"
-            onClick={() => scrollToId(slide.secondaryCta.targetId)}
+            onClick={handleSecondaryCta}
             type="button"
           >
             {slide.secondaryCta.label}

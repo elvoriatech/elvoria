@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
 import { formatAdminTimestamp } from '@/lib/formatAdminTimestamp';
 import type { AdminProposalQueueRow } from '@/lib/proposalFinalizeLog';
+import { AdminPromptModal } from './AdminPromptModal';
 
 async function readJsonBody(res: Response): Promise<unknown> {
   const text = await res.text();
@@ -24,17 +25,17 @@ export function AdminProposalQueue({ rows }: { rows: AdminProposalQueueRow[] }) 
   const router = useRouter();
   const [error, setError] = useState('');
   const [busyVersion, setBusyVersion] = useState<string | null>(null);
+  const [pdfPrompt, setPdfPrompt] = useState<{ versionId: string; defaultEmail: string } | null>(null);
   const sortedRows = useMemo(() => sortProposalRows(rows), [rows]);
 
-  async function sendPdf(versionId: string, defaultEmail: string) {
+  async function sendPdf(versionId: string, to: string) {
     setError('');
-    const to = window.prompt('Send PDF to email address:', defaultEmail || '');
-    if (to === null) return;
     const trimmed = to.trim().toLowerCase();
     if (!trimmed) {
       setError('Email is required.');
       return;
     }
+    setPdfPrompt(null);
     setBusyVersion(versionId);
     try {
       const res = await fetch('/api/admin/send-proposal-pdf', {
@@ -66,9 +67,19 @@ export function AdminProposalQueue({ rows }: { rows: AdminProposalQueueRow[] }) 
 
   return (
     <div className="space-y-3">
-      <div className="rounded-xl border border-amber-500/35 bg-amber-500/10 px-4 py-3 text-sm leading-relaxed text-amber-950 dark:border-amber-400/25 dark:bg-amber-500/10 dark:text-amber-50">
-        <strong className="font-semibold">Manual PDF delivery:</strong> successful PDF generation only enables download in
-        the widget and <strong className="font-semibold">View PDF</strong> here. Use <strong className="font-semibold">Send PDF by email</strong> so the visitor receives the attachment, unless you handle delivery elsewhere.
+      <div className="space-y-3">
+        <div className="rounded-xl border border-amber-500/35 bg-amber-500/10 px-4 py-3 text-sm leading-relaxed text-amber-950 dark:border-amber-400/25 dark:bg-amber-500/10 dark:text-amber-50">
+          <strong className="font-semibold">Manual PDF delivery:</strong> when <strong>PDF on server</strong> is{' '}
+          <strong>Yes</strong>, <strong>View PDF</strong> and <strong>Send PDF by email</strong> are enabled. If PDF
+          generation failed (see <strong>Last status</strong>), both stay disabled until a new proposal is finalized
+          successfully.
+        </div>
+        <div className="rounded-xl border border-border bg-muted/30 px-4 py-3 text-sm text-muted-foreground dark:border-slate-700 dark:bg-slate-900/50">
+          <strong className="text-foreground">Actions:</strong>{' '}
+          <span className="text-foreground/90">View PDF</span> — open the file in a new tab.{' '}
+          <span className="text-foreground/90">Send PDF by email</span> — attach it to the visitor (enter address in the dialog).
+          Grayed controls mean no PDF file exists on the server yet.
+        </div>
       </div>
       {error ? (
         <div className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
@@ -92,6 +103,12 @@ export function AdminProposalQueue({ rows }: { rows: AdminProposalQueueRow[] }) 
           <tbody>
             {sortedRows.map((row) => {
               const needsSend = row.pdfFilePresent && !row.pdfEmailedByAdminAt;
+              const pdfActionsDisabled = !row.pdfFilePresent;
+              const disabledReason = pdfActionsDisabled
+                ? row.pdfStatus === 'failed'
+                  ? 'PDF generation failed — no file on server'
+                  : 'PDF not ready — no file on server'
+                : undefined;
               return (
               <tr
                 key={row.versionId}
@@ -159,15 +176,20 @@ export function AdminProposalQueue({ rows }: { rows: AdminProposalQueueRow[] }) 
                         View PDF
                       </a>
                     ) : (
-                      <span className="rounded-md border border-border bg-muted/50 px-3 py-1.5 text-xs font-medium text-muted-foreground">
+                      <span
+                        className="cursor-not-allowed rounded-md border border-dashed border-border bg-muted/50 px-3 py-1.5 text-xs font-medium text-muted-foreground"
+                        title={disabledReason}
+                      >
                         View PDF
                       </span>
                     )}
                     <button
                       type="button"
-                      disabled={!row.pdfFilePresent || busyVersion === row.versionId}
-                      title={!row.pdfFilePresent ? 'PDF file is not on the server yet' : undefined}
-                      onClick={() => void sendPdf(row.versionId, row.visitorEmail)}
+                      disabled={pdfActionsDisabled || busyVersion === row.versionId}
+                      title={disabledReason ?? 'Email the proposal PDF to the visitor'}
+                      onClick={() =>
+                        setPdfPrompt({ versionId: row.versionId, defaultEmail: row.visitorEmail })
+                      }
                       className="rounded-md border border-[#06B6D4]/50 bg-[#06B6D4]/10 px-3 py-1.5 text-xs font-semibold text-[#0e7490] hover:bg-[#06B6D4]/20 disabled:cursor-not-allowed disabled:opacity-50 dark:border-cyan-500/40 dark:bg-cyan-500/15 dark:text-cyan-100 dark:hover:bg-cyan-500/25"
                     >
                       {busyVersion === row.versionId ? 'Sending…' : 'Send PDF by email'}
@@ -183,6 +205,19 @@ export function AdminProposalQueue({ rows }: { rows: AdminProposalQueueRow[] }) 
           </tbody>
         </table>
       </div>
+
+      <AdminPromptModal
+        open={pdfPrompt !== null}
+        title="Send PDF by email"
+        description="The proposal PDF will be attached to this message."
+        label="Recipient email"
+        defaultValue={pdfPrompt?.defaultEmail ?? ''}
+        inputType="email"
+        submitLabel="Send PDF"
+        busy={busyVersion !== null}
+        onSubmit={(email) => pdfPrompt && void sendPdf(pdfPrompt.versionId, email)}
+        onClose={() => setPdfPrompt(null)}
+      />
     </div>
   );
 }

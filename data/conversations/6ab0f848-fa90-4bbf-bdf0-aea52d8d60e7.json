@@ -1,0 +1,43 @@
+{
+  "id": "6ab0f848-fa90-4bbf-bdf0-aea52d8d60e7",
+  "createdAt": "2026-05-06T10:45:20.893Z",
+  "updatedAt": "2026-05-06T10:45:27.604Z",
+  "messages": [
+    {
+      "role": "user",
+      "content": "hello",
+      "ts": "2026-05-06T10:45:20.893Z"
+    },
+    {
+      "role": "assistant",
+      "content": "Hello! I’m the AI Technical Proposal Architect at Elvoria Tech. I’m here to help you translate your idea into a clear, AI‑first technical plan and outline the next steps.  \n\nCould you tell me a bit about the product or service you’re envisioning? What problem are you trying to solve, and who will be using it? This will let me start shaping a solution that fits your goals.",
+      "ts": "2026-05-06T10:45:27.604Z"
+    }
+  ],
+  "draft": {
+    "project": {
+      "summary": ""
+    },
+    "platforms": {
+      "web": false,
+      "ios": false,
+      "android": false,
+      "desktop": false
+    },
+    "mustHave": [],
+    "niceToHave": [],
+    "integrations": [],
+    "nonFunctional": {
+      "securityLevel": "standard",
+      "scaleTarget": "mvp",
+      "compliance": []
+    },
+    "keyFlows": [],
+    "assumptions": [],
+    "outOfScope": [],
+    "risks": [],
+    "additionalContext": [
+      "Awaiting user to provide product idea details and problem statement."
+    ]
+  }
+}

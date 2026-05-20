@@ -1,27 +1,29 @@
+'use client';
+
 import { ArrowRight, Briefcase, CheckCircle, X } from 'lucide-react';
+import { useState } from 'react';
+import type { ContactInquiryPreset } from '@/lib/elvoriaEvents';
+import { ContactInquiryTrigger } from './ContactInquiryTrigger';
 import { ScheduleConsultationTrigger } from './ScheduleConsultationTrigger';
 
 type EngagementCard = {
   name: string;
   description: string;
-  price: string;
-  /** Shown under price (e.g. per developer, per project) */
-  priceSubtext?: string;
   bestFor: string[];
   features: { text: string; included: boolean }[];
   idealLine: string;
   cta: string;
-  highlight?: boolean;
+  contactPreset: ContactInquiryPreset;
   badge?: string;
 };
+
+const DEFAULT_SELECTED_INDEX = 0;
 
 export function EngagementModels() {
   const models: EngagementCard[] = [
     {
       name: 'Dedicated Product Team',
       description: 'Build and scale your product with an experienced engineering team',
-      price: 'From €8,000 – €12,000',
-      priceSubtext: '/ month per developer',
       bestFor: ['SaaS product development', 'Long-term scaling', 'Continuous feature delivery'],
       features: [
         { text: 'Experienced engineers only', included: true },
@@ -31,16 +33,19 @@ export function EngagementModels() {
         { text: 'Architecture & scalability focus', included: true },
         { text: 'Continuous improvement', included: true },
       ],
-      idealLine: 'Ideal for startups serious about growth',
+      idealLine: 'Ideal for startups serious about growth.',
       cta: 'Book a Dedicated Team Call',
-      highlight: true,
+      contactPreset: {
+        projectType: 'SaaS Product Development',
+        budget: '€100K - €250K',
+        messageSeed:
+          'I would like to book a dedicated product team call to discuss long-term engineering capacity.',
+      },
       badge: 'Most Popular',
     },
     {
       name: 'Fixed Scope Projects',
       description: 'Defined scope. Predictable delivery. No surprises.',
-      price: 'From €25,000 – €40,000+',
-      priceSubtext: 'per project',
       bestFor: ['MVP development', 'Feature-based builds', 'Product launches'],
       features: [
         { text: 'Clear requirements & planning', included: true },
@@ -50,28 +55,36 @@ export function EngagementModels() {
         { text: 'QA & testing included', included: true },
         { text: 'Transparent timelines', included: true },
       ],
-      idealLine: 'Perfect for launching validated ideas fast',
+      idealLine: 'Perfect for launching validated ideas fast.',
       cta: 'Get Project Estimate',
-      highlight: false,
+      contactPreset: {
+        projectType: 'SaaS Product Development',
+        budget: '€25K - €50K',
+        messageSeed: 'I need a fixed-scope project estimate with clear milestones and delivery timeline.',
+      },
     },
     {
       name: 'Flexible Engineering & Consulting',
       description: 'On-demand experienced expertise when you need it',
-      price: '€70 – €120',
-      priceSubtext: '/ hour',
       bestFor: ['Prototyping', 'Technical audits', 'API integrations', 'Debugging & optimization'],
       features: [
-        { text: 'Pay-as-you-go model', included: true },
+        { text: 'Flexible engagement model', included: true },
         { text: 'Fast onboarding', included: true },
         { text: 'Weekly progress updates', included: true },
         { text: 'Transparent tracking', included: true },
         { text: 'Experienced-level problem solving', included: true },
       ],
-      idealLine: 'Ideal for flexible or short-term needs',
+      idealLine: 'Ideal for flexible or short-term needs.',
       cta: 'Start Consultation',
-      highlight: false,
+      contactPreset: {
+        projectType: 'Other',
+        budget: '€10K - €25K',
+        messageSeed: 'I am interested in flexible engineering or consulting support.',
+      },
     },
   ];
+
+  const [selectedIndex, setSelectedIndex] = useState(DEFAULT_SELECTED_INDEX);
 
   return (
     <section className="bg-background py-16 sm:py-20 md:py-24 dark:bg-linear-to-b dark:from-[#1E293B] dark:to-[#0F172A]">
@@ -85,18 +98,34 @@ export function EngagementModels() {
             Choose Your Engagement Model
           </h2>
           <p className="mx-auto max-w-3xl text-base font-light text-muted-foreground sm:text-lg md:text-xl">
-            Flexible collaboration tailored to your product, timeline, and budget
+            Flexible collaboration tailored to your product and timeline
           </p>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-3 md:gap-8">
-          {models.map((model, index) => (
+        <div
+          className="grid gap-6 md:grid-cols-3 md:gap-8"
+          role="tablist"
+          aria-label="Engagement models"
+        >
+          {models.map((model, index) => {
+            const selected = selectedIndex === index;
+            return (
             <div
-              key={index}
-              className={`relative flex flex-col rounded-2xl border-2 p-5 transition-all duration-300 sm:p-6 md:p-8 ${
-                model.highlight
+              key={model.name}
+              role="tab"
+              tabIndex={selected ? 0 : -1}
+              aria-selected={selected}
+              onClick={() => setSelectedIndex(index)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  setSelectedIndex(index);
+                }
+              }}
+              className={`relative flex cursor-pointer flex-col rounded-2xl border-2 p-5 transition-all duration-300 sm:p-6 md:p-8 ${
+                selected
                   ? 'border-[#06B6D4] bg-linear-to-b from-[#06B6D4]/10 to-muted/30 shadow-xl shadow-[#06B6D4]/10 dark:to-[#1E293B] dark:shadow-[#06B6D4]/20'
-                  : 'border-border/60 bg-card hover:border-border dark:border-slate-700/50 dark:bg-[#1E293B] dark:hover:border-slate-600'
+                  : 'border-border/60 bg-card hover:border-[#06B6D4]/30 dark:border-slate-700/50 dark:bg-[#1E293B] dark:hover:border-slate-600'
               }`}
             >
               {model.badge ? (
@@ -105,21 +134,9 @@ export function EngagementModels() {
                 </div>
               ) : null}
 
-              <div className="text-center mb-6">
-                <h3 className="text-2xl font-bold text-foreground dark:text-[#F8FAFC] mb-2">{model.name}</h3>
-                <p className="text-muted-foreground dark:text-slate-400 mb-4 text-sm leading-relaxed">
-                  {model.description}
-                </p>
-                <div className="mb-1">
-                  <div className="text-2xl sm:text-3xl font-bold bg-linear-to-r from-[#06B6D4] to-[#3B82F6] bg-clip-text text-transparent">
-                    {model.price}
-                  </div>
-                  {model.priceSubtext ? (
-                    <div className="text-sm font-semibold text-muted-foreground dark:text-slate-400 mt-1">
-                      {model.priceSubtext}
-                    </div>
-                  ) : null}
-                </div>
+              <div className="mb-6 text-center">
+                <h3 className="mb-2 text-2xl font-bold text-foreground dark:text-[#F8FAFC]">{model.name}</h3>
+                <p className="text-sm leading-relaxed text-muted-foreground dark:text-slate-400">{model.description}</p>
               </div>
 
               <div className="mb-6">
@@ -162,27 +179,30 @@ export function EngagementModels() {
                 <span>{model.idealLine}</span>
               </p>
 
-              <ScheduleConsultationTrigger
-                className={`mt-auto w-full py-4 rounded-lg font-semibold transition-all ${
-                  model.highlight
+              <ContactInquiryTrigger
+                preset={model.contactPreset}
+                className={`mt-auto w-full rounded-lg py-4 font-semibold transition-all ${
+                  selected
                     ? 'bg-linear-to-r from-[#06B6D4] to-[#3B82F6] text-white hover:shadow-lg hover:shadow-[#06B6D4]/30'
-                    : 'bg-background border border-border/60 text-foreground hover:border-[#06B6D4]/50 dark:bg-[#0F172A] dark:border-slate-700 dark:text-[#F8FAFC]'
+                    : 'border border-border/60 bg-background text-foreground hover:border-[#06B6D4]/50 dark:border-slate-700 dark:bg-[#0F172A] dark:text-[#F8FAFC]'
                 }`}
+                onClick={(e) => e.stopPropagation()}
               >
                 {model.cta}
-              </ScheduleConsultationTrigger>
+              </ContactInquiryTrigger>
             </div>
-          ))}
+          );
+          })}
         </div>
 
-        <div className="mt-12 p-8 bg-linear-to-r from-[#8B5CF6]/10 to-[#06B6D4]/10 border border-border/60 rounded-2xl text-center dark:border-[#06B6D4]/30">
-          <h3 className="text-2xl font-bold text-foreground dark:text-[#F8FAFC] mb-4">Not Sure Which Model Fits?</h3>
-          <p className="text-lg text-muted-foreground dark:text-slate-300 mb-6 max-w-2xl mx-auto">
+        <div className="mt-12 rounded-2xl border border-border/60 bg-linear-to-r from-[#8B5CF6]/10 to-[#06B6D4]/10 p-6 text-center sm:p-8 dark:border-[#06B6D4]/30">
+          <h3 className="mb-4 text-2xl font-bold text-foreground dark:text-[#F8FAFC]">Not Sure Which Model Fits?</h3>
+          <p className="mx-auto mb-6 max-w-2xl text-lg text-muted-foreground dark:text-slate-300">
             Schedule a free 30-minute consultation with our team to discuss your project requirements and find the
             right engagement model.
           </p>
-          <ScheduleConsultationTrigger className="px-8 py-4 bg-linear-to-r from-[#06B6D4] to-[#3B82F6] rounded-lg font-semibold text-white hover:shadow-lg hover:shadow-[#06B6D4]/30 transition-all">
-            Schedule Free Consultation
+          <ScheduleConsultationTrigger className="inline-flex rounded-lg bg-linear-to-r from-[#06B6D4] to-[#3B82F6] px-8 py-4 font-semibold text-white transition-all hover:shadow-lg hover:shadow-[#06B6D4]/30">
+            Schedule 30-Min Consultation
           </ScheduleConsultationTrigger>
         </div>
       </div>

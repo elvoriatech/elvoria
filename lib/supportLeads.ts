@@ -1,11 +1,21 @@
-import fs from 'node:fs/promises';
-import path from 'node:path';
+import {
+  CrmNotConfiguredError,
+  deleteLeadById,
+  listLeadsForAdmin,
+  upsertLeadForConversation,
+  type CrmLeadRow,
+} from '@/lib/crmStore';
 
-const LEADS_FILE = path.join(process.cwd(), 'data', 'support-leads.json');
-
-export type SupportLeadSource = 'proposal_widget' | 'contact_technical_proposal';
+export type SupportLeadSource =
+  | 'proposal_widget'
+  | 'contact_technical_proposal'
+  | 'hero_start_project'
+  | 'hero_build_together'
+  | 'contact_start_project';
 
 export type SupportLeadRecord = {
+  id: string;
+  conversationId: string;
   /** ISO 8601 UTC when the lead was saved */
   timestamp: string;
   source: SupportLeadSource;
@@ -15,39 +25,52 @@ export type SupportLeadRecord = {
   phone: string;
 };
 
-export async function readSupportLeads(): Promise<SupportLeadRecord[]> {
-  try {
-    const raw = await fs.readFile(LEADS_FILE, 'utf8');
-    const parsed = JSON.parse(raw) as unknown;
-    return Array.isArray(parsed) ? (parsed as SupportLeadRecord[]) : [];
-  } catch {
-    return [];
-  }
-}
+const VALID_SOURCES = new Set<SupportLeadSource>([
+  'proposal_widget',
+  'contact_technical_proposal',
+  'hero_start_project',
+  'hero_build_together',
+  'contact_start_project',
+]);
 
-async function writeSupportLeads(leads: SupportLeadRecord[]): Promise<void> {
-  await fs.mkdir(path.dirname(LEADS_FILE), { recursive: true });
-  await fs.writeFile(LEADS_FILE, JSON.stringify(leads, null, 2), 'utf8');
-}
-
-/** Append one record to `data/support-leads.json` (array of objects, each with `timestamp`). */
-export async function appendSupportLead(
-  record: Omit<SupportLeadRecord, 'timestamp'> & { timestamp?: string }
-): Promise<void> {
-  const entry: SupportLeadRecord = {
-    ...record,
-    timestamp: record.timestamp ?? new Date().toISOString(),
+function toRecord(row: CrmLeadRow): SupportLeadRecord {
+  return {
+    id: row.id,
+    conversationId: row.conversationId,
+    timestamp: row.timestamp,
+    source: row.source,
+    fullName: row.fullName,
+    email: row.email,
+    company: row.company,
+    phone: row.phone,
   };
-  const existing = await readSupportLeads();
-  existing.push(entry);
-  await writeSupportLeads(existing);
 }
 
-/** Remove one lead by zero-based index. Returns false if index out of range. */
-export async function deleteSupportLeadAt(index: number): Promise<boolean> {
-  const leads = await readSupportLeads();
-  if (!Number.isInteger(index) || index < 0 || index >= leads.length) return false;
-  leads.splice(index, 1);
-  await writeSupportLeads(leads);
-  return true;
+export async function readSupportLeads(): Promise<SupportLeadRecord[]> {
+  const leads = await listLeadsForAdmin();
+  return leads.map(toRecord);
 }
+
+export async function appendSupportLead(
+  record: Omit<SupportLeadRecord, 'timestamp' | 'id'> & {
+    timestamp?: string;
+    id?: string;
+  }
+): Promise<SupportLeadRecord> {
+  const source = VALID_SOURCES.has(record.source) ? record.source : 'proposal_widget';
+  const row = await upsertLeadForConversation({
+    conversationId: record.conversationId,
+    source,
+    fullName: record.fullName,
+    email: record.email,
+    company: record.company,
+    phone: record.phone || '',
+  });
+  return toRecord(row);
+}
+
+export async function deleteSupportLeadById(leadId: string): Promise<boolean> {
+  return deleteLeadById(leadId);
+}
+
+export { CrmNotConfiguredError };
