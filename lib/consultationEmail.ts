@@ -1,6 +1,14 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import nodemailer from 'nodemailer';
+import { getContactEmail, sendSiteHtmlEmail } from '@/lib/siteMailer';
+import { isVisitorAutoReplyEnabled } from '@/lib/visitorAckEmail';
+import {
+  buildVisitorAutoReplyHtml,
+  visitorAutoReplyAttachments,
+  visitorAutoReplyInfoBox,
+  visitorAutoReplyMailtoLink,
+  visitorAutoReplySignOff,
+} from '@/lib/visitorAutoReplyLayout';
 
 export function escapeHtml(input: string) {
   return input
@@ -80,51 +88,17 @@ export type ConsultationEmailPayload = {
   notes?: string;
 };
 
-function createMailer() {
-  const emailService = process.env.EMAIL_SERVICE;
-  const emailUser = process.env.EMAIL_USER;
-  const emailPassword = process.env.EMAIL_PASSWORD;
-  const smtpHost = process.env.SMTP_HOST;
-  const smtpPortRaw = process.env.SMTP_PORT;
-  const smtpPort = smtpPortRaw ? Number.parseInt(smtpPortRaw.trim(), 10) : undefined;
-  const smtpUser = process.env.SMTP_USER;
-  const smtpPassword = process.env.SMTP_PASSWORD;
-  const smtpFrom = process.env.SMTP_FROM;
-
-  const hasSmtp = Boolean(smtpHost && smtpPort && smtpUser && smtpPassword);
-  const hasService = Boolean(emailService && emailUser && emailPassword);
-
-  if (!hasSmtp && !hasService) {
-    throw new Error(
-      'Email is not configured. Set either (EMAIL_SERVICE, EMAIL_USER, EMAIL_PASSWORD) or (SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD).'
-    );
-  }
-
-  const transporter = hasSmtp
-    ? nodemailer.createTransport({
-        host: smtpHost,
-        port: smtpPort,
-        secure: smtpPort === 465,
-        auth: { user: smtpUser, pass: smtpPassword },
-      })
-    : nodemailer.createTransport({
-        service: emailService,
-        auth: { user: emailUser, pass: emailPassword },
-      });
-
-  const fromAddress = smtpFrom || smtpUser || emailUser;
-  return { transporter, fromAddress };
+function logoAttachments() {
+  const attachmentPath = path.join(process.cwd(), 'public', 'elvoria.png');
+  return fs.existsSync(attachmentPath)
+    ? [{ filename: 'elvoria.png', path: attachmentPath, cid: 'elvoria-mark' }]
+    : [];
 }
 
 export async function sendConsultationEmails(payload: ConsultationEmailPayload) {
   const { name, email, company, whenDisplay, notes } = payload;
-  const contactEmail = process.env.CONTACT_EMAIL || 'contact@elvoriatech.com';
-  const { transporter, fromAddress } = createMailer();
-
-  const attachmentPath = path.join(process.cwd(), 'public', 'elvoria.png');
-  const attachments = fs.existsSync(attachmentPath)
-    ? [{ filename: 'elvoria.png', path: attachmentPath, cid: 'elvoria-mark' }]
-    : [];
+  const contactEmail = getContactEmail();
+  const attachments = logoAttachments();
 
   const safeName = escapeHtml(String(name));
   const safeEmail = escapeHtml(String(email));
@@ -132,11 +106,10 @@ export async function sendConsultationEmails(payload: ConsultationEmailPayload) 
   const safeWhen = escapeHtml(whenDisplay);
   const safeNotes = escapeHtml(String(notes || '')).replace(/\n/g, '<br>') || '—';
 
-  await transporter.sendMail({
-    from: fromAddress,
+  const staff = await sendSiteHtmlEmail({
     to: contactEmail,
-    subject: `New consultation request — ${name}`,
     replyTo: email,
+    subject: `New consultation request — ${name}`,
     html: renderEmailShell({
       title: 'New Consultation Request',
       preheader: `New consultation request from ${name}.`,
@@ -184,30 +157,26 @@ export async function sendConsultationEmails(payload: ConsultationEmailPayload) 
     }),
     attachments,
   });
+  if (!staff.sent) throw new Error(staff.detail || 'Failed to send consultation email to staff');
 
-  await transporter.sendMail({
-    from: fromAddress,
-    to: email,
-    subject: 'Consultation request received - Elvoriatech',
-    html: renderEmailShell({
-      title: 'Consultation request received',
-      preheader: 'Thanks — we’ll confirm a time shortly.',
-      contentHtml: `
-          <div style="font-size:18px;font-weight:800;color:#ffffff;margin:0 0 10px 0;">We received your request</div>
-          <div style="font-size:13px;color:#cbd5e1;line-height:1.7;margin:0 0 14px 0;">
-            Hi ${safeName}, thanks for requesting a consultation. We’ll reply shortly to confirm a final time (or propose alternatives).
-          </div>
+  if (isVisitorAutoReplyEnabled()) {
+    const bodyHtml = `<p>Hi ${safeName},</p>
 
-          <div style="background:rgba(2,6,23,0.55);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:12px 14px;">
-            <div style="font-size:12px;color:#94a3b8;margin-bottom:6px;">Preferred time</div>
-            <div style="font-size:14px;color:#e5e7eb;font-weight:700;">${safeWhen}</div>
-          </div>
+<p>Thank you for requesting a consultation with us. We’ll reply shortly to confirm your booking (or propose alternatives if needed).</p>
 
-          <div style="font-size:12px;color:#94a3b8;line-height:1.7;margin-top:14px;">
-            Contact: <a href="mailto:${escapeHtml(contactEmail)}" style="color:#93c5fd;text-decoration:none;">${escapeHtml(contactEmail)}</a>
-          </div>
-        `,
-    }),
-    attachments,
-  });
+${visitorAutoReplyInfoBox('Preferred time', `<strong>${safeWhen}</strong>`)}
+
+<p>Questions before we confirm? Contact us at ${visitorAutoReplyMailtoLink(contactEmail)}.</p>
+
+${visitorAutoReplySignOff()}`;
+
+    const visitor = await sendSiteHtmlEmail({
+      to: email,
+      replyTo: contactEmail,
+      subject: 'Consultation request received — Elvoria Tech',
+      html: buildVisitorAutoReplyHtml(bodyHtml, 'Thanks — we’ll confirm a time shortly.'),
+      attachments: visitorAutoReplyAttachments(),
+    });
+    if (!visitor.sent) throw new Error(visitor.detail || 'Failed to send consultation confirmation');
+  }
 }

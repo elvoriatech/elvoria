@@ -58,9 +58,23 @@ export function Contact() {
         body: JSON.stringify(formData),
       });
 
+      const data = (await response.json()) as {
+        error?: string;
+        autoReplyEnabled?: boolean;
+        autoReplySent?: boolean;
+        autoReplyError?: string;
+      };
+
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to send message');
+        throw new Error(data.error || 'Failed to send message');
+      }
+
+      if (data.autoReplyEnabled && !data.autoReplySent) {
+        setError(
+          data.autoReplyError
+            ? `Message received, but we could not send a confirmation email: ${data.autoReplyError}`
+            : 'Message received, but we could not send a confirmation email. Check spam or contact us directly.'
+        );
       }
 
       setSubmitted(true);

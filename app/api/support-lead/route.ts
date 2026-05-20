@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { appendSupportLead, CrmNotConfiguredError, type SupportLeadSource } from '@/lib/supportLeads';
 import { crmErrorResponse } from '@/lib/crmApiError';
+import { isVisitorAutoReplyEnabled, sendSupportLeadAutoReply } from '@/lib/visitorAckEmail';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const UUID_RE =
@@ -55,7 +56,27 @@ export async function POST(request: NextRequest) {
       phone: phone || '',
     });
 
-    return NextResponse.json({ ok: true, conversationId });
+    let autoReplySent = false;
+    let autoReplyError: string | undefined;
+    const sendAutoReply = isVisitorAutoReplyEnabled();
+    if (sendAutoReply) {
+      try {
+        const auto = await sendSupportLeadAutoReply({ fullName, email, company });
+        autoReplySent = auto.sent;
+        if (!auto.sent && !auto.skipped) autoReplyError = auto.detail;
+      } catch (err) {
+        console.error('[support-lead] auto-reply:', err);
+        autoReplyError = err instanceof Error ? err.message : 'Auto-reply failed';
+      }
+    }
+
+    return NextResponse.json({
+      ok: true,
+      conversationId,
+      autoReplyEnabled: sendAutoReply,
+      autoReplySent,
+      autoReplyError,
+    });
   } catch (e) {
     const crm = crmErrorResponse(e);
     if (crm) return crm;

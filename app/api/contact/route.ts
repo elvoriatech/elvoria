@@ -1,8 +1,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import nodemailer from 'nodemailer';
 import { NextRequest, NextResponse } from 'next/server';
 import { escapeHtmlEmail as escapeHtml, renderElvoriaEmailShell } from '@/lib/emailShell';
+import { getContactEmail, isSiteMailConfigured, sendSiteHtmlEmail } from '@/lib/siteMailer';
+import { isVisitorAutoReplyEnabled, sendContactFormAutoReply } from '@/lib/visitorAckEmail';
 
 function toPublicEmailError(error: unknown) {
   const e = error as { code?: string; responseCode?: number; message?: string };
@@ -10,7 +11,7 @@ function toPublicEmailError(error: unknown) {
     return {
       status: 500,
       message:
-        'Email login failed (Gmail). Use a Google “App Password” (requires 2‑Step Verification) for EMAIL_PASSWORD, and ensure EMAIL_USER is the mailbox address. If this is not a Gmail/Workspace inbox, use SMTP settings instead.',
+        'Email login failed (Gmail). Use a Google App Password in EMAIL_PASSWORD and EMAIL_USER as the mailbox address.',
     };
   }
   const code = e?.code ? ` (${e.code})` : '';
@@ -30,56 +31,23 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const emailService = process.env.EMAIL_SERVICE;
-    const emailUser = process.env.EMAIL_USER;
-    const emailPassword = process.env.EMAIL_PASSWORD;
-    const smtpHost = process.env.SMTP_HOST;
-    const smtpPortRaw = process.env.SMTP_PORT;
-    const smtpPort = smtpPortRaw ? Number.parseInt(smtpPortRaw.trim(), 10) : undefined;
-    const smtpUser = process.env.SMTP_USER;
-    const smtpPassword = process.env.SMTP_PASSWORD;
-    const smtpFrom = process.env.SMTP_FROM;
-    const contactEmail = process.env.SMTP_TO || process.env.CONTACT_EMAIL || 'contact@elvoriatech.com';
-    const companyName = process.env.COMPANY_NAME || 'Elvoriatech';
-    const siteUrl = process.env.SITE_URL || 'https://elvoriatech.com';
-    const supportPhone = process.env.SUPPORT_PHONE || '';
-    const sendAutoReply = String(process.env.SEND_AUTOREPLY ?? 'true').toLowerCase() !== 'false';
-
-    const hasSmtp = Boolean(smtpHost && smtpPort && smtpUser && smtpPassword);
-    const hasService = Boolean(emailService && emailUser && emailPassword);
-
-    if (!hasSmtp && !hasService) {
+    if (!isSiteMailConfigured()) {
       return NextResponse.json(
         {
           error:
-            'Email is not configured. Set either (EMAIL_SERVICE, EMAIL_USER, EMAIL_PASSWORD) or (SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD) in your environment.',
+            'Email is not configured. Set EMAIL_SERVICE, EMAIL_USER, and EMAIL_PASSWORD in .env.local',
         },
         { status: 500 }
       );
     }
 
-    const transporter = hasSmtp
-      ? nodemailer.createTransport({
-          host: smtpHost,
-          port: smtpPort,
-          secure: smtpPort === 465,
-          auth: { user: smtpUser, pass: smtpPassword },
-        })
-      : nodemailer.createTransport({
-          service: emailService,
-          auth: { user: emailUser, pass: emailPassword },
-        });
+    const contactEmail = getContactEmail();
+    const companyName = process.env.COMPANY_NAME || 'Elvoriatech';
+    const sendAutoReply = isVisitorAutoReplyEnabled();
 
-    const fromAddress = smtpFrom || smtpUser || emailUser;
     const attachmentPath = path.join(process.cwd(), 'public', 'elvoria.png');
     const attachments = fs.existsSync(attachmentPath)
-      ? [
-          {
-            filename: 'elvoria.png',
-            path: attachmentPath,
-            cid: 'elvoria-mark',
-          },
-        ]
+      ? [{ filename: 'elvoria.png', path: attachmentPath, cid: 'elvoria-mark' }]
       : [];
 
     // Email to company
@@ -91,9 +59,9 @@ export async function POST(request: NextRequest) {
     const safeBudget = escapeHtml(String(budget || 'Not specified'));
     const safeMessage = escapeHtml(String(message)).replace(/\n/g, '<br>');
 
-    await transporter.sendMail({
-      from: fromAddress,
+    const staffMail = await sendSiteHtmlEmail({
       to: contactEmail,
+      replyTo: email,
       subject: `New Contact Form Submission — ${name}`,
       html: renderElvoriaEmailShell({
         title: 'New Contact Form Submission',
@@ -166,61 +134,20 @@ export async function POST(request: NextRequest) {
         `,
       }),
       attachments,
-      replyTo: email,
     });
+    if (!staffMail.sent) {
+      const err = toPublicEmailError(new Error(staffMail.detail || 'Send failed'));
+      return NextResponse.json({ error: err.message }, { status: err.status });
+    }
 
-    // Confirmation email to user (do not fail the request if this fails)
+    // Confirmation email to visitor (do not fail the request if this fails)
     let autoReplySent = false;
     let autoReplyError: string | undefined;
     if (sendAutoReply) {
       try {
-        await transporter.sendMail({
-          from: fromAddress,
-          to: email,
-          subject: `Thank you for contacting ${companyName}`,
-          replyTo: contactEmail,
-          html: renderElvoriaEmailShell({
-            title: 'We received your message',
-            preheader: 'Thanks — we’ll get back to you shortly.',
-            showTimestamp: false,
-            logoImgSrc: 'cid:elvoria-mark',
-            footerNoteHtml:
-              'You’re receiving this email because you used the contact form on our website.',
-            contentHtml: `
-            <div class="h1" style="font-size:18px;font-weight:800;color:#ffffff;margin:0 0 10px 0;">Thank you for reaching out</div>
-            <div class="p" style="font-size:13px;color:#cbd5e1;line-height:1.7;margin:0 0 14px 0;">
-              Dear ${safeName},<br><br>
-              Thank you for reaching out to us. We have received your message and appreciate your interest.
-            </div>
-
-            <div class="p" style="font-size:13px;color:#cbd5e1;line-height:1.7;margin:0 0 14px 0;">
-              Our team will review your inquiry and get back to you as soon as possible, typically within <strong>24–48 hours</strong>.
-            </div>
-
-            <div class="p" style="font-size:13px;color:#cbd5e1;line-height:1.7;margin:0 0 14px 0;">
-              If your request is urgent, please feel free to reply to this email.
-            </div>
-
-            <div style="background:rgba(2,6,23,0.55);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:12px 14px;">
-              <div style="font-size:12px;color:#94a3b8;margin-bottom:6px;">Your message</div>
-              <div style="font-size:14px;color:#e5e7eb;line-height:1.7;">${safeMessage || '—'}</div>
-            </div>
-
-            <div style="margin-top:14px;font-size:13px;color:#cbd5e1;line-height:1.7;">
-              We look forward to assisting you.
-            </div>
-
-            <div style="margin-top:14px;font-size:12px;color:#94a3b8;line-height:1.7;">
-              Best regards,<br>
-              ${escapeHtml(companyName)}<br>
-              <a href="${escapeHtml(siteUrl)}" style="color:#93c5fd;text-decoration:none;">${escapeHtml(siteUrl)}</a><br>
-              <a href="mailto:${escapeHtml(contactEmail)}" style="color:#93c5fd;text-decoration:none;">${escapeHtml(contactEmail)}</a>${supportPhone ? `<br>${escapeHtml(supportPhone)}` : ''}
-            </div>
-          `,
-          }),
-          attachments,
-        });
-        autoReplySent = true;
+        const auto = await sendContactFormAutoReply({ name, email, message });
+        autoReplySent = auto.sent;
+        if (!auto.sent && !auto.skipped) autoReplyError = auto.detail;
       } catch (err) {
         const e = err as { code?: string; message?: string };
         autoReplyError = `${e?.code ? `${e.code}: ` : ''}${e?.message ? String(e.message) : 'unknown error'}`;

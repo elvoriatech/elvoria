@@ -105,10 +105,22 @@ export function ConsultationScheduleForm({
     };
   }, [enabled, data.preferredDate, data.timeZone]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
     setData((prev) => ({ ...prev, [name]: value }));
   };
+
+  function handleSlotSelect(e: React.ChangeEvent<HTMLSelectElement>) {
+    const start = e.target.value;
+    if (!start) {
+      setSelectedSlot(null);
+      return;
+    }
+    const slot = slots.find((s) => s.start === start) ?? null;
+    setSelectedSlot(slot);
+  }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -255,9 +267,12 @@ export function ConsultationScheduleForm({
         </div>
 
         <div className="grid gap-5 sm:grid-cols-3">
-          <div className="sm:col-span-1">
-            <label className={labelClass}>Date *</label>
+          <div>
+            <label className={labelClass} htmlFor="consultation-date">
+              Date *
+            </label>
             <input
+              id="consultation-date"
               type="date"
               name="preferredDate"
               value={data.preferredDate}
@@ -271,10 +286,14 @@ export function ConsultationScheduleForm({
               className={inputClass}
             />
           </div>
+
           {bookingMode === 'email' ? (
-            <div className="sm:col-span-1">
-              <label className={labelClass}>Time *</label>
+            <div>
+              <label className={labelClass} htmlFor="consultation-time">
+                Time *
+              </label>
               <input
+                id="consultation-time"
                 type="time"
                 name="preferredTime"
                 value={data.preferredTime}
@@ -284,58 +303,63 @@ export function ConsultationScheduleForm({
               />
             </div>
           ) : (
-            <div className="min-h-12 sm:col-span-2">
+            <div>
+              <label className={labelClass} htmlFor="consultation-slot">
+                Available times *
+              </label>
               {slotsLoading || bookingMode === 'unknown' ? (
-                <p className={`pt-8 text-sm ${hintClass} sm:pt-10`}>Loading available times…</p>
-              ) : bookingMode === 'slots' ? (
-                <div>
-                  <div className={labelClass}>Available times *</div>
-                  {slots.length === 0 ? (
-                    <div className="space-y-2">
-                      <p className={`text-sm ${hintClass}`}>
-                        No 30-minute openings on this day. Choose another weekday (Mon–Fri) or adjust your time zone.
-                      </p>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setBookingMode('email');
-                          setSelectedSlot(null);
-                        }}
-                        className="text-sm font-medium text-[#06B6D4] underline-offset-2 hover:text-[#22d3ee] hover:underline"
-                      >
-                        Suggest a time by email instead
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="flex flex-wrap gap-2">
-                      {slots.map((slot) => {
-                        const active = selectedSlot?.start === slot.start;
-                        return (
-                          <button
-                            key={slot.start}
-                            type="button"
-                            onClick={() => setSelectedSlot(slot)}
-                            className={`rounded-lg border px-3 py-2 text-sm font-medium transition-colors ${
-                              active
-                                ? 'border-[#06B6D4] bg-[#06B6D4]/20 text-foreground dark:text-[#F8FAFC]'
-                                : isModal
-                                  ? 'border-slate-700 bg-slate-900 text-slate-200 hover:border-[#06B6D4]/60'
-                                  : 'border-border/60 bg-background text-foreground hover:border-[#06B6D4]/60 dark:border-slate-700 dark:bg-[#0F172A] dark:text-slate-200'
-                            }`}
-                          >
-                            {slot.label}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  )}
+                <select
+                  id="consultation-slot"
+                  disabled
+                  className={`${inputClass} cursor-wait opacity-70`}
+                  aria-busy="true"
+                >
+                  <option>Loading available times…</option>
+                </select>
+              ) : bookingMode === 'slots' && slots.length === 0 ? (
+                <div className="space-y-2">
+                  <select id="consultation-slot" disabled className={`${inputClass} opacity-70`}>
+                    <option>No openings on this day</option>
+                  </select>
+                  <p className={`text-sm ${hintClass}`}>
+                    Choose another weekday (Mon–Fri) or adjust your time zone.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setBookingMode('email');
+                      setSelectedSlot(null);
+                    }}
+                    className="text-sm font-medium text-[#06B6D4] underline-offset-2 hover:text-[#22d3ee] hover:underline"
+                  >
+                    Suggest a time by email instead
+                  </button>
                 </div>
+              ) : bookingMode === 'slots' ? (
+                <select
+                  id="consultation-slot"
+                  value={selectedSlot?.start ?? ''}
+                  onChange={handleSlotSelect}
+                  required
+                  className={inputClass}
+                >
+                  <option value="">Select a time</option>
+                  {slots.map((slot) => (
+                    <option key={slot.start} value={slot.start}>
+                      {slot.label}
+                    </option>
+                  ))}
+                </select>
               ) : null}
             </div>
           )}
-          <div className={bookingMode === 'email' ? 'sm:col-span-1' : 'sm:col-span-3 sm:max-w-md'}>
-            <label className={labelClass}>Time zone</label>
+
+          <div>
+            <label className={labelClass} htmlFor="consultation-timezone">
+              Time zone
+            </label>
             <input
+              id="consultation-timezone"
               type="text"
               name="timeZone"
               value={data.timeZone}
@@ -369,7 +393,7 @@ export function ConsultationScheduleForm({
             }
             className={
               isModal
-                ? 'flex-1 rounded-lg bg-linear-to-r from-purple-600 to-blue-600 px-6 py-3 transition-all hover:shadow-lg hover:shadow-purple-500/40 disabled:cursor-not-allowed disabled:opacity-50'
+                ? 'flex-1 rounded-lg bg-linear-to-r from-purple-600 to-blue-600 px-6 py-3 font-semibold text-white transition-all hover:shadow-lg hover:shadow-purple-500/40 disabled:cursor-not-allowed disabled:opacity-50'
                 : 'flex-1 rounded-lg bg-linear-to-r from-[#06B6D4] to-[#3B82F6] px-6 py-3 font-semibold text-white transition-all hover:shadow-lg hover:shadow-[#06B6D4]/30 disabled:cursor-not-allowed disabled:opacity-50'
             }
           >
@@ -379,15 +403,19 @@ export function ConsultationScheduleForm({
                 ? 'Confirm booking'
                 : 'Request consultation time'}
           </button>
-          {showCancel && onCancel && (
+          {showCancel && onCancel ? (
             <button
               type="button"
               onClick={onCancel}
-              className="flex-1 rounded-lg border border-slate-800 bg-slate-900 px-6 py-3 transition-colors hover:bg-slate-800"
+              className={
+                isModal
+                  ? 'flex-1 rounded-lg border border-slate-500 bg-slate-800 px-6 py-3 font-semibold text-slate-100 shadow-sm transition-colors hover:border-slate-400 hover:bg-slate-700'
+                  : 'flex-1 rounded-lg border border-border/80 bg-muted px-6 py-3 font-semibold text-foreground transition-colors hover:bg-muted/80 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700'
+              }
             >
               Cancel
             </button>
-          )}
+          ) : null}
         </div>
       </form>
     </>

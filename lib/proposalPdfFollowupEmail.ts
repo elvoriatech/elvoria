@@ -1,5 +1,14 @@
-import { escapeHtmlEmail, renderElvoriaEmailShell } from '@/lib/emailShell';
-import { sendSiteHtmlEmail } from '@/lib/siteMailer';
+import { escapeHtml } from '@/lib/emailMarketing/emailLayout';
+import { getContactEmail, sendSiteHtmlEmail } from '@/lib/siteMailer';
+import {
+  buildVisitorAutoReplyHtml,
+  visitorAutoReplyAttachments,
+  visitorAutoReplyInfoBox,
+  visitorAutoReplyMailtoLink,
+  visitorAutoReplySignOff,
+} from '@/lib/visitorAutoReplyLayout';
+
+const BODY_LINK = 'color:#0891b2;font-weight:600;text-decoration:underline;';
 
 /** Email to the visitor when finalize succeeded but PDF rendering did not (e.g. Puppeteer / Mermaid path issue). */
 export async function sendProposalPdfNotReadyVisitorEmail(opts: {
@@ -13,88 +22,58 @@ export async function sendProposalPdfNotReadyVisitorEmail(opts: {
 }): Promise<{ sent: true } | { sent: false; reason: string; detail?: string }> {
   const company = opts.companyName || process.env.COMPANY_NAME || 'Elvoria Tech';
   const site = opts.siteUrl.replace(/\/$/, '');
-  const contact = (opts.replyTo || process.env.SMTP_TO || process.env.CONTACT_EMAIL || '').trim();
+  const contact = (opts.replyTo || getContactEmail()).trim();
   const name = opts.visitorName.trim() || 'there';
-  const safeName = escapeHtmlEmail(name);
-  const safeCompany = escapeHtmlEmail(company);
-  const safeSite = escapeHtmlEmail(site);
-  const safeContact = escapeHtmlEmail(contact);
-  const logoUrl = `${site}/elvoria.png`;
-  const safeLogo = escapeHtmlEmail(logoUrl);
+  const safeName = escapeHtml(name);
+  const safeCompany = escapeHtml(company);
+  const safeSite = escapeHtml(site);
 
   const previewPath = `/api/proposal/version/${encodeURIComponent(opts.versionId)}/preview?token=${encodeURIComponent(opts.downloadToken)}`;
   const previewUrl = `${site}${previewPath}`;
-  const safePreviewUrl = escapeHtmlEmail(previewUrl);
+  const safePreviewUrl = escapeHtml(previewUrl);
 
   const subject = `${company} — your technical proposal (read online)`;
-  const contentHtml = `
-          <div class="h1" style="font-size:18px;font-weight:800;color:#ffffff;margin:0 0 10px 0;">Your proposal is ready to view</div>
-          <div class="p" style="font-size:13px;color:#cbd5e1;line-height:1.7;margin:0 0 14px 0;">
-            Hi ${safeName},
-          </div>
-          <div class="p" style="font-size:13px;color:#cbd5e1;line-height:1.7;margin:0 0 16px 0;">
-            Your technical proposal was generated in our <strong style="color:#f8fafc;">AI proposal assistant</strong>.
-            The automatic <strong style="color:#f8fafc;">PDF file</strong> could not be created on our server this time (often a temporary rendering or packaging issue).
-            Your full text is saved securely on our side.
-          </div>
+  const contactLine = contact
+    ? `Reply to this message or write to ${visitorAutoReplyMailtoLink(contact)} and mention <strong>proposal PDF</strong>.`
+    : `Visit <a href="${safeSite}" style="${BODY_LINK}">${safeSite}</a> and use the contact options there.`;
 
-          <div style="margin:0 0 18px 0;">
-            <a href="${safePreviewUrl}" style="display:inline-block;background:linear-gradient(90deg,#06b6d4,#3b82f6);color:#04131a;text-decoration:none;font-weight:800;font-size:14px;padding:12px 18px;border-radius:12px;">
-              Open proposal in browser
-            </a>
-          </div>
+  const bodyHtml = `<p>Hi ${safeName},</p>
 
-          <div class="p" style="font-size:13px;color:#cbd5e1;line-height:1.7;margin:0 0 14px 0;">
-            <strong style="color:#f8fafc;">What happens next</strong>
-          </div>
-          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:separate;border-spacing:0;background:rgba(2,6,23,0.55);border:1px solid rgba(255,255,255,0.08);border-radius:12px;overflow:hidden;margin:0 0 16px 0;">
-            <tr>
-              <td style="padding:12px 14px;border-bottom:1px solid rgba(255,255,255,0.06);">
-                <div style="font-size:12px;color:#94a3b8;">Read online</div>
-                <div style="font-size:13px;color:#e5e7eb;line-height:1.6;">Use the button above anytime. Keep this email — the link includes a private access token.</div>
-              </td>
-            </tr>
-            <tr>
-              <td style="padding:12px 14px;border-bottom:1px solid rgba(255,255,255,0.06);">
-                <div style="font-size:12px;color:#94a3b8;">PDF by email</div>
-                <div style="font-size:13px;color:#e5e7eb;line-height:1.6;">Our team can email you the official PDF. If you do not receive it within one business day, check spam or reach out below.</div>
-              </td>
-            </tr>
-            <tr>
-              <td style="padding:12px 14px;">
-                <div style="font-size:12px;color:#94a3b8;">Contact</div>
-                <div style="font-size:13px;color:#e5e7eb;line-height:1.6;">
-                  ${
-                    contact
-                      ? `Reply to this message or write to <a href="mailto:${safeContact}" style="color:#67e8f9;text-decoration:none;">${safeContact}</a> and mention <strong style="color:#f8fafc;">proposal PDF</strong>.`
-                      : `Visit <a href="${safeSite}" style="color:#67e8f9;text-decoration:none;">${safeSite}</a> and use the contact options there.`
-                  }
-                </div>
-              </td>
-            </tr>
-          </table>
+<p>Your technical proposal was generated in our <strong>AI proposal assistant</strong>. The automatic <strong>PDF file</strong> could not be created on our server this time (often a temporary rendering issue). Your full text is saved securely on our side.</p>
 
-          <div class="p" style="font-size:12px;color:#94a3b8;line-height:1.6;margin:0;">
-            Plain link (if the button does not open):<br/>
-            <span style="word-break:break-all;color:#cbd5e1;">${safePreviewUrl}</span>
-          </div>
+<p><a href="${safePreviewUrl}" style="${BODY_LINK}">Open your proposal in the browser</a></p>
 
-          <div style="margin-top:16px;font-size:12px;color:#94a3b8;line-height:1.6;">
-            Best regards,<br/>
-            <span style="color:#e5e7eb;font-weight:700;">${safeCompany}</span>
-          </div>`;
+<h3 style="margin:22px 0 10px 0;font-size:15px;font-weight:700;color:#0f172a;line-height:1.35;">What happens next</h3>
 
-  const html = renderElvoriaEmailShell({
-    title: subject,
-    preheader: 'Open your AI-generated technical proposal in the browser while we prepare your PDF.',
-    showTimestamp: true,
-    logoImgSrc: safeLogo,
-    footerNoteHtml:
-      'You are receiving this because you finalized a proposal in the AI assistant on our website. This message is transactional, not marketing.',
-    contentHtml,
+${visitorAutoReplyInfoBox(
+  'Read online',
+  'Use the link above anytime. Keep this email — the link includes a private access token.'
+)}
+
+${visitorAutoReplyInfoBox(
+  'PDF by email',
+  'Our team can email you the official PDF. If you do not receive it within one business day, check spam or reach out below.'
+)}
+
+${visitorAutoReplyInfoBox('Contact', contactLine)}
+
+<p style="font-size:13px;color:#64748b;line-height:1.6;">Plain link (if the button above does not open):<br />
+<span style="word-break:break-all;color:#475569;">${safePreviewUrl}</span></p>
+
+${visitorAutoReplySignOff()}`;
+
+  const html = buildVisitorAutoReplyHtml(
+    bodyHtml,
+    'Open your AI-generated technical proposal in the browser while we prepare your PDF.'
+  );
+
+  const r = await sendSiteHtmlEmail({
+    to: opts.to,
+    subject,
+    html,
+    replyTo: contact || undefined,
+    attachments: visitorAutoReplyAttachments(),
   });
-
-  const r = await sendSiteHtmlEmail({ to: opts.to, subject, html });
   if (r.sent) return { sent: true };
   return {
     sent: false as const,

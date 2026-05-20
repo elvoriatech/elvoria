@@ -41,7 +41,7 @@ export function wrapMarketingEmailHtml(
 ): string {
   const company = process.env.COMPANY_NAME || 'Elvoria Tech';
   const contact =
-    process.env.SMTP_TO || process.env.CONTACT_EMAIL || 'contact@elvoriatech.com';
+    process.env.CONTACT_EMAIL || 'contact@elvoriatech.com';
   const site = ELVORIA_WEBSITE_URL;
   const preheader = escapeHtml(
     opts.preheader || 'Software development partnership — Elvoria Tech'

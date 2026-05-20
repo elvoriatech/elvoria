@@ -175,8 +175,17 @@ export function ProposalChatWidget() {
           source: leadSource,
         }),
       });
-      const data = (await readJsonBody(res)) as { error?: string; conversationId?: string };
+      const data = (await readJsonBody(res)) as {
+        error?: string;
+        conversationId?: string;
+        autoReplyEnabled?: boolean;
+        autoReplySent?: boolean;
+        autoReplyError?: string;
+      };
       if (!res.ok) throw new Error(data?.error || 'Could not save your details');
+      if (data.autoReplyEnabled && !data.autoReplySent && data.autoReplyError) {
+        console.warn('[support-lead] confirmation email not sent:', data.autoReplyError);
+      }
       if (data.conversationId) setConversationId(data.conversationId);
       localStorage.setItem(
         LEAD_STORAGE_KEY,
