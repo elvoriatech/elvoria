@@ -1,4 +1,4 @@
-import { sendSiteHtmlEmail } from '@/lib/siteMailer';
+import { formatMailSendError, sendSiteHtmlEmail } from '@/lib/siteMailer';
 import { buildFullMarketingEmailHtml } from '@/lib/emailMarketing/emailLayout';
 import {
   getMarketingEmailLogoAttachment,
@@ -76,7 +76,10 @@ export async function sendCampaignEmails(params: {
       });
     } else {
       failed++;
-      const detail = result.reason === 'not_configured' ? 'Email not configured on server' : result.detail || 'Send failed';
+      const detail =
+        result.reason === 'not_configured'
+          ? 'Email not configured on server'
+          : formatMailSendError(result.detail || 'Send failed');
       errors.push(`${r.email}: ${detail}`);
       await appendSendLog({
         campaignId,

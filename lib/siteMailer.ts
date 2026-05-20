@@ -62,6 +62,26 @@ export async function sendSiteHtmlEmail(params: {
     return { sent: true };
   } catch (e) {
     console.error('[siteMailer] send failed:', e);
-    return { sent: false, reason: 'send_failed', detail: e instanceof Error ? e.message : String(e) };
+    const raw = e instanceof Error ? e.message : String(e);
+    return { sent: false, reason: 'send_failed', detail: formatMailSendError(raw) };
   }
+}
+
+/** Turn SMTP auth failures into actionable setup hints for the admin UI. */
+export function formatMailSendError(detail: string): string {
+  const lower = detail.toLowerCase();
+  if (
+    lower.includes('535') ||
+    lower.includes('badcredentials') ||
+    lower.includes('username and password not accepted') ||
+    lower.includes('eauth')
+  ) {
+    return (
+      'Gmail SMTP login rejected (535). Use a Google App Password — not your normal Gmail password — ' +
+      'with 2-Step Verification enabled. Set SMTP_USER (or EMAIL_USER) to the full mailbox address ' +
+      '(e.g. contact@elvoriatech.com). If both SMTP_* and EMAIL_* are set, SMTP_* is used. ' +
+      'Restart the server after changing .env. See https://support.google.com/mail/?p=BadCredentials'
+    );
+  }
+  return detail;
 }
