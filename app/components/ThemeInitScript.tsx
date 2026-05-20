@@ -1,10 +1,7 @@
-'use client';
+import { headers } from 'next/headers';
 
-/**
- * Apply saved theme before paint (SSR only). On the client we render nothing so React 19
- * does not warn about <script> in the component tree.
- */
-export function ThemeInitScript() {
-  if (typeof window !== 'undefined') return null;
-  return <script src="/theme-init.js" suppressHydrationWarning />;
+/** Apply saved theme before paint; uses CSP nonce from middleware. */
+export async function ThemeInitScript() {
+  const nonce = (await headers()).get('x-nonce') ?? undefined;
+  return <script src="/theme-init.js" nonce={nonce} suppressHydrationWarning />;
 }

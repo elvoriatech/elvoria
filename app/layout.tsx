@@ -26,6 +26,9 @@ function siteUrl(): string {
   return raw.replace(/\/$/, "");
 }
 
+/** Required so middleware can inject a fresh CSP nonce on each request. */
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl()),
   title: {
@@ -62,7 +65,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
