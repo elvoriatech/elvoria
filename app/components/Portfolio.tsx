@@ -3,7 +3,6 @@ import {
   Car,
   Clock,
   Euro,
-  Plane,
   TrendingDown,
   TrendingUp,
   Users,
@@ -11,24 +10,8 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 
+/** TravelConnect hidden for now — re-add when approved for public portfolio. */
 const caseStudies = [
-  {
-    icon: Plane,
-    name: 'TravelConnect',
-    industry: 'Aviation Technology',
-    tagline: 'Mission-Critical Flight Operations Platform',
-    description:
-      'Real-time flight management system serving airlines with 99.99% uptime requirements and sub-second response times.',
-    kpis: [
-      { value: '99.99%', label: 'System Uptime', icon: TrendingUp },
-      { value: '< 50ms', label: 'Response Time', icon: Clock },
-      { value: '€2.3M', label: 'Cost Savings/Year', icon: Euro },
-      { value: '15K', label: 'Daily Active Users', icon: Users },
-    ],
-    technologies: ['Next.js', 'NestJS', 'AWS Lambda', 'PostgreSQL', 'Redis'],
-    gradient: 'from-[#06B6D4] to-[#3B82F6]',
-    image: 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=1200&q=80',
-  },
   {
     icon: Briefcase,
     name: 'HireFlow',
@@ -109,9 +92,9 @@ export function Portfolio() {
         </div>
 
         <div className="space-y-8">
-          {caseStudies.map((study, index) => (
+          {caseStudies.map((study) => (
             <div
-              key={index}
+              key={study.name}
               className="group rounded-2xl border border-border/60 bg-card overflow-hidden transition-all duration-300 hover:border-[#06B6D4]/50 sm:p-6 md:p-8 dark:bg-linear-to-br dark:from-[#1E293B] dark:to-[#0F172A] dark:border-slate-700/50"
             >
               <div className="grid gap-6 lg:grid-cols-5 lg:gap-8">

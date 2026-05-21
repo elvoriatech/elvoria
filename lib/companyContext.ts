@@ -29,7 +29,7 @@ export function getSalesEngineerContextBlock(): string {
     'Flexible Engineering & Consulting: €70–€120/hour.',
     '',
     'CASE STUDIES (do not fabricate beyond these names/themes):',
-    'TravelConnect (aviation, 99.99% uptime), HireFlow (HR AI, 95% time reduction),',
+    'HireFlow (HR AI, 95% time reduction),',
     'FoodHub SaaS (€3.2M GMV/mo), MarketHub Pro (€8M GMV/mo, 1,800+ vendors).',
     '',
     'COMPLIANCE:',

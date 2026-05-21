@@ -1,0 +1,78 @@
+import {
+  createSiteMailer,
+  formatMailSendError,
+  getContactEmail,
+  isSiteMailConfigured,
+  normalizeMailPassword,
+} from '@/lib/siteMailer';
+
+describe('siteMailer', () => {
+  const env = process.env;
+
+  beforeEach(() => {
+    jest.resetModules();
+    process.env = { ...env };
+  });
+
+  afterAll(() => {
+    process.env = env;
+  });
+
+  describe('normalizeMailPassword', () => {
+    it('strips spaces from Google app passwords', () => {
+      expect(normalizeMailPassword('abcd efgh ijkl mnop')).toBe('abcdefghijklmnop');
+    });
+
+    it('returns empty string for undefined', () => {
+      expect(normalizeMailPassword(undefined)).toBe('');
+    });
+  });
+
+  describe('getContactEmail', () => {
+    it('uses CONTACT_EMAIL when set', () => {
+      process.env.CONTACT_EMAIL = 'hello@example.com';
+      expect(getContactEmail()).toBe('hello@example.com');
+    });
+
+    it('falls back to default contact address', () => {
+      delete process.env.CONTACT_EMAIL;
+      expect(getContactEmail()).toBe('contact@elvoriatech.com');
+    });
+  });
+
+  describe('createSiteMailer / isSiteMailConfigured', () => {
+    it('is not configured when env vars are missing', () => {
+      delete process.env.EMAIL_SERVICE;
+      delete process.env.EMAIL_USER;
+      delete process.env.EMAIL_PASSWORD;
+      expect(isSiteMailConfigured()).toBe(false);
+      expect(createSiteMailer()).toEqual({ ok: false });
+    });
+
+    it('is configured with formatted From when env is set', () => {
+      process.env.EMAIL_SERVICE = 'gmail';
+      process.env.EMAIL_USER = 'contact@elvoriatech.com';
+      process.env.EMAIL_PASSWORD = 'apppassword16chars';
+      process.env.COMPANY_NAME = 'Elvoria Tech';
+
+      const kit = createSiteMailer();
+      expect(kit.ok).toBe(true);
+      if (kit.ok) {
+        expect(kit.from).toBe('Elvoria Tech <contact@elvoriatech.com>');
+      }
+      expect(isSiteMailConfigured()).toBe(true);
+    });
+  });
+
+  describe('formatMailSendError', () => {
+    it('maps Gmail 535 to actionable message', () => {
+      const msg = formatMailSendError('Invalid login: 535-5.7.8 Username and Password not accepted');
+      expect(msg).toContain('Google App Password');
+      expect(msg).toContain('535');
+    });
+
+    it('passes through unknown errors', () => {
+      expect(formatMailSendError('timeout')).toBe('timeout');
+    });
+  });
+});
