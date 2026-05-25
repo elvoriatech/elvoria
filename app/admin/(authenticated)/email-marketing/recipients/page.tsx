@@ -1,4 +1,4 @@
-import { isEmailMarketingReady, isEmailMarketingSchemaApplied, listRecipients } from '@/lib/emailMarketing/store';
+import { isEmailMarketingReady, isEmailMarketingSchemaApplied } from '@/lib/emailMarketing/store';
 import { EmailRecipientsManager } from '../../../_components/EmailRecipientsManager';
 
 export default async function EmailRecipientsPage() {
@@ -9,6 +9,5 @@ export default async function EmailRecipientsPage() {
       </p>
     );
   }
-  const recipients = await listRecipients();
-  return <EmailRecipientsManager initial={recipients} />;
+  return <EmailRecipientsManager />;
 }

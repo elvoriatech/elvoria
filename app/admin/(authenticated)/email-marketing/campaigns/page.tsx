@@ -1,9 +1,4 @@
-import {
-  isEmailMarketingReady,
-  isEmailMarketingSchemaApplied,
-  listRecipients,
-  listTemplates,
-} from '@/lib/emailMarketing/store';
+import { isEmailMarketingReady, isEmailMarketingSchemaApplied, listTemplates } from '@/lib/emailMarketing/store';
 import { EmailCampaignSend } from '../../../_components/EmailCampaignSend';
 
 export default async function EmailCampaignsPage() {
@@ -14,6 +9,6 @@ export default async function EmailCampaignsPage() {
       </p>
     );
   }
-  const [recipients, templates] = await Promise.all([listRecipients(), listTemplates()]);
-  return <EmailCampaignSend recipients={recipients} templates={templates} />;
+  const templates = await listTemplates();
+  return <EmailCampaignSend templates={templates} />;
 }

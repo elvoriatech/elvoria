@@ -1,14 +1,40 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminSession } from '@/lib/requireAdminSession';
 import { emailMarketingErrorResponse } from '@/lib/emailMarketing/apiError';
-import { createRecipient, deleteRecipient, listRecipients, markRecipientReplied } from '@/lib/emailMarketing/store';
+import { RECIPIENTS_PAGE_SIZE } from '@/lib/emailMarketing/constants';
+import {
+  createRecipient,
+  deleteRecipient,
+  listRecipientIdsByStatus,
+  listRecipientsPaginated,
+  markRecipientReplied,
+} from '@/lib/emailMarketing/store';
+import type { RecipientStatus } from '@/lib/emailMarketing/types';
 
-export async function GET() {
+const STATUSES = new Set<RecipientStatus>(['not_sent', 'sent', 'replied']);
+
+export async function GET(request: NextRequest) {
   const denied = await requireAdminSession();
   if (denied) return denied;
   try {
-    const recipients = await listRecipients();
-    return NextResponse.json({ recipients });
+    const sp = request.nextUrl.searchParams;
+    const idsOnly = sp.get('idsOnly') === 'true';
+    const statusRaw = sp.get('status');
+    const status = statusRaw && STATUSES.has(statusRaw as RecipientStatus) ? (statusRaw as RecipientStatus) : undefined;
+
+    if (idsOnly && status) {
+      const ids = await listRecipientIdsByStatus(status);
+      return NextResponse.json({ ids, total: ids.length });
+    }
+
+    const page = Math.max(1, parseInt(sp.get('page') || '1', 10) || 1);
+    const pageSize = Math.min(
+      RECIPIENTS_PAGE_SIZE,
+      Math.max(1, parseInt(sp.get('pageSize') || String(RECIPIENTS_PAGE_SIZE), 10) || RECIPIENTS_PAGE_SIZE)
+    );
+
+    const result = await listRecipientsPaginated({ page, pageSize, status });
+    return NextResponse.json(result);
   } catch (e) {
     const r = emailMarketingErrorResponse(e);
     if (r) return r;

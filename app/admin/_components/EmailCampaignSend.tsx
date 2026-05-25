@@ -1,38 +1,50 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { applyTemplateVars, recipientToVars } from '@/lib/emailMarketing/templateVars';
-import type { EmailRecipient, EmailTemplate, EmailTemplateType } from '@/lib/emailMarketing/types';
+import {
+  clearStoredRecipientSelection,
+  loadStoredRecipientSelection,
+  saveStoredRecipientSelection,
+} from '@/lib/emailMarketing/recipientSelectionStorage';
+import type { EmailTemplate, EmailTemplateType } from '@/lib/emailMarketing/types';
 import { TEMPLATE_LABELS } from '@/lib/emailMarketing/types';
 import { AdminConfirmModal } from './AdminConfirmModal';
 import { EmailHtmlPreview } from './EmailHtmlPreview';
+import { RecipientPaginationControls } from './RecipientPaginationControls';
+import { RecipientSelectionToolbar } from './RecipientSelectionToolbar';
+import { fetchRecipientIdsByStatus, usePaginatedRecipients } from './usePaginatedRecipients';
 
-export function EmailCampaignSend({
-  recipients,
-  templates,
-}: {
-  recipients: EmailRecipient[];
-  templates: EmailTemplate[];
-}) {
-  const router = useRouter();
+export function EmailCampaignSend({ templates }: { templates: EmailTemplate[] }) {
+  const { page, setPage, rows, total, totalPages, loading, error, refresh, rangeStart, rangeEnd } =
+    usePaginatedRecipients();
   const [templateType, setTemplateType] = useState<EmailTemplateType>('initial');
-  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [selected, setSelected] = useState<Set<string>>(() => loadStoredRecipientSelection());
   const [autoFollowUp, setAutoFollowUp] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [selectBusy, setSelectBusy] = useState(false);
   const [result, setResult] = useState('');
   const [previewRecipientId, setPreviewRecipientId] = useState<string>('');
   const [confirmSendOpen, setConfirmSendOpen] = useState(false);
 
+  useEffect(() => {
+    saveStoredRecipientSelection(selected);
+  }, [selected]);
+
   const template = templates.find((t) => t.templateType === templateType);
+
+  const pageSelectedCount = useMemo(
+    () => rows.filter((r) => selected.has(r.id)).length,
+    [rows, selected]
+  );
 
   const previewRecipient = useMemo(() => {
     if (previewRecipientId) {
-      return recipients.find((r) => r.id === previewRecipientId) ?? recipients[0];
+      return rows.find((r) => r.id === previewRecipientId) ?? rows[0];
     }
-    const firstSelected = recipients.find((r) => selected.has(r.id));
-    return firstSelected ?? recipients[0];
-  }, [previewRecipientId, recipients, selected]);
+    const firstSelected = rows.find((r) => selected.has(r.id));
+    return firstSelected ?? rows[0];
+  }, [previewRecipientId, rows, selected]);
 
   useEffect(() => {
     if (previewRecipient && previewRecipientId !== previewRecipient.id) {
@@ -68,6 +80,37 @@ export function EmailCampaignSend({
     });
   }
 
+  function togglePage() {
+    const pageIds = rows.map((r) => r.id);
+    const allOnPage = pageIds.length > 0 && pageIds.every((id) => selected.has(id));
+    setSelected((s) => {
+      const n = new Set(s);
+      if (allOnPage) {
+        for (const id of pageIds) n.delete(id);
+      } else {
+        for (const id of pageIds) n.add(id);
+      }
+      return n;
+    });
+  }
+
+  function clearSelection() {
+    setSelected(new Set());
+    clearStoredRecipientSelection();
+  }
+
+  async function selectAllNotSent() {
+    setSelectBusy(true);
+    try {
+      const ids = await fetchRecipientIdsByStatus('not_sent');
+      setSelected(new Set(ids));
+    } catch (e) {
+      setResult((e as Error).message);
+    } finally {
+      setSelectBusy(false);
+    }
+  }
+
   function requestSend() {
     if (!selected.size) {
       setResult('Select at least one recipient in Step 2.');
@@ -96,7 +139,8 @@ export function EmailCampaignSend({
       if (!res.ok) throw new Error(data.error || 'Send failed');
       const errLines = data.errors?.length ? ` Errors: ${data.errors.slice(0, 3).join('; ')}` : '';
       setResult(`Sent ${data.sent ?? 0}, failed ${data.failed ?? 0}.${errLines}`);
-      router.refresh();
+      clearSelection();
+      await refresh();
     } catch (e) {
       setResult((e as Error).message);
     } finally {
@@ -118,7 +162,7 @@ export function EmailCampaignSend({
       const p1 = data.followUp1 ? `FU1: ${data.followUp1.sent} sent` : 'FU1: none due';
       const p2 = data.followUp2 ? `FU2: ${data.followUp2.sent} sent` : 'FU2: none due';
       setResult(`${p1}. ${p2}.`);
-      router.refresh();
+      await refresh();
     } catch (e) {
       setResult((e as Error).message);
     } finally {
@@ -160,21 +204,44 @@ export function EmailCampaignSend({
       <div className="rounded-xl border border-border bg-card p-4">
         <h3 className="text-sm font-semibold text-foreground">Step 2 — Recipients</h3>
         <p className="mt-1 text-sm text-muted-foreground">
-          Select who receives this campaign ({recipients.length} in list).
+          {total.toLocaleString()} companies total. Selection is kept across pages and when you switch from the Companies tab.
         </p>
-        <div className="mt-3 max-h-48 overflow-y-auto rounded-lg border border-border p-2 text-sm">
-          {recipients.length === 0 ? (
-            <p className="py-4 text-center text-muted-foreground">Add companies on the Companies tab first.</p>
-          ) : (
-            recipients.map((r) => (
-              <label key={r.id} className="flex cursor-pointer items-center gap-2 py-1">
-                <input type="checkbox" checked={selected.has(r.id)} onChange={() => toggle(r.id)} />
-                <span>
-                  {r.contactName || r.email} — {r.companyName} ({r.status})
-                </span>
-              </label>
-            ))
-          )}
+        <div className="mt-3 space-y-3">
+          <RecipientPaginationControls
+            page={page}
+            totalPages={totalPages}
+            total={total}
+            rangeStart={rangeStart}
+            rangeEnd={rangeEnd}
+            loading={loading}
+            onPageChange={setPage}
+          />
+          <RecipientSelectionToolbar
+            selectedCount={selected.size}
+            pageSelectedCount={pageSelectedCount}
+            pageRowCount={rows.length}
+            busy={busy || selectBusy || loading}
+            onSelectPage={togglePage}
+            onClear={clearSelection}
+            onSelectNotSent={() => void selectAllNotSent()}
+          />
+          {error ? <p className="text-sm text-destructive">{error}</p> : null}
+          <div className="max-h-64 overflow-y-auto rounded-lg border border-border p-2 text-sm">
+            {loading && rows.length === 0 ? (
+              <p className="py-4 text-center text-muted-foreground">Loading…</p>
+            ) : rows.length === 0 ? (
+              <p className="py-4 text-center text-muted-foreground">Add companies on the Companies tab first.</p>
+            ) : (
+              rows.map((r) => (
+                <label key={r.id} className="flex cursor-pointer items-center gap-2 py-1">
+                  <input type="checkbox" checked={selected.has(r.id)} onChange={() => toggle(r.id)} />
+                  <span>
+                    {r.contactName || r.email} — {r.companyName} ({r.status})
+                  </span>
+                </label>
+              ))
+            )}
+          </div>
         </div>
       </div>
 
@@ -183,15 +250,15 @@ export function EmailCampaignSend({
         <p className="mt-1 text-sm text-muted-foreground">
           Review the exact email layout (white inbox view). Variables are filled for the recipient below.
         </p>
-        {recipients.length > 0 ? (
+        {rows.length > 0 ? (
           <label className="mt-3 block text-sm">
-            <span className="font-medium text-foreground">Preview as recipient</span>
+            <span className="font-medium text-foreground">Preview as recipient (current page)</span>
             <select
               value={previewRecipient?.id ?? ''}
               onChange={(e) => setPreviewRecipientId(e.target.value)}
               className="mt-1 w-full max-w-md rounded-lg border border-border bg-background px-3 py-2"
             >
-              {recipients.map((r) => (
+              {rows.map((r) => (
                 <option key={r.id} value={r.id}>
                   {r.contactName || r.email} — {r.companyName}
                 </option>
@@ -220,7 +287,7 @@ export function EmailCampaignSend({
           onClick={() => requestSend()}
           className="rounded-lg bg-[#0e7490] px-6 py-2 text-sm font-semibold text-white disabled:opacity-50 dark:bg-cyan-600"
         >
-          {busy ? 'Sending…' : `Send emails (${selected.size} selected)`}
+          {busy ? 'Sending…' : `Send emails (${selected.size.toLocaleString()} selected)`}
         </button>
         <button
           type="button"
@@ -237,7 +304,7 @@ export function EmailCampaignSend({
       <AdminConfirmModal
         open={confirmSendOpen}
         title="Send campaign emails?"
-        description={`Send "${TEMPLATE_LABELS[templateType]}" to ${selected.size} recipient(s)? This cannot be undone.`}
+        description={`Send "${TEMPLATE_LABELS[templateType]}" to ${selected.size.toLocaleString()} recipient(s)? Large sends are processed in batches.`}
         confirmLabel="Send emails"
         cancelLabel="Cancel"
         busy={busy}

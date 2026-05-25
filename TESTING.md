@@ -22,7 +22,9 @@ git commit --no-verify
 
 - **Mail config** — password normalization, From address, Gmail error hints (`lib/siteMailer`)
 - **Visitor auto-replies** — `SEND_AUTOREPLY`, marketing layout emails (`lib/visitorAckEmail`, `lib/visitorAutoReplyLayout`)
-- **Email marketing** — template variables and outreach HTML shell (`lib/emailMarketing`)
+- **Email marketing** — template variables, outreach HTML shell, recipient pagination (`lib/emailMarketing`)
 - **API routes** — contact form and support-lead validation + success paths (mocked mail/CRM)
+
+Recipients admin lists **500 companies per page** with total count; selection persists in `sessionStorage` between Companies and Campaigns tabs.
 
 Tests do not call Gmail, Supabase, or OpenRouter. Add new tests under `**/__tests__/**/*.test.ts` when changing behavior.

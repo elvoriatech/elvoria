@@ -6,7 +6,12 @@ import {
   elvoriaBrandLink,
   LEGACY_CALL_INVITE_LINE,
 } from '@/lib/emailMarketing/defaults';
-import { ELVORIA_WEBSITE_URL } from '@/lib/emailMarketing/constants';
+import {
+  ELVORIA_WEBSITE_URL,
+  POSTGREST_FETCH_PAGE,
+  RECIPIENT_IDS_CHUNK,
+  RECIPIENTS_PAGE_SIZE,
+} from '@/lib/emailMarketing/constants';
 import type {
   EmailCampaign,
   EmailRecipient,
@@ -319,12 +324,91 @@ export async function updateTemplate(
 }
 
 export async function listRecipients(): Promise<EmailRecipient[]> {
-  const { data, error } = await requireSb()
+  return listAllRecipients();
+}
+
+export type RecipientsPageResult = {
+  recipients: EmailRecipient[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+};
+
+export async function listRecipientsPaginated(params: {
+  page?: number;
+  pageSize?: number;
+  status?: RecipientStatus;
+}): Promise<RecipientsPageResult> {
+  const pageSize = Math.min(Math.max(params.pageSize ?? RECIPIENTS_PAGE_SIZE, 1), RECIPIENTS_PAGE_SIZE);
+  const page = Math.max(params.page ?? 1, 1);
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+
+  let query = requireSb()
     .from('em_recipients')
-    .select('*')
+    .select('*', { count: 'exact' })
     .order('created_at', { ascending: false });
+  if (params.status) query = query.eq('status', params.status);
+
+  const { data, error, count } = await query.range(from, to);
   throwIfDb(error);
-  return ((data || []) as DbRecipient[]).map(mapRecipient);
+
+  const total = count ?? 0;
+  const totalPages = total ? Math.ceil(total / pageSize) : 0;
+
+  return {
+    recipients: ((data || []) as DbRecipient[]).map(mapRecipient),
+    total,
+    page,
+    pageSize,
+    totalPages,
+  };
+}
+
+/** Fetch every row (paginates past PostgREST 1000-row cap). */
+export async function listAllRecipients(): Promise<EmailRecipient[]> {
+  const sb = requireSb();
+  const all: EmailRecipient[] = [];
+  let from = 0;
+
+  while (true) {
+    const { data, error } = await sb
+      .from('em_recipients')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .range(from, from + POSTGREST_FETCH_PAGE - 1);
+    throwIfDb(error);
+    const batch = ((data || []) as DbRecipient[]).map(mapRecipient);
+    all.push(...batch);
+    if (batch.length < POSTGREST_FETCH_PAGE) break;
+    from += POSTGREST_FETCH_PAGE;
+  }
+
+  return all;
+}
+
+/** All recipient IDs for a status (for “Select not sent”). */
+export async function listRecipientIdsByStatus(status: RecipientStatus): Promise<string[]> {
+  const sb = requireSb();
+  const ids: string[] = [];
+  let from = 0;
+
+  while (true) {
+    const { data, error } = await sb
+      .from('em_recipients')
+      .select('id')
+      .eq('status', status)
+      .order('created_at', { ascending: false })
+      .range(from, from + POSTGREST_FETCH_PAGE - 1);
+    throwIfDb(error);
+    const batch = (data || []) as { id: string }[];
+    ids.push(...batch.map((r) => r.id));
+    if (batch.length < POSTGREST_FETCH_PAGE) break;
+    from += POSTGREST_FETCH_PAGE;
+  }
+
+  return ids;
 }
 
 export async function createRecipient(input: {
@@ -406,9 +490,18 @@ export async function upsertRecipientsFromRows(
 
 export async function getRecipientsByIds(ids: string[]): Promise<EmailRecipient[]> {
   if (!ids.length) return [];
-  const { data, error } = await requireSb().from('em_recipients').select('*').in('id', ids);
-  throwIfDb(error);
-  return ((data || []) as DbRecipient[]).map(mapRecipient);
+  const unique = [...new Set(ids)];
+  const sb = requireSb();
+  const out: EmailRecipient[] = [];
+
+  for (let i = 0; i < unique.length; i += RECIPIENT_IDS_CHUNK) {
+    const chunk = unique.slice(i, i + RECIPIENT_IDS_CHUNK);
+    const { data, error } = await sb.from('em_recipients').select('*').in('id', chunk);
+    throwIfDb(error);
+    out.push(...((data || []) as DbRecipient[]).map(mapRecipient));
+  }
+
+  return out;
 }
 
 export async function createCampaign(meta: {
