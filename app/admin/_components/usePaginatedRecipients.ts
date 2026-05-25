@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { RECIPIENTS_PAGE_SIZE } from '@/lib/emailMarketing/constants';
-import type { EmailRecipient } from '@/lib/emailMarketing/types';
+import { RECIPIENTS_CHANGED_EVENT } from '@/lib/emailMarketing/recipientListEvents';
+import type { EmailRecipient, RecipientStatus } from '@/lib/emailMarketing/types';
 
 export type RecipientsPageResponse = {
   recipients: EmailRecipient[];
@@ -12,7 +13,9 @@ export type RecipientsPageResponse = {
   totalPages: number;
 };
 
-export function usePaginatedRecipients() {
+export type StatusFilter = 'all' | RecipientStatus;
+
+export function usePaginatedRecipients(statusFilter: StatusFilter = 'all') {
   const [page, setPage] = useState(1);
   const [rows, setRows] = useState<EmailRecipient[]>([]);
   const [total, setTotal] = useState(0);
@@ -20,34 +23,50 @@ export function usePaginatedRecipients() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  const loadPage = useCallback(async (targetPage: number) => {
-    setLoading(true);
-    setError('');
-    try {
-      const params = new URLSearchParams({
-        page: String(targetPage),
-        pageSize: String(RECIPIENTS_PAGE_SIZE),
-      });
-      const res = await fetch(`/api/admin/email-marketing/recipients?${params}`);
-      const data = (await res.json()) as RecipientsPageResponse & { error?: string };
-      if (!res.ok) throw new Error(data.error || 'Failed to load recipients');
-      setRows(data.recipients);
-      setTotal(data.total);
-      setTotalPages(data.totalPages);
-      setPage(data.page);
-    } catch (e) {
-      setError((e as Error).message);
-      setRows([]);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const loadPage = useCallback(
+    async (targetPage: number, filter: StatusFilter = statusFilter) => {
+      setLoading(true);
+      setError('');
+      try {
+        const params = new URLSearchParams({
+          page: String(targetPage),
+          pageSize: String(RECIPIENTS_PAGE_SIZE),
+        });
+        if (filter !== 'all') params.set('status', filter);
+        const res = await fetch(`/api/admin/email-marketing/recipients?${params}`);
+        const data = (await res.json()) as RecipientsPageResponse & { error?: string };
+        if (!res.ok) throw new Error(data.error || 'Failed to load recipients');
+        setRows(data.recipients);
+        setTotal(data.total);
+        setTotalPages(data.totalPages);
+        setPage(data.page);
+      } catch (e) {
+        setError((e as Error).message);
+        setRows([]);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [statusFilter]
+  );
 
   useEffect(() => {
-    void loadPage(page);
-  }, [page, loadPage]);
+    setPage(1);
+  }, [statusFilter]);
 
-  const refresh = useCallback(() => loadPage(page), [loadPage, page]);
+  useEffect(() => {
+    void loadPage(page, statusFilter);
+  }, [page, statusFilter, loadPage]);
+
+  useEffect(() => {
+    function onChanged() {
+      void loadPage(page, statusFilter);
+    }
+    window.addEventListener(RECIPIENTS_CHANGED_EVENT, onChanged);
+    return () => window.removeEventListener(RECIPIENTS_CHANGED_EVENT, onChanged);
+  }, [page, statusFilter, loadPage]);
+
+  const refresh = useCallback(() => loadPage(page, statusFilter), [loadPage, page, statusFilter]);
 
   const rangeStart = total === 0 ? 0 : (page - 1) * RECIPIENTS_PAGE_SIZE + 1;
   const rangeEnd = total === 0 ? 0 : Math.min(page * RECIPIENTS_PAGE_SIZE, total);
@@ -68,7 +87,7 @@ export function usePaginatedRecipients() {
   };
 }
 
-export async function fetchRecipientIdsByStatus(status: 'not_sent' | 'sent' | 'replied'): Promise<string[]> {
+export async function fetchRecipientIdsByStatus(status: RecipientStatus): Promise<string[]> {
   const params = new URLSearchParams({ idsOnly: 'true', status });
   const res = await fetch(`/api/admin/email-marketing/recipients?${params}`);
   const data = (await res.json()) as { ids?: string[]; error?: string };

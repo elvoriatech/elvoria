@@ -15,6 +15,17 @@ export function getContactEmail(): string {
   return process.env.CONTACT_EMAIL?.trim() || 'contact@elvoriatech.com';
 }
 
+/**
+ * BCC address for campaign sends so the sending mailbox gets a copy of each outbound message.
+ * Set EMAIL_CAMPAIGN_BCC=false to disable. Defaults to EMAIL_USER when unset.
+ */
+export function getCampaignSentCopyBcc(): string | undefined {
+  const raw = process.env.EMAIL_CAMPAIGN_BCC?.trim();
+  if (raw && /^false$/i.test(raw)) return undefined;
+  if (raw && !/^false$/i.test(raw)) return raw;
+  return process.env.EMAIL_USER?.trim() || undefined;
+}
+
 function formatFromAddress(user: string): string {
   const addr = user.trim();
   if (!addr) return addr;
@@ -81,6 +92,8 @@ export async function sendSiteHtmlEmail(params: {
   text?: string;
   attachments?: Attachment[];
   replyTo?: string;
+  /** e.g. your mailbox — one copy per message in Sent/BCC */
+  bcc?: string | string[];
 }): Promise<{ sent: true } | { sent: false; reason: 'not_configured' | 'send_failed'; detail?: string }> {
   const kit = createSiteMailer();
   if (!kit.ok) return { sent: false, reason: 'not_configured' };
@@ -88,6 +101,7 @@ export async function sendSiteHtmlEmail(params: {
     await kit.transporter.sendMail({
       from: kit.from,
       to: params.to,
+      bcc: params.bcc,
       replyTo: params.replyTo,
       subject: params.subject,
       html: params.html,

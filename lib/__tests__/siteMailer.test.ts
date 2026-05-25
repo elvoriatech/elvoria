@@ -1,6 +1,7 @@
 import {
   createSiteMailer,
   formatMailSendError,
+  getCampaignSentCopyBcc,
   getContactEmail,
   isSiteMailConfigured,
   normalizeMailPassword,
@@ -61,6 +62,24 @@ describe('siteMailer', () => {
         expect(kit.from).toBe('Elvoria Tech <contact@elvoriatech.com>');
       }
       expect(isSiteMailConfigured()).toBe(true);
+    });
+  });
+
+  describe('getCampaignSentCopyBcc', () => {
+    it('defaults to EMAIL_USER when unset', () => {
+      delete process.env.EMAIL_CAMPAIGN_BCC;
+      process.env.EMAIL_USER = 'sender@example.com';
+      expect(getCampaignSentCopyBcc()).toBe('sender@example.com');
+    });
+
+    it('returns undefined when EMAIL_CAMPAIGN_BCC=false', () => {
+      process.env.EMAIL_CAMPAIGN_BCC = 'false';
+      expect(getCampaignSentCopyBcc()).toBeUndefined();
+    });
+
+    it('uses explicit EMAIL_CAMPAIGN_BCC address', () => {
+      process.env.EMAIL_CAMPAIGN_BCC = 'archive@example.com';
+      expect(getCampaignSentCopyBcc()).toBe('archive@example.com');
     });
   });
 

@@ -2,22 +2,26 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { applyTemplateVars, recipientToVars } from '@/lib/emailMarketing/templateVars';
-import {
-  clearStoredRecipientSelection,
-  loadStoredRecipientSelection,
-  saveStoredRecipientSelection,
-} from '@/lib/emailMarketing/recipientSelectionStorage';
-import type { EmailTemplate, EmailTemplateType } from '@/lib/emailMarketing/types';
+import { notifyRecipientsChanged } from '@/lib/emailMarketing/recipientListEvents';
+import type { EmailTemplate, EmailTemplateType, RecipientStatus } from '@/lib/emailMarketing/types';
 import { TEMPLATE_LABELS } from '@/lib/emailMarketing/types';
 import { AdminConfirmModal } from './AdminConfirmModal';
 import { EmailHtmlPreview } from './EmailHtmlPreview';
 import { RecipientPaginationControls } from './RecipientPaginationControls';
 import { RecipientSelectionToolbar } from './RecipientSelectionToolbar';
-import { fetchRecipientIdsByStatus, usePaginatedRecipients } from './usePaginatedRecipients';
+import { fetchRecipientIdsByStatus, usePaginatedRecipients, type StatusFilter } from './usePaginatedRecipients';
+
+const STATUS_FILTER_OPTIONS: { value: StatusFilter; label: string }[] = [
+  { value: 'all', label: 'All' },
+  { value: 'not_sent', label: 'Not sent' },
+  { value: 'sent', label: 'Sent' },
+  { value: 'replied', label: 'Replied' },
+];
 
 export function EmailCampaignSend({ templates }: { templates: EmailTemplate[] }) {
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const { page, setPage, rows, total, totalPages, loading, error, refresh, rangeStart, rangeEnd } =
-    usePaginatedRecipients();
+    usePaginatedRecipients(statusFilter);
   const [templateType, setTemplateType] = useState<EmailTemplateType>('initial');
   const [selected, setSelected] = useState<Set<string>>(() => loadStoredRecipientSelection());
   const [autoFollowUp, setAutoFollowUp] = useState(false);
@@ -111,6 +115,18 @@ export function EmailCampaignSend({ templates }: { templates: EmailTemplate[] })
     }
   }
 
+  async function selectAllSent() {
+    setSelectBusy(true);
+    try {
+      const ids = await fetchRecipientIdsByStatus('sent');
+      setSelected(new Set(ids));
+    } catch (e) {
+      setResult((e as Error).message);
+    } finally {
+      setSelectBusy(false);
+    }
+  }
+
   function requestSend() {
     if (!selected.size) {
       setResult('Select at least one recipient in Step 2.');
@@ -135,11 +151,23 @@ export function EmailCampaignSend({ templates }: { templates: EmailTemplate[] })
         sent?: number;
         failed?: number;
         errors?: string[];
+        sentRecipientIds?: string[];
       };
       if (!res.ok) throw new Error(data.error || 'Send failed');
       const errLines = data.errors?.length ? ` Errors: ${data.errors.slice(0, 3).join('; ')}` : '';
       setResult(`Sent ${data.sent ?? 0}, failed ${data.failed ?? 0}.${errLines}`);
-      clearSelection();
+
+      const sentIds = new Set(data.sentRecipientIds ?? []);
+      if (sentIds.size) {
+        setSelected((prev) => {
+          const next = new Set(prev);
+          for (const id of sentIds) next.delete(id);
+          return next;
+        });
+      } else {
+        clearSelection();
+      }
+      notifyRecipientsChanged();
       await refresh();
     } catch (e) {
       setResult((e as Error).message);
@@ -162,6 +190,7 @@ export function EmailCampaignSend({ templates }: { templates: EmailTemplate[] })
       const p1 = data.followUp1 ? `FU1: ${data.followUp1.sent} sent` : 'FU1: none due';
       const p2 = data.followUp2 ? `FU2: ${data.followUp2.sent} sent` : 'FU2: none due';
       setResult(`${p1}. ${p2}.`);
+      notifyRecipientsChanged();
       await refresh();
     } catch (e) {
       setResult((e as Error).message);
@@ -204,8 +233,31 @@ export function EmailCampaignSend({ templates }: { templates: EmailTemplate[] })
       <div className="rounded-xl border border-border bg-card p-4">
         <h3 className="text-sm font-semibold text-foreground">Step 2 — Recipients</h3>
         <p className="mt-1 text-sm text-muted-foreground">
-          {total.toLocaleString()} companies total. Selection is kept across pages and when you switch from the Companies tab.
+          {total.toLocaleString()} companies{statusFilter !== 'all' ? ` (${statusFilter.replace('_', ' ')})` : ''}.
+          Status becomes <strong className="text-foreground">Sent</strong> only after SMTP succeeds. Each successful
+          send is BCC’d to your sending mailbox (<code className="text-xs">EMAIL_USER</code>, or{' '}
+          <code className="text-xs">EMAIL_CAMPAIGN_BCC</code>) — check Gmail <strong>Sent</strong> or Inbox. See{' '}
+          <a href="/admin/email-marketing/logs" className="font-semibold text-[#0e7490] underline dark:text-cyan-300">
+            Logs
+          </a>
+          . Set <code className="text-xs">EMAIL_CAMPAIGN_BCC=false</code> to disable copies.
         </p>
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <label className="text-sm font-medium text-foreground">
+            Show
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
+              className="ml-2 rounded-lg border border-border bg-background px-2 py-1 text-sm"
+            >
+              {STATUS_FILTER_OPTIONS.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
         <div className="mt-3 space-y-3">
           <RecipientPaginationControls
             page={page}
@@ -224,6 +276,7 @@ export function EmailCampaignSend({ templates }: { templates: EmailTemplate[] })
             onSelectPage={togglePage}
             onClear={clearSelection}
             onSelectNotSent={() => void selectAllNotSent()}
+            onSelectSent={() => void selectAllSent()}
           />
           {error ? <p className="text-sm text-destructive">{error}</p> : null}
           <div className="max-h-64 overflow-y-auto rounded-lg border border-border p-2 text-sm">

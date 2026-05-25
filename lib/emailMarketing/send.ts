@@ -1,4 +1,4 @@
-import { formatMailSendError, sendSiteHtmlEmail } from '@/lib/siteMailer';
+import { formatMailSendError, getCampaignSentCopyBcc, sendSiteHtmlEmail } from '@/lib/siteMailer';
 import { SEND_CHUNK_DELAY_MS, SEND_RECIPIENTS_CHUNK } from '@/lib/emailMarketing/constants';
 import { buildFullMarketingEmailHtml } from '@/lib/emailMarketing/emailLayout';
 import {
@@ -20,6 +20,8 @@ export type SendCampaignResult = {
   sent: number;
   failed: number;
   errors: string[];
+  /** Recipient IDs that were emailed successfully (status → sent in DB). */
+  sentRecipientIds: string[];
 };
 
 function sleep(ms: number) {
@@ -32,10 +34,12 @@ async function sendToRecipients(params: {
   templateType: EmailTemplateType;
   autoFollowUp: boolean;
   campaignId: string;
-}): Promise<{ sent: number; failed: number; errors: string[] }> {
+}): Promise<{ sent: number; failed: number; errors: string[]; sentRecipientIds: string[] }> {
   let sent = 0;
   let failed = 0;
   const errors: string[] = [];
+  const sentRecipientIds: string[] = [];
+  const sentCopyBcc = getCampaignSentCopyBcc();
 
   for (const r of params.recipients) {
     const vars = recipientToVars(r);
@@ -51,11 +55,13 @@ async function sendToRecipients(params: {
       to: r.email,
       subject,
       html,
+      bcc: sentCopyBcc,
       attachments: attachments.length ? attachments : undefined,
     });
 
     if (result.sent) {
       sent++;
+      sentRecipientIds.push(r.id);
       await updateRecipientAfterSend(r.id, params.templateType, {
         autoFollowUp: params.autoFollowUp && params.templateType === 'initial',
         success: true,
@@ -85,7 +91,7 @@ async function sendToRecipients(params: {
     }
   }
 
-  return { sent, failed, errors };
+  return { sent, failed, errors, sentRecipientIds };
 }
 
 export async function sendCampaignEmails(params: {
@@ -110,6 +116,7 @@ export async function sendCampaignEmails(params: {
   let sent = 0;
   let failed = 0;
   const errors: string[] = [];
+  const sentRecipientIds: string[] = [];
 
   for (let i = 0; i < uniqueIds.length; i += SEND_RECIPIENTS_CHUNK) {
     if (i > 0) await sleep(SEND_CHUNK_DELAY_MS);
@@ -127,6 +134,7 @@ export async function sendCampaignEmails(params: {
     sent += chunkResult.sent;
     failed += chunkResult.failed;
     errors.push(...chunkResult.errors);
+    sentRecipientIds.push(...chunkResult.sentRecipientIds);
   }
 
   if (!sent && !failed) throw new Error('No valid recipients selected');
@@ -137,7 +145,7 @@ export async function sendCampaignEmails(params: {
     .update({ sent_count: sent, failed_count: failed })
     .eq('id', campaignId);
 
-  return { campaignId, sent, failed, errors };
+  return { campaignId, sent, failed, errors, sentRecipientIds };
 }
 
 export async function processAutoFollowUps(): Promise<{

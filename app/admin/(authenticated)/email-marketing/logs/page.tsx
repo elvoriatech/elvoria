@@ -16,7 +16,7 @@ export default async function EmailLogsPage() {
     );
   }
 
-  const [logs, campaigns] = await Promise.all([listSendLogs(150), listCampaigns(30)]);
+  const [logs, campaigns] = await Promise.all([listSendLogs(500), listCampaigns(30)]);
 
   return (
     <div className="space-y-8">

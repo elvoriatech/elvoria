@@ -2,19 +2,28 @@
 
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
-import type { EmailRecipient } from '@/lib/emailMarketing/types';
+import { notifyRecipientsChanged } from '@/lib/emailMarketing/recipientListEvents';
 import {
   loadStoredRecipientSelection,
   saveStoredRecipientSelection,
 } from '@/lib/emailMarketing/recipientSelectionStorage';
+import type { EmailRecipient } from '@/lib/emailMarketing/types';
 import { AdminConfirmModal } from './AdminConfirmModal';
 import { RecipientPaginationControls } from './RecipientPaginationControls';
 import { RecipientSelectionToolbar } from './RecipientSelectionToolbar';
-import { fetchRecipientIdsByStatus, usePaginatedRecipients } from './usePaginatedRecipients';
+import { fetchRecipientIdsByStatus, usePaginatedRecipients, type StatusFilter } from './usePaginatedRecipients';
+
+const STATUS_FILTER_OPTIONS: { value: StatusFilter; label: string }[] = [
+  { value: 'all', label: 'All' },
+  { value: 'not_sent', label: 'Not sent' },
+  { value: 'sent', label: 'Sent' },
+  { value: 'replied', label: 'Replied' },
+];
 
 export function EmailRecipientsManager() {
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const { page, setPage, rows, total, totalPages, loading, error, loadPage, refresh, rangeStart, rangeEnd } =
-    usePaginatedRecipients();
+    usePaginatedRecipients(statusFilter);
   const [selected, setSelected] = useState<Set<string>>(() => loadStoredRecipientSelection());
   const [form, setForm] = useState({
     companyName: '',
@@ -87,6 +96,18 @@ export function EmailRecipientsManager() {
     }
   }
 
+  async function selectAllSent() {
+    setSelectBusy(true);
+    try {
+      const ids = await fetchRecipientIdsByStatus('sent');
+      setSelected(new Set(ids));
+    } catch (e) {
+      setFormError((e as Error).message);
+    } finally {
+      setSelectBusy(false);
+    }
+  }
+
   async function addManual() {
     setFormError('');
     setBusy(true);
@@ -99,6 +120,7 @@ export function EmailRecipientsManager() {
       const data = (await res.json()) as { error?: string };
       if (!res.ok) throw new Error(data.error || 'Failed');
       setForm({ companyName: '', contactName: '', email: '', industry: '', notes: '' });
+      notifyRecipientsChanged();
       await refresh();
     } catch (e) {
       setFormError((e as Error).message);
@@ -118,6 +140,7 @@ export function EmailRecipientsManager() {
       if (!res.ok) throw new Error(data.error || 'Upload failed');
       setUploadMsg(`Imported ${data.inserted ?? 0}, skipped ${data.skipped ?? 0}`);
       await loadPage(1);
+      notifyRecipientsChanged();
     } catch (e) {
       setUploadMsg((e as Error).message);
     } finally {
@@ -139,6 +162,7 @@ export function EmailRecipientsManager() {
         n.delete(id);
         return n;
       });
+      notifyRecipientsChanged();
       await refresh();
     } finally {
       setBusy(false);
@@ -153,6 +177,7 @@ export function EmailRecipientsManager() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id, markReplied: true }),
       });
+      notifyRecipientsChanged();
       await refresh();
     } finally {
       setBusy(false);
@@ -235,6 +260,25 @@ export function EmailRecipientsManager() {
       </div>
 
       <div className="space-y-3">
+        <div className="flex flex-wrap items-center gap-2">
+          <label className="text-sm font-medium text-foreground">
+            Show
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
+              className="ml-2 rounded-lg border border-border bg-background px-2 py-1 text-sm"
+            >
+              {STATUS_FILTER_OPTIONS.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <span className="text-sm text-muted-foreground">
+            {total.toLocaleString()} in this view · Status = Sent only after successful SMTP
+          </span>
+        </div>
         <RecipientPaginationControls
           page={page}
           totalPages={totalPages}
@@ -252,6 +296,7 @@ export function EmailRecipientsManager() {
           onSelectPage={togglePage}
           onClear={clearSelection}
           onSelectNotSent={() => void selectAllNotSent()}
+          onSelectSent={() => void selectAllSent()}
         />
         {selected.size > 0 ? (
           <p className="text-sm">

@@ -8,6 +8,7 @@ type Props = {
   onSelectPage: () => void;
   onClear: () => void;
   onSelectNotSent: () => void;
+  onSelectSent?: () => void;
 };
 
 export function RecipientSelectionToolbar({
@@ -18,6 +19,7 @@ export function RecipientSelectionToolbar({
   onSelectPage,
   onClear,
   onSelectNotSent,
+  onSelectSent,
 }: Props) {
   const allPageSelected = pageRowCount > 0 && pageSelectedCount === pageRowCount;
 
@@ -43,6 +45,16 @@ export function RecipientSelectionToolbar({
       >
         Select all not sent
       </button>
+      {onSelectSent ? (
+        <button
+          type="button"
+          disabled={busy}
+          onClick={onSelectSent}
+          className="rounded-lg border border-border px-3 py-1.5 text-xs font-semibold disabled:opacity-50"
+        >
+          Select all sent
+        </button>
+      ) : null}
       <button
         type="button"
         disabled={busy || selectedCount === 0}

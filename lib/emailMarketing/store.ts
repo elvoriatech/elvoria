@@ -570,7 +570,7 @@ export async function updateRecipientAfterSend(
   throwIfDb(error);
 }
 
-export async function listSendLogs(limit = 100): Promise<EmailSendLog[]> {
+export async function listSendLogs(limit = 500): Promise<EmailSendLog[]> {
   const { data, error } = await requireSb()
     .from('em_send_logs')
     .select('*')
