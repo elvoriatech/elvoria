@@ -3,6 +3,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import { applyTemplateVars, recipientToVars } from '@/lib/emailMarketing/templateVars';
 import { notifyRecipientsChanged } from '@/lib/emailMarketing/recipientListEvents';
+import {
+  clearStoredRecipientSelection,
+  loadStoredRecipientSelection,
+  saveStoredRecipientSelection,
+} from '@/lib/emailMarketing/recipientSelectionStorage';
 import type { EmailTemplate, EmailTemplateType, RecipientStatus } from '@/lib/emailMarketing/types';
 import { TEMPLATE_LABELS } from '@/lib/emailMarketing/types';
 import { AdminConfirmModal } from './AdminConfirmModal';
