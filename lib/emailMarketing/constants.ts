@@ -20,3 +20,12 @@ export const SEND_CHUNK_DELAY_MS = 1200;
 
 /** sessionStorage key for cross-tab recipient selection (Companies → Campaigns). */
 export const CAMPAIGN_RECIPIENT_SELECTION_KEY = 'elvoria:email-marketing:selected-recipient-ids';
+
+/** sessionStorage key for active background send job id. */
+export const ACTIVE_SEND_JOB_STORAGE_KEY = 'elvoria:email-marketing:active-send-job-id';
+
+/** Emails per worker invocation (keep under Vercel function timeout). */
+export const SEND_JOB_BATCH_SIZE = 30;
+
+/** Default client poll interval when a job is running (ms). */
+export const SEND_JOB_POLL_MS = 3000;

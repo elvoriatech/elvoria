@@ -48,6 +48,27 @@ export type EmailSendLog = {
   sentAt: string;
 };
 
+export type SendJobStatus = 'queued' | 'running' | 'completed' | 'failed' | 'cancelled';
+
+export type SendJobSelectionMode = 'all_not_sent' | 'recipient_ids';
+
+export type EmailSendJob = {
+  id: string;
+  campaignId: string | null;
+  status: SendJobStatus;
+  templateType: EmailTemplateType;
+  autoFollowUp: boolean;
+  selectionMode: SendJobSelectionMode;
+  totalCount: number;
+  processedIndex: number;
+  sentCount: number;
+  failedCount: number;
+  lastError: string;
+  createdAt: string;
+  startedAt: string | null;
+  completedAt: string | null;
+};
+
 export const TEMPLATE_LABELS: Record<EmailTemplateType, string> = {
   initial: 'Initial outreach',
   follow_up_1: 'Follow-up (2–3 days)',

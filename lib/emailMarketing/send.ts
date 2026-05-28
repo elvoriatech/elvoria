@@ -28,7 +28,7 @@ function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-async function sendToRecipients(params: {
+export async function sendBatchToRecipients(params: {
   recipients: Awaited<ReturnType<typeof getRecipientsByIds>>;
   template: NonNullable<Awaited<ReturnType<typeof getTemplate>>>;
   templateType: EmailTemplateType;
@@ -124,7 +124,7 @@ export async function sendCampaignEmails(params: {
     const recipients = await getRecipientsByIds(chunkIds);
     if (!recipients.length) continue;
 
-    const chunkResult = await sendToRecipients({
+    const chunkResult = await sendBatchToRecipients({
       recipients,
       template,
       templateType: params.templateType,

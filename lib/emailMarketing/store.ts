@@ -388,6 +388,16 @@ export async function listAllRecipients(): Promise<EmailRecipient[]> {
   return all;
 }
 
+/** Count recipients by status (for queue UI). */
+export async function countRecipientsByStatus(status: RecipientStatus): Promise<number> {
+  const { count, error } = await requireSb()
+    .from('em_recipients')
+    .select('*', { count: 'exact', head: true })
+    .eq('status', status);
+  throwIfDb(error);
+  return count ?? 0;
+}
+
 /** All recipient IDs for a status (for “Select not sent”). */
 export async function listRecipientIdsByStatus(status: RecipientStatus): Promise<string[]> {
   const sb = requireSb();

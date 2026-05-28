@@ -14,7 +14,9 @@ import { AdminConfirmModal } from './AdminConfirmModal';
 import { EmailHtmlPreview } from './EmailHtmlPreview';
 import { RecipientPaginationControls } from './RecipientPaginationControls';
 import { RecipientSelectionToolbar } from './RecipientSelectionToolbar';
+import { SendJobProgressBanner } from './SendJobProgressBanner';
 import { fetchRecipientIdsByStatus, usePaginatedRecipients, type StatusFilter } from './usePaginatedRecipients';
+import { useSendJob } from './useSendJob';
 
 const STATUS_FILTER_OPTIONS: { value: StatusFilter; label: string }[] = [
   { value: 'all', label: 'All' },
@@ -30,11 +32,21 @@ export function EmailCampaignSend({ templates }: { templates: EmailTemplate[] })
   const [templateType, setTemplateType] = useState<EmailTemplateType>('initial');
   const [selected, setSelected] = useState<Set<string>>(() => loadStoredRecipientSelection());
   const [autoFollowUp, setAutoFollowUp] = useState(false);
-  const [busy, setBusy] = useState(false);
   const [selectBusy, setSelectBusy] = useState(false);
-  const [result, setResult] = useState('');
   const [previewRecipientId, setPreviewRecipientId] = useState<string>('');
-  const [confirmSendOpen, setConfirmSendOpen] = useState(false);
+  const [confirmQueueSelectedOpen, setConfirmQueueSelectedOpen] = useState(false);
+  const [confirmQueueAllNotSentOpen, setConfirmQueueAllNotSentOpen] = useState(false);
+  const {
+    job,
+    notSentCount,
+    busy: jobBusy,
+    message: jobMessage,
+    setMessage: setJobMessage,
+    isProcessing,
+    progressPercent,
+    startJob,
+    cancelJob,
+  } = useSendJob();
 
   useEffect(() => {
     saveStoredRecipientSelection(selected);
@@ -114,7 +126,7 @@ export function EmailCampaignSend({ templates }: { templates: EmailTemplate[] })
       const ids = await fetchRecipientIdsByStatus('not_sent');
       setSelected(new Set(ids));
     } catch (e) {
-      setResult((e as Error).message);
+      setJobMessage((e as Error).message);
     } finally {
       setSelectBusy(false);
     }
@@ -126,64 +138,52 @@ export function EmailCampaignSend({ templates }: { templates: EmailTemplate[] })
       const ids = await fetchRecipientIdsByStatus('sent');
       setSelected(new Set(ids));
     } catch (e) {
-      setResult((e as Error).message);
+      setJobMessage((e as Error).message);
     } finally {
       setSelectBusy(false);
     }
   }
 
-  function requestSend() {
+  function requestQueueSelected() {
     if (!selected.size) {
-      setResult('Select at least one recipient in Step 2.');
+      setJobMessage('Select at least one recipient in Step 2.');
       return;
     }
-    setConfirmSendOpen(true);
+    setConfirmQueueSelectedOpen(true);
   }
 
-  async function sendConfirmed() {
-    const ids = [...selected];
-    setConfirmSendOpen(false);
-    setBusy(true);
-    setResult('');
+  async function queueSelectedConfirmed() {
+    setConfirmQueueSelectedOpen(false);
     try {
-      const res = await fetch('/api/admin/email-marketing/send', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ templateType, recipientIds: ids, autoFollowUp }),
+      await startJob({
+        templateType,
+        autoFollowUp,
+        selectionMode: 'recipient_ids',
+        recipientIds: [...selected],
       });
-      const data = (await res.json()) as {
-        error?: string;
-        sent?: number;
-        failed?: number;
-        errors?: string[];
-        sentRecipientIds?: string[];
-      };
-      if (!res.ok) throw new Error(data.error || 'Send failed');
-      const errLines = data.errors?.length ? ` Errors: ${data.errors.slice(0, 3).join('; ')}` : '';
-      setResult(`Sent ${data.sent ?? 0}, failed ${data.failed ?? 0}.${errLines}`);
-
-      const sentIds = new Set(data.sentRecipientIds ?? []);
-      if (sentIds.size) {
-        setSelected((prev) => {
-          const next = new Set(prev);
-          for (const id of sentIds) next.delete(id);
-          return next;
-        });
-      } else {
-        clearSelection();
-      }
-      notifyRecipientsChanged();
+      clearSelection();
       await refresh();
     } catch (e) {
-      setResult((e as Error).message);
-    } finally {
-      setBusy(false);
+      setJobMessage((e as Error).message);
+    }
+  }
+
+  async function queueAllNotSentConfirmed() {
+    setConfirmQueueAllNotSentOpen(false);
+    try {
+      await startJob({
+        templateType,
+        autoFollowUp,
+        selectionMode: 'all_not_sent',
+      });
+      await refresh();
+    } catch (e) {
+      setJobMessage((e as Error).message);
     }
   }
 
   async function runAutoFollowUps() {
-    setBusy(true);
-    setResult('');
+    setJobMessage('');
     try {
       const res = await fetch('/api/admin/email-marketing/follow-ups', { method: 'POST' });
       const data = (await res.json()) as {
@@ -194,18 +194,26 @@ export function EmailCampaignSend({ templates }: { templates: EmailTemplate[] })
       if (!res.ok) throw new Error(data.error || 'Failed');
       const p1 = data.followUp1 ? `FU1: ${data.followUp1.sent} sent` : 'FU1: none due';
       const p2 = data.followUp2 ? `FU2: ${data.followUp2.sent} sent` : 'FU2: none due';
-      setResult(`${p1}. ${p2}.`);
+      setJobMessage(`${p1}. ${p2}.`);
       notifyRecipientsChanged();
       await refresh();
     } catch (e) {
-      setResult((e as Error).message);
-    } finally {
-      setBusy(false);
+      setJobMessage((e as Error).message);
     }
   }
 
+  const busy = jobBusy || isProcessing;
+
   return (
     <div className="space-y-6">
+      {job ? (
+        <SendJobProgressBanner
+          job={job}
+          progressPercent={progressPercent}
+          busy={jobBusy}
+          onCancel={() => void cancelJob()}
+        />
+      ) : null}
       <div className="rounded-xl border border-border bg-card p-4">
         <h3 className="text-sm font-semibold text-foreground">Step 1 — Template type (one per campaign)</h3>
         <div className="mt-3 flex flex-wrap gap-2">
@@ -277,7 +285,7 @@ export function EmailCampaignSend({ templates }: { templates: EmailTemplate[] })
             selectedCount={selected.size}
             pageSelectedCount={pageSelectedCount}
             pageRowCount={rows.length}
-            busy={busy || selectBusy || loading}
+            busy={busy || selectBusy || loading || isProcessing}
             onSelectPage={togglePage}
             onClear={clearSelection}
             onSelectNotSent={() => void selectAllNotSent()}
@@ -341,11 +349,21 @@ export function EmailCampaignSend({ templates }: { templates: EmailTemplate[] })
       <div className="flex flex-wrap gap-3">
         <button
           type="button"
-          disabled={busy || !selected.size}
-          onClick={() => requestSend()}
+          disabled={busy || notSentCount === 0}
+          onClick={() => setConfirmQueueAllNotSentOpen(true)}
           className="rounded-lg bg-[#0e7490] px-6 py-2 text-sm font-semibold text-white disabled:opacity-50 dark:bg-cyan-600"
         >
-          {busy ? 'Sending…' : `Send emails (${selected.size.toLocaleString()} selected)`}
+          {isProcessing
+            ? 'Sending in background…'
+            : `Queue all not sent (${notSentCount.toLocaleString()})`}
+        </button>
+        <button
+          type="button"
+          disabled={busy || !selected.size}
+          onClick={() => requestQueueSelected()}
+          className="rounded-lg border border-[#0e7490] px-6 py-2 text-sm font-semibold text-[#0e7490] disabled:opacity-50 dark:border-cyan-500 dark:text-cyan-300"
+        >
+          Queue selected ({selected.size.toLocaleString()})
         </button>
         <button
           type="button"
@@ -357,17 +375,33 @@ export function EmailCampaignSend({ templates }: { templates: EmailTemplate[] })
         </button>
       </div>
 
-      {result ? <p className="text-sm text-foreground">{result}</p> : null}
+      <p className="text-sm text-muted-foreground">
+        Sends run in the background in small batches (no timeout). Progress updates above. Run{' '}
+        <code className="text-xs">supabase/email_marketing_jobs_schema.sql</code> once if jobs fail to create.
+      </p>
+
+      {jobMessage ? <p className="text-sm text-foreground">{jobMessage}</p> : null}
 
       <AdminConfirmModal
-        open={confirmSendOpen}
-        title="Send campaign emails?"
-        description={`Send "${TEMPLATE_LABELS[templateType]}" to ${selected.size.toLocaleString()} recipient(s)? Large sends are processed in batches.`}
-        confirmLabel="Send emails"
+        open={confirmQueueAllNotSentOpen}
+        title="Queue send to all not sent?"
+        description={`Queue "${TEMPLATE_LABELS[templateType]}" for ${notSentCount.toLocaleString()} companies with status Not sent? Emails send in the background; you do not need to click Send repeatedly.`}
+        confirmLabel="Queue & send"
         cancelLabel="Cancel"
-        busy={busy}
-        onConfirm={() => void sendConfirmed()}
-        onClose={() => setConfirmSendOpen(false)}
+        busy={jobBusy}
+        onConfirm={() => void queueAllNotSentConfirmed()}
+        onClose={() => setConfirmQueueAllNotSentOpen(false)}
+      />
+
+      <AdminConfirmModal
+        open={confirmQueueSelectedOpen}
+        title="Queue send to selected?"
+        description={`Queue "${TEMPLATE_LABELS[templateType]}" for ${selected.size.toLocaleString()} selected recipient(s)? Sends run in the background.`}
+        confirmLabel="Queue & send"
+        cancelLabel="Cancel"
+        busy={jobBusy}
+        onConfirm={() => void queueSelectedConfirmed()}
+        onClose={() => setConfirmQueueSelectedOpen(false)}
       />
     </div>
   );
