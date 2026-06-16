@@ -1,23 +1,6 @@
-import { createClient } from '@supabase/supabase-js';
-
-export function isSupabaseConfigured(): boolean {
-  return Boolean(
-    process.env.NEXT_PUBLIC_SUPABASE_URL?.trim() &&
-      process.env.SUPABASE_SERVICE_ROLE_KEY?.trim()
-  );
-}
-
-/** @deprecated Use isSupabaseConfigured — same check (URL + service role). */
-export const isBookingDatabaseConfigured = isSupabaseConfigured;
-
-/** Server-only: bypasses RLS. Never import in client components. */
-export function createAdminClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim();
-  if (!url || !key) {
-    throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY');
-  }
-  return createClient(url, key, {
-    auth: { persistSession: false, autoRefreshToken: false },
-  });
-}
+/**
+ * Compatibility shim — previously backed by Supabase, now backed by a pg Pool.
+ * All stores import isDbConfigured / isSupabaseConfigured from here so they don't
+ * need to change their import paths.
+ */
+export { isDbConfigured as isSupabaseConfigured, isDbConfigured as isBookingDatabaseConfigured, getPool as createAdminClient } from '@/lib/db';

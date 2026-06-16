@@ -24,7 +24,7 @@ export function SendJobProgressBanner({ job, progressPercent, busy, onCancel }: 
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h3 className="text-sm font-semibold text-foreground">
-            {isActive ? 'Sending in background…' : `Campaign ${job.status}`}
+            {isActive ? 'Sending… (keep this tab open)' : `Campaign ${job.status}`}
           </h3>
           <p className="mt-1 text-sm text-muted-foreground">
             {TEMPLATE_LABELS[job.templateType]} — {job.processedIndex.toLocaleString()} /{' '}

@@ -3,19 +3,16 @@
 import { useEffect, useMemo, useState } from 'react';
 import { applyTemplateVars, recipientToVars } from '@/lib/emailMarketing/templateVars';
 import { notifyRecipientsChanged } from '@/lib/emailMarketing/recipientListEvents';
-import {
-  clearStoredRecipientSelection,
-  loadStoredRecipientSelection,
-  saveStoredRecipientSelection,
-} from '@/lib/emailMarketing/recipientSelectionStorage';
 import type { EmailTemplate, EmailTemplateType, RecipientStatus } from '@/lib/emailMarketing/types';
 import { TEMPLATE_LABELS } from '@/lib/emailMarketing/types';
 import { AdminConfirmModal } from './AdminConfirmModal';
 import { EmailHtmlPreview } from './EmailHtmlPreview';
 import { RecipientPaginationControls } from './RecipientPaginationControls';
+import { RecipientDataTable } from './RecipientDataTable';
 import { RecipientSelectionToolbar } from './RecipientSelectionToolbar';
 import { SendJobProgressBanner } from './SendJobProgressBanner';
 import { fetchRecipientIdsByStatus, usePaginatedRecipients, type StatusFilter } from './usePaginatedRecipients';
+import { useRecipientSelection } from './useRecipientSelection';
 import { useSendJob } from './useSendJob';
 
 const STATUS_FILTER_OPTIONS: { value: StatusFilter; label: string }[] = [
@@ -30,7 +27,7 @@ export function EmailCampaignSend({ templates }: { templates: EmailTemplate[] })
   const { page, setPage, rows, total, totalPages, loading, error, refresh, rangeStart, rangeEnd } =
     usePaginatedRecipients(statusFilter);
   const [templateType, setTemplateType] = useState<EmailTemplateType>('initial');
-  const [selected, setSelected] = useState<Set<string>>(() => loadStoredRecipientSelection());
+  const { selected, setSelected, clearSelection, importedFromCompanies } = useRecipientSelection('campaigns');
   const [autoFollowUp, setAutoFollowUp] = useState(false);
   const [selectBusy, setSelectBusy] = useState(false);
   const [previewRecipientId, setPreviewRecipientId] = useState<string>('');
@@ -48,16 +45,15 @@ export function EmailCampaignSend({ templates }: { templates: EmailTemplate[] })
     cancelJob,
   } = useSendJob();
 
-  useEffect(() => {
-    saveStoredRecipientSelection(selected);
-  }, [selected]);
-
   const template = templates.find((t) => t.templateType === templateType);
 
   const pageSelectedCount = useMemo(
     () => rows.filter((r) => selected.has(r.id)).length,
     [rows, selected]
   );
+
+  const pageAllSelected = rows.length > 0 && pageSelectedCount === rows.length;
+  const pageSomeSelected = pageSelectedCount > 0 && !pageAllSelected;
 
   const previewRecipient = useMemo(() => {
     if (previewRecipientId) {
@@ -113,11 +109,6 @@ export function EmailCampaignSend({ templates }: { templates: EmailTemplate[] })
       }
       return n;
     });
-  }
-
-  function clearSelection() {
-    setSelected(new Set());
-    clearStoredRecipientSelection();
   }
 
   async function selectAllNotSent() {
@@ -247,14 +238,15 @@ export function EmailCampaignSend({ templates }: { templates: EmailTemplate[] })
         <h3 className="text-sm font-semibold text-foreground">Step 2 — Recipients</h3>
         <p className="mt-1 text-sm text-muted-foreground">
           {total.toLocaleString()} companies{statusFilter !== 'all' ? ` (${statusFilter.replace('_', ' ')})` : ''}.
-          Status becomes <strong className="text-foreground">Sent</strong> only after SMTP succeeds. Each successful
-          send is BCC’d to your sending mailbox (<code className="text-xs">EMAIL_USER</code>, or{' '}
-          <code className="text-xs">EMAIL_CAMPAIGN_BCC</code>) — check Gmail <strong>Sent</strong> or Inbox. See{' '}
-          <a href="/admin/email-marketing/logs" className="font-semibold text-[#0e7490] underline dark:text-cyan-300">
-            Logs
-          </a>
-          . Set <code className="text-xs">EMAIL_CAMPAIGN_BCC=false</code> to disable copies.
+          Use the table header checkbox to select a page, or{' '}
+          <strong className="text-foreground">Queue all not sent</strong> below to email everyone without selecting.
+          Selection clears on refresh unless you arrive from Companies with an imported list.
         </p>
+        {importedFromCompanies && selected.size > 0 ? (
+          <p className="mt-2 rounded-lg border border-cyan-500/30 bg-cyan-500/10 px-3 py-2 text-sm text-foreground">
+            Imported {selected.size.toLocaleString()} companies from the Companies tab.
+          </p>
+        ) : null}
         <div className="mt-3 flex flex-wrap items-center gap-2">
           <label className="text-sm font-medium text-foreground">
             Show
@@ -286,28 +278,23 @@ export function EmailCampaignSend({ templates }: { templates: EmailTemplate[] })
             pageSelectedCount={pageSelectedCount}
             pageRowCount={rows.length}
             busy={busy || selectBusy || loading || isProcessing}
+            hint="Selection is not restored on refresh. Use “Queue all not sent” for bulk outreach."
             onSelectPage={togglePage}
             onClear={clearSelection}
             onSelectNotSent={() => void selectAllNotSent()}
             onSelectSent={() => void selectAllSent()}
           />
           {error ? <p className="text-sm text-destructive">{error}</p> : null}
-          <div className="max-h-64 overflow-y-auto rounded-lg border border-border p-2 text-sm">
-            {loading && rows.length === 0 ? (
-              <p className="py-4 text-center text-muted-foreground">Loading…</p>
-            ) : rows.length === 0 ? (
-              <p className="py-4 text-center text-muted-foreground">Add companies on the Companies tab first.</p>
-            ) : (
-              rows.map((r) => (
-                <label key={r.id} className="flex cursor-pointer items-center gap-2 py-1">
-                  <input type="checkbox" checked={selected.has(r.id)} onChange={() => toggle(r.id)} />
-                  <span>
-                    {r.contactName || r.email} — {r.companyName} ({r.status})
-                  </span>
-                </label>
-              ))
-            )}
-          </div>
+          <RecipientDataTable
+            rows={rows}
+            selected={selected}
+            loading={loading}
+            emptyMessage="Add companies on the Companies tab first."
+            pageAllSelected={pageAllSelected}
+            pageSomeSelected={pageSomeSelected}
+            onToggle={toggle}
+            onTogglePage={togglePage}
+          />
         </div>
       </div>
 
@@ -376,8 +363,8 @@ export function EmailCampaignSend({ templates }: { templates: EmailTemplate[] })
       </div>
 
       <p className="text-sm text-muted-foreground">
-        Sends run in the background in small batches (no timeout). Progress updates above. Run{' '}
-        <code className="text-xs">supabase/email_marketing_jobs_schema.sql</code> once if jobs fail to create.
+        Sends run in batches while this tab stays open (progress above). Run{' '}
+        <code className="text-xs">supabase/email_marketing_jobs_schema.sql</code> once if queueing fails.
       </p>
 
       {jobMessage ? <p className="text-sm text-foreground">{jobMessage}</p> : null}
@@ -385,7 +372,7 @@ export function EmailCampaignSend({ templates }: { templates: EmailTemplate[] })
       <AdminConfirmModal
         open={confirmQueueAllNotSentOpen}
         title="Queue send to all not sent?"
-        description={`Queue "${TEMPLATE_LABELS[templateType]}" for ${notSentCount.toLocaleString()} companies with status Not sent? Emails send in the background; you do not need to click Send repeatedly.`}
+        description={`Queue "${TEMPLATE_LABELS[templateType]}" for ${notSentCount.toLocaleString()} companies with status Not sent? Keep this tab open until sending completes.`}
         confirmLabel="Queue & send"
         cancelLabel="Cancel"
         busy={jobBusy}
@@ -396,7 +383,7 @@ export function EmailCampaignSend({ templates }: { templates: EmailTemplate[] })
       <AdminConfirmModal
         open={confirmQueueSelectedOpen}
         title="Queue send to selected?"
-        description={`Queue "${TEMPLATE_LABELS[templateType]}" for ${selected.size.toLocaleString()} selected recipient(s)? Sends run in the background.`}
+        description={`Queue "${TEMPLATE_LABELS[templateType]}" for ${selected.size.toLocaleString()} selected recipient(s)? Keep this tab open until sending completes.`}
         confirmLabel="Queue & send"
         cancelLabel="Cancel"
         busy={jobBusy}

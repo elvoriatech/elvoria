@@ -2,7 +2,7 @@ import { formatInTimeZone } from 'date-fns-tz';
 import { NextResponse } from 'next/server';
 import { sendConsultationEmails } from '@/lib/consultationEmail';
 import { requireAdminSession } from '@/lib/requireAdminSession';
-import { createAdminClient, isBookingDatabaseConfigured } from '@/lib/supabaseAdmin';
+import { getPool, isDbConfigured } from '@/lib/db';
 
 const DEFAULT_SLUG = 'consultation';
 
@@ -14,23 +14,17 @@ export async function GET() {
   const denied = await requireAdminSession();
   if (denied) return denied;
 
-  if (!isBookingDatabaseConfigured()) {
+  if (!isDbConfigured()) {
     return NextResponse.json({ error: 'Bookings database not configured' }, { status: 503 });
   }
 
   try {
-    const supabase = createAdminClient();
-    const { data, error } = await supabase
-      .from('bookings')
-      .select('id, name, email, company, notes, start_time, end_time, created_at, meeting_type_id')
-      .order('start_time', { ascending: true });
-
-    if (error) {
-      console.error('bookings list:', error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-
-    return NextResponse.json({ bookings: data ?? [] });
+    const { rows } = await getPool().query(
+      `SELECT id, name, email, company, notes, start_time, end_time, created_at, meeting_type_id
+         FROM bookings
+        ORDER BY start_time ASC`
+    );
+    return NextResponse.json({ bookings: rows });
   } catch (e) {
     console.error('bookings GET:', e);
     return NextResponse.json({ error: 'Failed to list bookings' }, { status: 500 });
@@ -38,7 +32,7 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-  if (!isBookingDatabaseConfigured()) {
+  if (!isDbConfigured()) {
     return NextResponse.json({ error: 'Bookings database not configured' }, { status: 503 });
   }
 
@@ -75,17 +69,16 @@ export async function POST(req: Request) {
   }
 
   try {
-    const supabase = createAdminClient();
+    const pool = getPool();
 
-    const { data: mt, error: mtErr } = await supabase
-      .from('meeting_types')
-      .select('id, duration_minutes')
-      .eq('slug', meetingTypeSlug)
-      .maybeSingle();
-
-    if (mtErr || !mt) {
+    const { rows: mtRows } = await pool.query<{ id: string; duration_minutes: number }>(
+      'SELECT id, duration_minutes FROM meeting_types WHERE slug = $1 LIMIT 1',
+      [meetingTypeSlug]
+    );
+    if (!mtRows.length) {
       return NextResponse.json({ error: 'Unknown meeting type' }, { status: 400 });
     }
+    const mt = mtRows[0];
 
     const expectedMs = mt.duration_minutes * 60 * 1000;
     if (Math.abs(endMs - startMs - expectedMs) > 2000) {
@@ -95,22 +88,20 @@ export async function POST(req: Request) {
       );
     }
 
-    const { data: rpcData, error: rpcErr } = await supabase.rpc('book_consultation', {
-      p_meeting_slug: meetingTypeSlug,
-      p_name: name,
-      p_email: normalizeEmail(email),
-      p_start: new Date(startMs).toISOString(),
-      p_end: new Date(endMs).toISOString(),
-      p_company: company || null,
-      p_notes: notes || null,
-    });
+    const { rows: rpcRows } = await pool.query<{ book_consultation: { ok: boolean; error?: string; booking?: { id: string } } }>(
+      `SELECT book_consultation($1, $2, $3, $4, $5, $6, $7) AS book_consultation`,
+      [
+        meetingTypeSlug,
+        name,
+        normalizeEmail(email),
+        new Date(startMs).toISOString(),
+        new Date(endMs).toISOString(),
+        company || null,
+        notes || null,
+      ]
+    );
 
-    if (rpcErr) {
-      console.error('book_consultation:', rpcErr);
-      return NextResponse.json({ error: rpcErr.message }, { status: 500 });
-    }
-
-    const row = rpcData as { ok?: boolean; error?: string; booking?: { id: string } } | null;
+    const row = rpcRows[0]?.book_consultation ?? null;
     if (!row?.ok) {
       if (row?.error === 'conflict') {
         return NextResponse.json({ error: 'Time slot already booked' }, { status: 409 });
@@ -133,7 +124,7 @@ export async function POST(req: Request) {
     } catch (mailErr) {
       console.error('Booking email failed:', mailErr);
       if (bookingId) {
-        await supabase.from('bookings').delete().eq('id', bookingId);
+        await pool.query('DELETE FROM bookings WHERE id = $1', [bookingId]);
       }
       return NextResponse.json(
         { error: 'Could not send confirmation email. Booking was not saved. Try again.' },

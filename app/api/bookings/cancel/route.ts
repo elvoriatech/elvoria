@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
-import { createAdminClient, isBookingDatabaseConfigured } from '@/lib/supabaseAdmin';
+import { getPool, isDbConfigured } from '@/lib/db';
 
 function normalizeEmail(s: string) {
   return s.trim().toLowerCase();
 }
 
 export async function POST(req: Request) {
-  if (!isBookingDatabaseConfigured()) {
+  if (!isDbConfigured()) {
     return NextResponse.json({ error: 'Bookings database not configured' }, { status: 503 });
   }
 
@@ -25,27 +25,21 @@ export async function POST(req: Request) {
   }
 
   try {
-    const supabase = createAdminClient();
-    const { data: row, error: selErr } = await supabase
-      .from('bookings')
-      .select('id, email')
-      .eq('id', id)
-      .maybeSingle();
+    const pool = getPool();
+    const { rows } = await pool.query<{ id: string; email: string }>(
+      'SELECT id, email FROM bookings WHERE id = $1 LIMIT 1',
+      [id]
+    );
 
-    if (selErr || !row) {
+    if (!rows.length) {
       return NextResponse.json({ error: 'Booking not found' }, { status: 404 });
     }
 
-    if (normalizeEmail(row.email) !== normalizeEmail(email)) {
+    if (normalizeEmail(rows[0].email) !== normalizeEmail(email)) {
       return NextResponse.json({ error: 'Email does not match this booking' }, { status: 403 });
     }
 
-    const { error: delErr } = await supabase.from('bookings').delete().eq('id', id);
-    if (delErr) {
-      console.error('booking cancel:', delErr);
-      return NextResponse.json({ error: delErr.message }, { status: 500 });
-    }
-
+    await pool.query('DELETE FROM bookings WHERE id = $1', [id]);
     return NextResponse.json({ success: true });
   } catch (e) {
     console.error('bookings cancel:', e);

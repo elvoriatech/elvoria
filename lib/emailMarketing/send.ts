@@ -139,11 +139,11 @@ export async function sendCampaignEmails(params: {
 
   if (!sent && !failed) throw new Error('No valid recipients selected');
 
-  const sb = await import('@/lib/supabaseAdmin').then((m) => m.createAdminClient());
-  await sb
-    .from('em_campaigns')
-    .update({ sent_count: sent, failed_count: failed })
-    .eq('id', campaignId);
+  const { getPool } = await import('@/lib/db');
+  await getPool().query(
+    'UPDATE em_campaigns SET sent_count = $1, failed_count = $2 WHERE id = $3',
+    [sent, failed, campaignId]
+  );
 
   return { campaignId, sent, failed, errors, sentRecipientIds };
 }

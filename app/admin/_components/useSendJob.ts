@@ -66,7 +66,7 @@ export function useSendJob() {
         sessionStorage.removeItem(ACTIVE_SEND_JOB_STORAGE_KEY);
       }
     } catch {
-      /* keep polling; cron may pick up */
+      /* keep polling until job completes */
     }
   }, [job?.id, fetchJob, runProcessor, refreshStatus]);
 
@@ -113,7 +113,7 @@ export function useSendJob() {
       setJob(data.job);
       sessionStorage.setItem(ACTIVE_SEND_JOB_STORAGE_KEY, data.job.id);
       setMessage(
-        `Queued ${data.job.totalCount.toLocaleString()} emails — sending in background. You can leave this page open or return later.`
+        `Queued ${data.job.totalCount.toLocaleString()} emails — keep this tab open until the progress bar finishes.`
       );
       await runProcessor();
       await fetchJob(data.job.id);

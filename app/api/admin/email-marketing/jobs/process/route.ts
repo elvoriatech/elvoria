@@ -1,12 +1,13 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
+import { requireAdminSession } from '@/lib/requireAdminSession';
 import { emailMarketingErrorResponse } from '@/lib/emailMarketing/apiError';
-import { requireJobProcessorAuth } from '@/lib/emailMarketing/jobAuth';
 import { processSendJobBatch } from '@/lib/emailMarketing/jobs';
 
 export const maxDuration = 60;
 
-export async function POST(request: NextRequest) {
-  const denied = await requireJobProcessorAuth(request);
+/** Processes one batch; called by the Campaigns UI while a send job is active. */
+export async function POST() {
+  const denied = await requireAdminSession();
   if (denied) return denied;
   try {
     const result = await processSendJobBatch();
@@ -16,9 +17,4 @@ export async function POST(request: NextRequest) {
     if (r) return r;
     throw e;
   }
-}
-
-/** Vercel Cron uses GET */
-export async function GET(request: NextRequest) {
-  return POST(request);
 }

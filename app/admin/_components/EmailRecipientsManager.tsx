@@ -1,17 +1,14 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { notifyRecipientsChanged } from '@/lib/emailMarketing/recipientListEvents';
-import {
-  loadStoredRecipientSelection,
-  saveStoredRecipientSelection,
-} from '@/lib/emailMarketing/recipientSelectionStorage';
-import type { EmailRecipient } from '@/lib/emailMarketing/types';
 import { AdminConfirmModal } from './AdminConfirmModal';
+import { RecipientDataTable } from './RecipientDataTable';
 import { RecipientPaginationControls } from './RecipientPaginationControls';
 import { RecipientSelectionToolbar } from './RecipientSelectionToolbar';
 import { fetchRecipientIdsByStatus, usePaginatedRecipients, type StatusFilter } from './usePaginatedRecipients';
+import { useRecipientSelection } from './useRecipientSelection';
 
 const STATUS_FILTER_OPTIONS: { value: StatusFilter; label: string }[] = [
   { value: 'all', label: 'All' },
@@ -24,7 +21,7 @@ export function EmailRecipientsManager() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const { page, setPage, rows, total, totalPages, loading, error, loadPage, refresh, rangeStart, rangeEnd } =
     usePaginatedRecipients(statusFilter);
-  const [selected, setSelected] = useState<Set<string>>(() => loadStoredRecipientSelection());
+  const { selected, setSelected, clearSelection } = useRecipientSelection('companies');
   const [form, setForm] = useState({
     companyName: '',
     contactName: '',
@@ -38,24 +35,13 @@ export function EmailRecipientsManager() {
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const [selectBusy, setSelectBusy] = useState(false);
 
-  useEffect(() => {
-    saveStoredRecipientSelection(selected);
-  }, [selected]);
-
   const pageSelectedCount = useMemo(
     () => rows.filter((r) => selected.has(r.id)).length,
     [rows, selected]
   );
 
-  const statusLabel = useMemo(
-    () =>
-      ({
-        not_sent: 'Not sent',
-        sent: 'Sent',
-        replied: 'Replied',
-      }) as const,
-    []
-  );
+  const pageAllSelected = rows.length > 0 && pageSelectedCount === rows.length;
+  const pageSomeSelected = pageSelectedCount > 0 && !pageAllSelected;
 
   function toggle(id: string) {
     setSelected((s) => {
@@ -78,10 +64,6 @@ export function EmailRecipientsManager() {
       }
       return n;
     });
-  }
-
-  function clearSelection() {
-    setSelected(new Set());
   }
 
   async function selectAllNotSent() {
@@ -293,6 +275,7 @@ export function EmailRecipientsManager() {
           pageSelectedCount={pageSelectedCount}
           pageRowCount={rows.length}
           busy={busy || selectBusy || loading}
+          hint="Selection clears on refresh. Use the link below to carry it to Send campaign."
           onSelectPage={togglePage}
           onClear={clearSelection}
           onSelectNotSent={() => void selectAllNotSent()}
@@ -301,72 +284,27 @@ export function EmailRecipientsManager() {
         {selected.size > 0 ? (
           <p className="text-sm">
             <Link
-              href="/admin/email-marketing/campaigns"
-              className="font-semibold text-[#0e7490] underline dark:text-cyan-300"
+              href="/admin/email-marketing/campaigns?importSelection=1"
+              className="inline-flex items-center rounded-lg bg-[#0e7490]/10 px-3 py-2 font-semibold text-[#0e7490] hover:bg-[#0e7490]/20 dark:bg-cyan-500/15 dark:text-cyan-300"
             >
-              Send campaign with {selected.size.toLocaleString()} selected →
+              Continue to Send campaign with {selected.size.toLocaleString()} selected →
             </Link>
           </p>
         ) : null}
         {error ? <p className="text-sm text-destructive">{error}</p> : null}
-        {loading && rows.length === 0 ? (
-          <p className="rounded-xl border border-dashed px-4 py-10 text-center text-muted-foreground">Loading…</p>
-        ) : rows.length === 0 ? (
-          <p className="rounded-xl border border-dashed px-4 py-10 text-center text-muted-foreground">No recipients yet.</p>
-        ) : (
-          <div className="overflow-x-auto rounded-xl border border-border bg-card shadow-sm">
-            <table className="w-full min-w-[900px] text-left text-[15px]">
-              <thead className="border-b bg-muted/50">
-                <tr>
-                  <th className="px-3 py-2 text-xs font-semibold uppercase text-muted-foreground">Select</th>
-                  <th className="px-3 py-2 text-xs font-semibold uppercase text-muted-foreground">Name</th>
-                  <th className="px-3 py-2 text-xs font-semibold uppercase text-muted-foreground">Email</th>
-                  <th className="px-3 py-2 text-xs font-semibold uppercase text-muted-foreground">Company</th>
-                  <th className="px-3 py-2 text-xs font-semibold uppercase text-muted-foreground">Industry</th>
-                  <th className="px-3 py-2 text-xs font-semibold uppercase text-muted-foreground">Status</th>
-                  <th className="px-3 py-2 text-xs font-semibold uppercase text-muted-foreground">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map((r: EmailRecipient) => (
-                  <tr key={r.id} className="border-b last:border-0 odd:bg-card even:bg-muted/20">
-                    <td className="px-3 py-2">
-                      <input
-                        type="checkbox"
-                        checked={selected.has(r.id)}
-                        onChange={() => toggle(r.id)}
-                        aria-label={`Select ${r.email}`}
-                      />
-                    </td>
-                    <td className="px-3 py-2 font-medium">{r.contactName || '—'}</td>
-                    <td className="px-3 py-2">{r.email}</td>
-                    <td className="px-3 py-2">{r.companyName || '—'}</td>
-                    <td className="px-3 py-2">{r.industry || '—'}</td>
-                    <td className="px-3 py-2 capitalize">{statusLabel[r.status]}</td>
-                    <td className="px-3 py-2 whitespace-nowrap">
-                      {r.status !== 'replied' ? (
-                        <button
-                          type="button"
-                          className="mr-2 text-xs font-semibold text-[#0e7490] underline dark:text-cyan-300"
-                          onClick={() => void markReplied(r.id)}
-                        >
-                          Mark replied
-                        </button>
-                      ) : null}
-                      <button
-                        type="button"
-                        className="text-xs font-semibold text-destructive"
-                        onClick={() => setDeleteTargetId(r.id)}
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+        <RecipientDataTable
+          rows={rows}
+          selected={selected}
+          loading={loading}
+          emptyMessage="No recipients yet. Add manually or upload Excel above."
+          pageAllSelected={pageAllSelected}
+          pageSomeSelected={pageSomeSelected}
+          onToggle={toggle}
+          onTogglePage={togglePage}
+          showActions
+          onMarkReplied={(id) => void markReplied(id)}
+          onDelete={(id) => setDeleteTargetId(id)}
+        />
       </div>
 
       <AdminConfirmModal

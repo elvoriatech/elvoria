@@ -1,3 +1,4 @@
+import { getPool, isDbConfigured } from '@/lib/db';
 import { SEND_JOB_BATCH_SIZE } from '@/lib/emailMarketing/constants';
 import { sendBatchToRecipients } from '@/lib/emailMarketing/send';
 import {
@@ -8,14 +9,13 @@ import {
   getTemplate,
   listRecipientIdsByStatus,
 } from '@/lib/emailMarketing/store';
+import { isPostgrestMissingTableError } from '@/lib/crmSchemaError';
 import type {
   EmailSendJob,
   EmailTemplateType,
   SendJobSelectionMode,
   SendJobStatus,
 } from '@/lib/emailMarketing/types';
-import { createAdminClient, isSupabaseConfigured } from '@/lib/supabaseAdmin';
-import { isPostgrestMissingTableError } from '@/lib/crmSchemaError';
 
 type DbJob = {
   id: string;
@@ -35,9 +35,9 @@ type DbJob = {
   completed_at: string | null;
 };
 
-function requireSb() {
-  if (!isSupabaseConfigured()) throw new EmailMarketingNotConfiguredError();
-  return createAdminClient();
+function requireDb() {
+  if (!isDbConfigured()) throw new EmailMarketingNotConfiguredError();
+  return getPool();
 }
 
 function throwIfDb(error: unknown): void {
@@ -74,23 +74,19 @@ function getBatchSize(): number {
 const ACTIVE_STATUSES: SendJobStatus[] = ['queued', 'running'];
 
 export async function getActiveSendJob(): Promise<EmailSendJob | null> {
-  const { data, error } = await requireSb()
-    .from('em_send_jobs')
-    .select('*')
-    .in('status', ACTIVE_STATUSES)
-    .order('created_at', { ascending: true })
-    .limit(1)
-    .maybeSingle();
-  throwIfDb(error);
-  if (!data) return null;
-  return mapJob(data as DbJob);
+  const { rows } = await requireDb().query<DbJob>(
+    `SELECT * FROM em_send_jobs WHERE status = ANY($1) ORDER BY created_at ASC LIMIT 1`,
+    [ACTIVE_STATUSES]
+  );
+  return rows.length ? mapJob(rows[0]) : null;
 }
 
 export async function getSendJob(id: string): Promise<EmailSendJob | null> {
-  const { data, error } = await requireSb().from('em_send_jobs').select('*').eq('id', id).maybeSingle();
-  throwIfDb(error);
-  if (!data) return null;
-  return mapJob(data as DbJob);
+  const { rows } = await requireDb().query<DbJob>(
+    'SELECT * FROM em_send_jobs WHERE id = $1 LIMIT 1',
+    [id]
+  );
+  return rows.length ? mapJob(rows[0]) : null;
 }
 
 async function resolveRecipientIds(selection: {
@@ -100,8 +96,7 @@ async function resolveRecipientIds(selection: {
   if (selection.selectionMode === 'all_not_sent') {
     return listRecipientIdsByStatus('not_sent');
   }
-  const ids = [...new Set((selection.recipientIds ?? []).filter(Boolean))];
-  return ids;
+  return [...new Set((selection.recipientIds ?? []).filter(Boolean))];
 }
 
 export async function createSendJob(params: {
@@ -111,9 +106,7 @@ export async function createSendJob(params: {
   recipientIds?: string[];
 }): Promise<EmailSendJob> {
   const active = await getActiveSendJob();
-  if (active) {
-    throw new Error('A send job is already in progress. Wait for it to finish or cancel it.');
-  }
+  if (active) throw new Error('A send job is already in progress. Wait for it to finish or cancel it.');
 
   const recipientIds = await resolveRecipientIds({
     selectionMode: params.selectionMode,
@@ -129,42 +122,36 @@ export async function createSendJob(params: {
     failedCount: 0,
   });
 
-  const { data, error } = await requireSb()
-    .from('em_send_jobs')
-    .insert({
-      campaign_id: campaignId,
-      status: 'queued',
-      template_type: params.templateType,
-      auto_follow_up: params.autoFollowUp,
-      selection_mode: params.selectionMode,
-      recipient_ids: recipientIds,
-      total_count: recipientIds.length,
-      processed_index: 0,
-      sent_count: 0,
-      failed_count: 0,
-    })
-    .select('*')
-    .single();
-  throwIfDb(error);
-  return mapJob(data as DbJob);
+  const { rows } = await requireDb().query<DbJob>(
+    `INSERT INTO em_send_jobs
+       (campaign_id, status, template_type, auto_follow_up, selection_mode,
+        recipient_ids, total_count, processed_index, sent_count, failed_count)
+     VALUES ($1,'queued',$2,$3,$4,$5,$6,0,0,0)
+     RETURNING *`,
+    [
+      campaignId,
+      params.templateType,
+      params.autoFollowUp,
+      params.selectionMode,
+      JSON.stringify(recipientIds),
+      recipientIds.length,
+    ]
+  );
+  return mapJob(rows[0]);
 }
 
 export async function cancelSendJob(id: string): Promise<EmailSendJob | null> {
   const job = await getSendJob(id);
   if (!job || !ACTIVE_STATUSES.includes(job.status)) return job;
 
-  const { data, error } = await requireSb()
-    .from('em_send_jobs')
-    .update({
-      status: 'cancelled',
-      completed_at: new Date().toISOString(),
-      last_error: 'Cancelled by admin',
-    })
-    .eq('id', id)
-    .select('*')
-    .single();
-  throwIfDb(error);
-  return mapJob(data as DbJob);
+  const { rows } = await requireDb().query<DbJob>(
+    `UPDATE em_send_jobs
+        SET status = 'cancelled', completed_at = $1, last_error = 'Cancelled by admin'
+      WHERE id = $2
+      RETURNING *`,
+    [new Date().toISOString(), id]
+  );
+  return rows.length ? mapJob(rows[0]) : null;
 }
 
 export type ProcessSendJobResult = {
@@ -174,24 +161,25 @@ export type ProcessSendJobResult = {
   batchFailed: number;
 };
 
-/** Process one batch for the oldest active job. Safe to call from cron or UI poll. */
 export async function processSendJobBatch(): Promise<ProcessSendJobResult> {
-  const sb = requireSb();
+  const pool = requireDb();
   const batchSize = getBatchSize();
 
-  const { data: jobRow, error: fetchErr } = await sb
-    .from('em_send_jobs')
-    .select('*')
-    .in('status', ACTIVE_STATUSES)
-    .order('created_at', { ascending: true })
-    .limit(1)
-    .maybeSingle();
-  throwIfDb(fetchErr);
+  let jobRow: DbJob | undefined;
+  try {
+    const { rows } = await pool.query<DbJob>(
+      `SELECT * FROM em_send_jobs WHERE status = ANY($1) ORDER BY created_at ASC LIMIT 1`,
+      [ACTIVE_STATUSES]
+    );
+    jobRow = rows[0];
+  } catch (e) {
+    throwIfDb(e);
+  }
 
   if (!jobRow) return { ran: false, job: null, batchSent: 0, batchFailed: 0 };
 
-  const job = mapJob(jobRow as DbJob);
-  const ids = Array.isArray(jobRow.recipient_ids) ? (jobRow.recipient_ids as string[]) : [];
+  const job = mapJob(jobRow);
+  const ids: string[] = Array.isArray(jobRow.recipient_ids) ? jobRow.recipient_ids : [];
 
   if (job.processedIndex >= ids.length) {
     await finalizeJob(job.id, job.campaignId, job.sentCount, job.failedCount);
@@ -200,39 +188,29 @@ export async function processSendJobBatch(): Promise<ProcessSendJobResult> {
   }
 
   if (job.status === 'queued') {
-    await sb
-      .from('em_send_jobs')
-      .update({ status: 'running', started_at: new Date().toISOString() })
-      .eq('id', job.id);
+    await pool.query(
+      `UPDATE em_send_jobs SET status = 'running', started_at = $1 WHERE id = $2`,
+      [new Date().toISOString(), job.id]
+    );
   }
 
   const slice = ids.slice(job.processedIndex, job.processedIndex + batchSize);
   const template = await getTemplate(job.templateType);
   if (!template) {
-    await sb
-      .from('em_send_jobs')
-      .update({
-        status: 'failed',
-        last_error: 'Template not found',
-        completed_at: new Date().toISOString(),
-      })
-      .eq('id', job.id);
-    const failed = await getSendJob(job.id);
-    return { ran: true, job: failed, batchSent: 0, batchFailed: 0 };
+    await pool.query(
+      `UPDATE em_send_jobs SET status = 'failed', last_error = 'Template not found', completed_at = $1 WHERE id = $2`,
+      [new Date().toISOString(), job.id]
+    );
+    return { ran: true, job: await getSendJob(job.id), batchSent: 0, batchFailed: 0 };
   }
 
   const campaignId = job.campaignId;
   if (!campaignId) {
-    await sb
-      .from('em_send_jobs')
-      .update({
-        status: 'failed',
-        last_error: 'Missing campaign id',
-        completed_at: new Date().toISOString(),
-      })
-      .eq('id', job.id);
-    const failed = await getSendJob(job.id);
-    return { ran: true, job: failed, batchSent: 0, batchFailed: 0 };
+    await pool.query(
+      `UPDATE em_send_jobs SET status = 'failed', last_error = 'Missing campaign id', completed_at = $1 WHERE id = $2`,
+      [new Date().toISOString(), job.id]
+    );
+    return { ran: true, job: await getSendJob(job.id), batchSent: 0, batchFailed: 0 };
   }
 
   const recipients = await getRecipientsByIds(slice);
@@ -248,36 +226,36 @@ export async function processSendJobBatch(): Promise<ProcessSendJobResult> {
   const newSent = job.sentCount + batchResult.sent;
   const newFailed = job.failedCount + batchResult.failed;
   const errSample = batchResult.errors.slice(0, 2).join('; ');
-
   const isDone = newProcessed >= ids.length;
 
-  const { error: updateErr } = await sb
-    .from('em_send_jobs')
-    .update({
-      processed_index: newProcessed,
-      sent_count: newSent,
-      failed_count: newFailed,
-      last_error: errSample,
-      ...(isDone
-        ? { status: 'completed' as const, completed_at: new Date().toISOString() }
-        : { status: 'running' as const }),
-    })
-    .eq('id', job.id);
-  throwIfDb(updateErr);
+  await pool.query(
+    `UPDATE em_send_jobs
+        SET processed_index = $1, sent_count = $2, failed_count = $3,
+            last_error = $4, status = $5, completed_at = $6
+      WHERE id = $7`,
+    [
+      newProcessed,
+      newSent,
+      newFailed,
+      errSample,
+      isDone ? 'completed' : 'running',
+      isDone ? new Date().toISOString() : null,
+      job.id,
+    ]
+  );
 
   if (isDone) {
     await finalizeJob(job.id, campaignId, newSent, newFailed);
   } else {
-    await sb
-      .from('em_campaigns')
-      .update({ sent_count: newSent, failed_count: newFailed })
-      .eq('id', campaignId);
+    await pool.query(
+      'UPDATE em_campaigns SET sent_count = $1, failed_count = $2 WHERE id = $3',
+      [newSent, newFailed, campaignId]
+    );
   }
 
-  const updated = await getSendJob(job.id);
   return {
     ran: true,
-    job: updated,
+    job: await getSendJob(job.id),
     batchSent: batchResult.sent,
     batchFailed: batchResult.failed,
   };
@@ -289,8 +267,10 @@ async function finalizeJob(
   sent: number,
   failed: number
 ): Promise<void> {
-  const sb = requireSb();
-  if (campaignId) {
-    await sb.from('em_campaigns').update({ sent_count: sent, failed_count: failed }).eq('id', campaignId);
-  }
+  void jobId;
+  if (!campaignId) return;
+  await getPool().query(
+    'UPDATE em_campaigns SET sent_count = $1, failed_count = $2 WHERE id = $3',
+    [sent, failed, campaignId]
+  );
 }

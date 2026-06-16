@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { dayRangeUtcForCalendarDate, listFreeSlots } from '@/lib/bookingAvailability';
-import { createAdminClient, isBookingDatabaseConfigured } from '@/lib/supabaseAdmin';
+import { getPool, isDbConfigured } from '@/lib/db';
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
@@ -14,7 +14,7 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: 'Missing date (YYYY-MM-DD)' }, { status: 400 });
   }
 
-  if (!isBookingDatabaseConfigured()) {
+  if (!isDbConfigured()) {
     return NextResponse.json({
       configured: false,
       useEmailFallback: true,
@@ -23,24 +23,18 @@ export async function GET(req: Request) {
   }
 
   try {
-    const supabase = createAdminClient();
     const { dayStart, dayEnd } = dayRangeUtcForCalendarDate(date, timeZone);
 
-    const { data: bookings, error } = await supabase
-      .from('bookings')
-      .select('start_time, end_time')
-      .lt('start_time', dayEnd.toISOString())
-      .gt('end_time', dayStart.toISOString());
-
-    if (error) {
-      console.error('availability query:', error);
-      return NextResponse.json({ error: 'Failed to load availability' }, { status: 500 });
-    }
+    const { rows } = await getPool().query<{ start_time: string; end_time: string }>(
+      `SELECT start_time, end_time FROM bookings
+        WHERE start_time < $1 AND end_time > $2`,
+      [dayEnd.toISOString(), dayStart.toISOString()]
+    );
 
     const slots = listFreeSlots({
       date,
       timeZone,
-      bookings: bookings ?? [],
+      bookings: rows,
       now: new Date(),
     });
 

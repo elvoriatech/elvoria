@@ -1,10 +1,8 @@
-import { createAdminClient, isSupabaseConfigured } from '@/lib/supabaseAdmin';
+import { getPool, isDbConfigured } from '@/lib/db';
 import { isPostgrestMissingTableError } from '@/lib/crmSchemaError';
 
 export type AnalyticsPeriod = 'daily' | 'weekly' | 'monthly';
-
 export type TimeSeriesPoint = { label: string; visitors: number; views: number };
-
 export type TopPageSlice = { path: string; views: number };
 
 export type SiteAnalyticsReport = {
@@ -16,28 +14,28 @@ export type SiteAnalyticsReport = {
   schemaApplied: boolean;
 };
 
-function requireSb() {
-  if (!isSupabaseConfigured()) return null;
-  return createAdminClient();
-}
-
 export async function isSiteAnalyticsSchemaApplied(): Promise<boolean> {
-  const sb = requireSb();
-  if (!sb) return false;
-  const { error } = await sb.from('site_page_views').select('id').limit(1);
-  if (error && isPostgrestMissingTableError(error)) return false;
-  return !error;
+  if (!isDbConfigured()) return false;
+  try {
+    await getPool().query('SELECT id FROM site_page_views LIMIT 1');
+    return true;
+  } catch (e) {
+    if (isPostgrestMissingTableError(e)) return false;
+    return false;
+  }
 }
 
 export async function recordPageView(visitorId: string, path: string): Promise<void> {
-  const sb = requireSb();
-  if (!sb) return;
+  if (!isDbConfigured()) return;
   const cleanPath = path.slice(0, 500) || '/';
-  const { error } = await sb.from('site_page_views').insert({
-    visitor_id: visitorId,
-    path: cleanPath,
-  });
-  if (error && !isPostgrestMissingTableError(error)) throw error;
+  try {
+    await getPool().query(
+      'INSERT INTO site_page_views (visitor_id, path) VALUES ($1, $2)',
+      [visitorId, cleanPath]
+    );
+  } catch (e) {
+    if (!isPostgrestMissingTableError(e)) throw e;
+  }
 }
 
 function periodStart(period: AnalyticsPeriod): Date {
@@ -54,15 +52,12 @@ function periodStart(period: AnalyticsPeriod): Date {
     d.setUTCHours(0, 0, 0, 0);
     return d;
   }
-  const d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 11, 1));
-  return d;
+  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 11, 1));
 }
 
 function bucketKey(iso: string, period: AnalyticsPeriod): string {
   const d = new Date(iso);
-  if (period === 'daily') {
-    return d.toISOString().slice(0, 10);
-  }
+  if (period === 'daily') return d.toISOString().slice(0, 10);
   if (period === 'weekly') {
     const day = d.getUTCDay();
     const diff = d.getUTCDate() - day + (day === 0 ? -6 : 1);
@@ -124,32 +119,23 @@ export async function getSiteAnalyticsReport(period: AnalyticsPeriod): Promise<S
     schemaApplied: false,
   };
 
-  const sb = requireSb();
-  if (!sb) return empty;
+  if (!isDbConfigured()) return empty;
 
   const schemaApplied = await isSiteAnalyticsSchemaApplied();
   if (!schemaApplied) return empty;
 
   const since = periodStart(period).toISOString();
-  const { data, error } = await sb
-    .from('site_page_views')
-    .select('visitor_id, path, viewed_at')
-    .gte('viewed_at', since)
-    .order('viewed_at', { ascending: true })
-    .limit(50_000);
+  const { rows } = await getPool().query<{ visitor_id: string; path: string; viewed_at: string }>(
+    'SELECT visitor_id, path, viewed_at FROM site_page_views WHERE viewed_at >= $1 ORDER BY viewed_at ASC LIMIT 50000',
+    [since]
+  );
 
-  if (error) {
-    if (isPostgrestMissingTableError(error)) return empty;
-    throw error;
-  }
-
-  const rows = data || [];
   const viewsByBucket = new Map<string, number>();
   const visitorsByBucket = new Map<string, Set<string>>();
   const viewsByPath = new Map<string, number>();
   const allVisitors = new Set<string>();
 
-  for (const row of rows as Array<{ visitor_id: string; path: string; viewed_at: string }>) {
+  for (const row of rows) {
     const key = bucketKey(row.viewed_at, period);
     viewsByBucket.set(key, (viewsByBucket.get(key) || 0) + 1);
     if (!visitorsByBucket.has(key)) visitorsByBucket.set(key, new Set());
