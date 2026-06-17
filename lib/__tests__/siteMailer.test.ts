@@ -84,9 +84,23 @@ describe('siteMailer', () => {
   });
 
   describe('formatMailSendError', () => {
-    it('maps Gmail 535 to actionable message', () => {
+    it('maps Gmail auth errors (gsmtp) to App Password guidance', () => {
+      const msg = formatMailSendError(
+        'Invalid login: 535-5.7.8 Username and Password not accepted ... gsmtp'
+      );
+      expect(msg).toContain('Google App Password');
+    });
+
+    it('maps Gmail auth errors to App Password guidance when EMAIL_SERVICE=gmail', () => {
+      process.env.EMAIL_SERVICE = 'gmail';
       const msg = formatMailSendError('Invalid login: 535-5.7.8 Username and Password not accepted');
       expect(msg).toContain('Google App Password');
+    });
+
+    it('maps custom SMTP (IONOS) auth errors to generic guidance with detail', () => {
+      delete process.env.EMAIL_SERVICE;
+      const msg = formatMailSendError('Invalid login: 535 Authentication credentials invalid');
+      expect(msg).toContain('SMTP login rejected');
       expect(msg).toContain('535');
     });
 

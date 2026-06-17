@@ -35,22 +35,35 @@ function formatFromAddress(user: string): string {
 }
 
 /**
- * Single mail config for the whole app:
- * EMAIL_SERVICE, EMAIL_USER, EMAIL_PASSWORD (+ CONTACT_EMAIL for recipients).
+ * Single mail config for the whole app.
+ * Preferred (custom SMTP, e.g. IONOS): EMAIL_HOST, EMAIL_PORT, EMAIL_USER, EMAIL_PASSWORD.
+ * Fallback (well-known provider): EMAIL_SERVICE (e.g. 'gmail'), EMAIL_USER, EMAIL_PASSWORD.
+ * (+ CONTACT_EMAIL for recipients.)
  */
 export function createSiteMailer(): MailKit {
+  const emailHost = process.env.EMAIL_HOST?.trim();
   const emailService = process.env.EMAIL_SERVICE?.trim();
   const emailUser = process.env.EMAIL_USER?.trim();
   const emailPassword = normalizeMailPassword(process.env.EMAIL_PASSWORD);
 
-  if (!emailService || !emailUser || !emailPassword) {
+  if (!emailUser || !emailPassword || (!emailHost && !emailService)) {
     return { ok: false };
   }
 
-  const transporter = nodemailer.createTransport({
-    service: emailService,
-    auth: { user: emailUser, pass: emailPassword },
-  });
+  const port = Number(process.env.EMAIL_PORT?.trim() || 587);
+  const transporter = nodemailer.createTransport(
+    emailHost
+      ? {
+          host: emailHost,
+          port,
+          secure: port === 465, // 465 = implicit SSL, 587 = STARTTLS
+          auth: { user: emailUser, pass: emailPassword },
+        }
+      : {
+          service: emailService,
+          auth: { user: emailUser, pass: emailPassword },
+        }
+  );
 
   return { ok: true, transporter, from: formatFromAddress(emailUser) };
 }
@@ -69,7 +82,7 @@ export async function verifySiteMailer(): Promise<
     return {
       ok: false,
       reason: 'not_configured',
-      detail: 'Set EMAIL_SERVICE, EMAIL_USER, and EMAIL_PASSWORD in .env.local',
+      detail: 'Set EMAIL_USER, EMAIL_PASSWORD, and EMAIL_HOST (or EMAIL_SERVICE) in .env.local',
     };
   }
   try {
@@ -77,7 +90,7 @@ export async function verifySiteMailer(): Promise<
     return {
       ok: true,
       from: kit.from,
-      service: process.env.EMAIL_SERVICE?.trim() || 'gmail',
+      service: process.env.EMAIL_HOST?.trim() || process.env.EMAIL_SERVICE?.trim() || 'unknown',
     };
   } catch (e) {
     const raw = e instanceof Error ? e.message : String(e);
@@ -123,16 +136,24 @@ export async function sendSiteHtmlEmail(params: {
 
 export function formatMailSendError(detail: string): string {
   const lower = detail.toLowerCase();
-  if (
+  const isAuthError =
     lower.includes('535') ||
+    lower.includes('534') ||
     lower.includes('badcredentials') ||
     lower.includes('username and password not accepted') ||
-    lower.includes('eauth')
-  ) {
+    lower.includes('eauth');
+  if (!isAuthError) return detail;
+
+  // Gmail-specific guidance (app password) when using the gmail service / gsmtp host.
+  if (lower.includes('gsmtp') || process.env.EMAIL_SERVICE?.trim() === 'gmail') {
     return (
-      'Gmail login rejected (535). Use a Google App Password in EMAIL_PASSWORD ' +
-      '(https://myaccount.google.com/apppasswords). EMAIL_USER must match that mailbox. Restart npm run dev.'
+      'Gmail login rejected. Use a Google App Password in EMAIL_PASSWORD ' +
+      '(https://myaccount.google.com/apppasswords). EMAIL_USER must match that mailbox. Restart the server after changing .env.'
     );
   }
-  return detail;
+  return (
+    'SMTP login rejected. Check EMAIL_USER (full mailbox address), EMAIL_PASSWORD, ' +
+    'EMAIL_HOST, and EMAIL_PORT. Restart the server after changing .env. Detail: ' +
+    detail
+  );
 }
