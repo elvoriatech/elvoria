@@ -1,5 +1,8 @@
 import nodemailer from 'nodemailer';
+import type Mail from 'nodemailer/lib/mailer';
 import type { Attachment } from 'nodemailer/lib/mailer';
+import MailComposer from 'nodemailer/lib/mail-composer';
+import { appendToSentFolder, isImapSentCopyEnabled } from '@/lib/imapSentCopy';
 
 type MailKit =
   | { ok: true; transporter: nodemailer.Transporter; from: string }
@@ -12,7 +15,7 @@ export function normalizeMailPassword(value: string | undefined): string {
 
 /** Inbound / footer contact address (not used for SMTP auth). */
 export function getContactEmail(): string {
-  return process.env.CONTACT_EMAIL?.trim() || 'contact@elvoriatech.com';
+  return process.env.CONTACT_EMAIL?.trim() || 'contact@elvoria.tech';
 }
 
 /**
@@ -110,27 +113,55 @@ export async function sendSiteHtmlEmail(params: {
 }): Promise<{ sent: true } | { sent: false; reason: 'not_configured' | 'send_failed'; detail?: string }> {
   const kit = createSiteMailer();
   if (!kit.ok) return { sent: false, reason: 'not_configured' };
+
+  const mailOptions: Mail.Options = {
+    from: kit.from,
+    to: params.to,
+    bcc: params.bcc,
+    replyTo: params.replyTo,
+    subject: params.subject,
+    html: params.html,
+    text:
+      params.text ??
+      params.html
+        .replace(/<[^>]+>/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim(),
+    attachments: params.attachments,
+    date: new Date(),
+  };
+
   try {
-    await kit.transporter.sendMail({
-      from: kit.from,
-      to: params.to,
-      bcc: params.bcc,
-      replyTo: params.replyTo,
-      subject: params.subject,
-      html: params.html,
-      text:
-        params.text ??
-        params.html
-          .replace(/<[^>]+>/g, ' ')
-          .replace(/\s+/g, ' ')
-          .trim(),
-      attachments: params.attachments,
-    });
+    const info = await kit.transporter.sendMail(mailOptions);
+    await saveCopyToSentFolder(mailOptions, info.messageId);
     return { sent: true };
   } catch (e) {
     console.error('[siteMailer] send failed:', e);
     const raw = e instanceof Error ? e.message : String(e);
     return { sent: false, reason: 'send_failed', detail: formatMailSendError(raw) };
+  }
+}
+
+/**
+ * Best-effort: append a copy of the just-sent message to the mailbox "Sent" folder
+ * via IMAP. Never throws — a failure here must not affect delivery. The saved copy
+ * drops Bcc so it mirrors what the recipient sees.
+ */
+async function saveCopyToSentFolder(mailOptions: Mail.Options, messageId?: string): Promise<void> {
+  if (!isImapSentCopyEnabled()) return;
+  try {
+    const raw: Buffer = await new Promise((resolve, reject) => {
+      new MailComposer({ ...mailOptions, bcc: undefined, messageId }).compile().build((err, message) => {
+        if (err) reject(err);
+        else resolve(message);
+      });
+    });
+    await appendToSentFolder(raw);
+  } catch (err) {
+    console.warn(
+      '[siteMailer] could not save copy to Sent folder:',
+      err instanceof Error ? err.message : err
+    );
   }
 }
 

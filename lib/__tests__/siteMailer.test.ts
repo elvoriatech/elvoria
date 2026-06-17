@@ -37,7 +37,7 @@ describe('siteMailer', () => {
 
     it('falls back to default contact address', () => {
       delete process.env.CONTACT_EMAIL;
-      expect(getContactEmail()).toBe('contact@elvoriatech.com');
+      expect(getContactEmail()).toBe('contact@elvoria.tech');
     });
   });
 
@@ -52,14 +52,14 @@ describe('siteMailer', () => {
 
     it('is configured with formatted From when env is set', () => {
       process.env.EMAIL_SERVICE = 'gmail';
-      process.env.EMAIL_USER = 'contact@elvoriatech.com';
+      process.env.EMAIL_USER = 'contact@elvoria.tech';
       process.env.EMAIL_PASSWORD = 'apppassword16chars';
       process.env.COMPANY_NAME = 'Elvoria Technologies';
 
       const kit = createSiteMailer();
       expect(kit.ok).toBe(true);
       if (kit.ok) {
-        expect(kit.from).toBe('Elvoria Technologies <contact@elvoriatech.com>');
+        expect(kit.from).toBe('Elvoria Technologies <contact@elvoria.tech>');
       }
       expect(isSiteMailConfigured()).toBe(true);
     });

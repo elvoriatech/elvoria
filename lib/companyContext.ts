@@ -4,7 +4,7 @@
  */
 export function getSalesEngineerContextBlock(): string {
   const site = process.env.SITE_URL || 'https://elvoriatech.com';
-  const email = process.env.CONTACT_EMAIL || 'contact@elvoriatech.com';
+  const email = process.env.CONTACT_EMAIL || 'contact@elvoria.tech';
   const phone = process.env.SUPPORT_PHONE || '+1 (555) 123-4567';
 
   return [

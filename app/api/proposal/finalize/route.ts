@@ -125,7 +125,7 @@ export async function POST(request: NextRequest) {
         JSON.stringify(estimate, null, 2),
         '',
         'Branding:',
-        `Company: ${process.env.COMPANY_NAME || 'Elvoria Technologiesnologies'}`,
+        `Company: ${process.env.COMPANY_NAME || 'Elvoria Technologies'}`,
         `Site: ${process.env.SITE_URL || 'https://elvoriatech.com'}`,
       ].join('\n'),
     };
@@ -159,7 +159,7 @@ export async function POST(request: NextRequest) {
         markdown,
         outPath: tmpPath,
         branding: {
-          companyName: process.env.COMPANY_NAME || 'Elvoria Technologiesnologies',
+          companyName: process.env.COMPANY_NAME || 'Elvoria Technologies',
           siteUrl: process.env.SITE_URL || 'https://elvoriatech.com',
           primary: '#22d3ee',
           secondary: '#6366f1',

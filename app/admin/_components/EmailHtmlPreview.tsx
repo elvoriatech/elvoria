@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Mail, Send, TextQuote, User } from 'lucide-react';
 import {
   buildFullMarketingEmailHtml,
-  marketingLogoUrlForPreview,
+  marketingLogoUrl,
 } from '@/lib/emailMarketing/emailLayout';
 
 /** Renders the full branded HTML email (logo, header, footer) as customers receive it. */
@@ -12,7 +12,7 @@ export function EmailHtmlPreview({
   subject,
   bodyHtml,
   toLabel,
-  fromLabel = 'Elvoria Technologies <contact@elvoriatech.com>',
+  fromLabel = 'Elvoria Technologies <contact@elvoria.tech>',
   note,
   className = '',
   matchedHeight,
@@ -35,7 +35,7 @@ export function EmailHtmlPreview({
     setReady(true);
     setSrcDoc(
       buildFullMarketingEmailHtml(bodyHtml, {
-        logoSrc: marketingLogoUrlForPreview(),
+        logoSrc: marketingLogoUrl(),
         preheader: subject,
       })
     );

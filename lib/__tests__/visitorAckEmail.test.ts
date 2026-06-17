@@ -3,7 +3,7 @@ import { sendSiteHtmlEmail } from '@/lib/siteMailer';
 
 jest.mock('@/lib/siteMailer', () => ({
   sendSiteHtmlEmail: jest.fn(),
-  getContactEmail: jest.fn(() => 'contact@elvoriatech.com'),
+  getContactEmail: jest.fn(() => 'contact@elvoria.tech'),
 }));
 
 const sendSiteHtmlEmailMock = sendSiteHtmlEmail as jest.MockedFunction<typeof sendSiteHtmlEmail>;

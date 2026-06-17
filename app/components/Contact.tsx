@@ -219,6 +219,7 @@ export function Contact() {
                   onChange={handleChange}
                   className="w-full px-4 py-3 bg-[#0F172A] border border-slate-700 rounded-lg focus:border-[#06B6D4] focus:outline-none text-[#F8FAFC]">
                   <option>Select budget range</option>
+                  <option>€5K - €8K</option>
                   <option>€10K - €25K</option>
                   <option>€25K - €50K</option>
                   <option>€50K - €100K</option>
@@ -264,10 +265,10 @@ export function Contact() {
                   <div>
                     <div className="text-slate-400 mb-1">Email</div>
                     <a
-                      href="mailto:info@elvoriatech.com"
+                      href="mailto:contact@elvoria.tech"
                       className="text-slate-200 hover:text-[#06B6D4] transition-colors"
                     >
-                      info@elvoriatech.com
+                      contact@elvoria.tech
                     </a>
                   </div>
                 </div>
@@ -279,10 +280,10 @@ export function Contact() {
                   <div>
                     <div className="text-slate-400 mb-1">Contact</div>
                     <a
-                      href="mailto:contact@elvoriatech.com"
+                      href="mailto:contact@elvoria.tech"
                       className="text-slate-200 hover:text-[#06B6D4] transition-colors"
                     >
-                      contact@elvoriatech.com
+                      contact@elvoria.tech
                     </a>
                   </div>
                 </div>

@@ -13,8 +13,8 @@ export function marketingSiteBaseUrl(): string {
   return (process.env.SITE_URL || 'https://elvoriatech.com').replace(/\/$/, '');
 }
 
-/** Colored logo for gradient header (preview + sent email). */
-export function marketingLogoUrlForPreview(): string {
+/** Hosted colored logo for the gradient header — used in both the admin preview and sent emails. */
+export function marketingLogoUrl(): string {
   return `${marketingSiteBaseUrl()}/elvoria.png`;
 }
 
@@ -41,7 +41,7 @@ export function wrapMarketingEmailHtml(
 ): string {
   const company = process.env.COMPANY_NAME || 'Elvoria Technologies';
   const contact =
-    process.env.CONTACT_EMAIL || 'contact@elvoriatech.com';
+    process.env.CONTACT_EMAIL || 'contact@elvoria.tech';
   const site = ELVORIA_WEBSITE_URL;
   const preheader = escapeHtml(
     opts.preheader || 'Software development partnership — Elvoria Technologies'

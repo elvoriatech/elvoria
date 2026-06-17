@@ -7,7 +7,7 @@ jest.mock('node:fs', () => ({
 
 jest.mock('@/lib/siteMailer', () => ({
   isSiteMailConfigured: jest.fn(),
-  getContactEmail: jest.fn(() => 'contact@elvoriatech.com'),
+  getContactEmail: jest.fn(() => 'contact@elvoria.tech'),
   sendSiteHtmlEmail: jest.fn(),
 }));
 

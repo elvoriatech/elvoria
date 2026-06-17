@@ -1,6 +1,5 @@
-import fs from 'node:fs';
-import path from 'node:path';
 import { getContactEmail, sendSiteHtmlEmail } from '@/lib/siteMailer';
+import { marketingLogoUrl } from '@/lib/emailMarketing/emailLayout';
 import { isVisitorAutoReplyEnabled } from '@/lib/visitorAckEmail';
 import {
   buildVisitorAutoReplyHtml,
@@ -43,9 +42,9 @@ export function renderEmailShell(params: { title: string; preheader: string; con
                   <tr>
                     <td style="vertical-align:middle;">
                       <div style="display:flex;align-items:center;gap:12px;">
-                        <img src="cid:elvoria-mark" alt="" width="36" height="36" style="display:block;border-radius:10px;" />
+                        <img src="${marketingLogoUrl()}" alt="Elvoria Technologies" width="36" height="36" style="display:block;border-radius:10px;" />
                         <div>
-                          <div style="font-size:14px;font-weight:700;letter-spacing:0.3px;color:#ffffff;">Elvoria Technologiesnologies</div>
+                          <div style="font-size:14px;font-weight:700;letter-spacing:0.3px;color:#ffffff;">Elvoria Technologies</div>
                           <div style="font-size:12px;color:#94a3b8;">AI-First Digital &amp; Software Development Partner</div>
                         </div>
                       </div>
@@ -88,17 +87,9 @@ export type ConsultationEmailPayload = {
   notes?: string;
 };
 
-function logoAttachments() {
-  const attachmentPath = path.join(process.cwd(), 'public', 'elvoria.png');
-  return fs.existsSync(attachmentPath)
-    ? [{ filename: 'elvoria.png', path: attachmentPath, cid: 'elvoria-mark' }]
-    : [];
-}
-
 export async function sendConsultationEmails(payload: ConsultationEmailPayload) {
   const { name, email, company, whenDisplay, notes } = payload;
   const contactEmail = getContactEmail();
-  const attachments = logoAttachments();
 
   const safeName = escapeHtml(String(name));
   const safeEmail = escapeHtml(String(email));
@@ -155,7 +146,6 @@ export async function sendConsultationEmails(payload: ConsultationEmailPayload) 
           </div>
         `,
     }),
-    attachments,
   });
   if (!staff.sent) throw new Error(staff.detail || 'Failed to send consultation email to staff');
 

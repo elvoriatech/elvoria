@@ -32,7 +32,7 @@ Edit `.env.local` in the project root:
 EMAIL_SERVICE=gmail
 EMAIL_USER=your-email@gmail.com
 EMAIL_PASSWORD=your-app-password
-CONTACT_EMAIL=contact@elvoriatech.com
+CONTACT_EMAIL=contact@elvoria.tech
 ```
 
 ### 2. Gmail Setup (Recommended) Adding for updating new version

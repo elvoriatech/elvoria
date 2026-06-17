@@ -1,8 +1,7 @@
-import { buildFullMarketingEmailHtml } from '@/lib/emailMarketing/emailLayout';
 import {
-  getMarketingEmailLogoAttachment,
-  marketingLogoCidSrc,
-} from '@/lib/emailMarketing/emailLogoAttachment';
+  buildFullMarketingEmailHtml,
+  marketingLogoUrl,
+} from '@/lib/emailMarketing/emailLayout';
 import { ELVORIA_WEBSITE_URL } from '@/lib/emailMarketing/constants';
 import { elvoriaBrandLink } from '@/lib/emailMarketing/defaults';
 
@@ -11,13 +10,17 @@ const BODY_LINK = 'color:#0891b2;font-weight:600;text-decoration:underline;';
 /** Same shell + logo as initial outreach (`wrapMarketingEmailHtml`). */
 export function buildVisitorAutoReplyHtml(bodyHtml: string, preheader: string): string {
   return buildFullMarketingEmailHtml(bodyHtml, {
-    logoSrc: marketingLogoCidSrc(),
+    logoSrc: marketingLogoUrl(),
     preheader,
   });
 }
 
+/**
+ * Logo is referenced by hosted HTTPS URL (see `marketingLogoUrl`), so no inline
+ * attachment is needed. Kept for callers that still spread attachments.
+ */
 export function visitorAutoReplyAttachments() {
-  return getMarketingEmailLogoAttachment();
+  return [];
 }
 
 export function visitorAutoReplySignOff(): string {
