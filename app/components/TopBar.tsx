@@ -94,7 +94,7 @@ export function TopBar() {
           >
             <Image
               src="/elvoria.png"
-              alt="Elvoriatech"
+              alt="Elvoria Technologies"
               width={40}
               height={40}
               priority
@@ -102,7 +102,7 @@ export function TopBar() {
               className="h-10 w-10"
             />
             <div className="hidden sm:flex flex-col leading-tight">
-              <span className="text-sm font-semibold tracking-wide text-foreground">Elvoriatech</span>
+              <span className="text-sm font-semibold tracking-wide text-foreground">Elvoria Technologies</span>
               <span className="text-xs text-muted-foreground group-hover:text-foreground/80 transition-colors">
                 {'AI-First Digital & Software Development Partner'}
               </span>

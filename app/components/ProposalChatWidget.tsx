@@ -89,7 +89,7 @@ export function ProposalChatWidget() {
     {
       role: 'assistant',
       content:
-        'I’m your AI Technical Proposal Architect for Elvoria Tech. Describe your idea — I’ll translate it into scope, AI-native architecture, roadmap, timeline, and indicative EUR ranges (then you can generate a PDF when ready).',
+        'I’m your AI Technical Proposal Architect for Elvoria Technologies. Describe your idea — I’ll translate it into scope, AI-native architecture, roadmap, timeline, and indicative EUR ranges (then you can generate a PDF when ready).',
     },
   ]);
   const [input, setInput] = useState('');

@@ -14,7 +14,7 @@ describe('visitorAutoReplyLayout', () => {
 
   it('renders sign-off with brand link', () => {
     const signOff = visitorAutoReplySignOff();
-    expect(signOff).toContain('Elvoria Tech Team');
+    expect(signOff).toContain('Elvoria Technologies Team');
     expect(signOff).toContain('elvoriatech.com');
   });
 

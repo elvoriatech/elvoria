@@ -22,7 +22,7 @@ export function visitorAutoReplyAttachments() {
 
 export function visitorAutoReplySignOff(): string {
   return `<p>Best regards,<br />
-${elvoriaBrandLink('Elvoria Tech Team')}<br />
+${elvoriaBrandLink('Elvoria Technologies Team')}<br />
 <a href="${ELVORIA_WEBSITE_URL}" style="${BODY_LINK}">elvoriatech.com</a></p>`;
 }
 

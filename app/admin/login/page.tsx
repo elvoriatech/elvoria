@@ -59,7 +59,7 @@ export default function AdminLoginPage() {
       <div className="admin-login-panel w-full max-w-md rounded-2xl border border-border bg-card p-8 text-card-foreground shadow-xl ring-1 ring-border/50">
         <div className="mb-6 flex items-center gap-3">
           <Link href="/" className="shrink-0 rounded-lg outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
-            <Image src="/elvoria.png" alt="Elvoria Tech" width={48} height={48} className="h-12 w-12 rounded-lg" priority />
+            <Image src="/elvoria.png" alt="Elvoria Technologies" width={48} height={48} className="h-12 w-12 rounded-lg" priority />
           </Link>
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-foreground">Admin sign in</h1>

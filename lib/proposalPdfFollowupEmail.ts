@@ -20,7 +20,7 @@ export async function sendProposalPdfNotReadyVisitorEmail(opts: {
   replyTo?: string;
   companyName?: string;
 }): Promise<{ sent: true } | { sent: false; reason: string; detail?: string }> {
-  const company = opts.companyName || process.env.COMPANY_NAME || 'Elvoria Tech';
+  const company = opts.companyName || process.env.COMPANY_NAME || 'Elvoria Technologies';
   const site = opts.siteUrl.replace(/\/$/, '');
   const contact = (opts.replyTo || getContactEmail()).trim();
   const name = opts.visitorName.trim() || 'there';

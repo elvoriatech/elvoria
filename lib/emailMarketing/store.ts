@@ -108,12 +108,12 @@ function mapRecipient(r: DbRecipient): EmailRecipient {
 
 const LEGACY_TEMPLATE_SUBJECTS: Partial<Record<EmailTemplateType, string[]>> = {
   initial: [
-    'Elvoria Tech — software development for [Company Name]',
-    'Elvoria Tech - software development for [Company Name]',
-    'Partnership opportunity for [Company Name] — Elvoria Tech',
+    'Elvoria Technologies — software development for [Company Name]',
+    'Elvoria Technologies - software development for [Company Name]',
+    'Partnership opportunity for [Company Name] — Elvoria Technologies',
   ],
-  follow_up_1: ['Following up — Elvoria Tech'],
-  follow_up_2: ['Final follow-up — Elvoria Tech'],
+  follow_up_1: ['Following up — Elvoria Technologies'],
+  follow_up_2: ['Final follow-up — Elvoria Technologies'],
 };
 
 async function syncLegacyInitialBodyFormat(pool: ReturnType<typeof getPool>): Promise<void> {
@@ -135,7 +135,7 @@ async function syncTemplateContentPatches(pool: ReturnType<typeof getPool>): Pro
     'SELECT template_type, body_html FROM em_templates'
   );
   const brandLinked = elvoriaBrandLink();
-  const teamLinked = elvoriaBrandLink('Elvoria Tech Team');
+  const teamLinked = elvoriaBrandLink('Elvoria Technologies Team');
   const now = new Date().toISOString();
 
   for (const row of rows) {
@@ -147,12 +147,12 @@ async function syncTemplateContentPatches(pool: ReturnType<typeof getPool>): Pro
       body = body.replace(/Node\.js, Java, Spring Boot<\/li>/g, 'Node.js, Java, Spring Boot, Python</li>');
       changed = true;
     }
-    if (body.includes('<strong>Elvoria Tech Team</strong>') && !body.includes(teamLinked)) {
-      body = body.replace(/<strong>Elvoria Tech Team<\/strong>/g, teamLinked);
+    if (body.includes('<strong>Elvoria Technologies Team</strong>') && !body.includes(teamLinked)) {
+      body = body.replace(/<strong>Elvoria Technologies Team<\/strong>/g, teamLinked);
       changed = true;
     }
-    if (type === 'initial' && body.includes('<strong>Elvoria Tech</strong>') && !body.includes(brandLinked)) {
-      body = body.replace(/<strong>Elvoria Tech<\/strong>/g, brandLinked);
+    if (type === 'initial' && body.includes('<strong>Elvoria Technologies</strong>') && !body.includes(brandLinked)) {
+      body = body.replace(/<strong>Elvoria Technologies<\/strong>/g, brandLinked);
       changed = true;
     }
     if (!changed) continue;

@@ -58,7 +58,7 @@ export function renderElvoriaEmailShell(params: {
                           </td>
                           <td style="vertical-align:middle;">
                             <div style="font-size:14px;font-weight:700;letter-spacing:0.3px;color:#ffffff;line-height:1.2;">
-                              Elvoriatech
+                              Elvoria Technologies
                             </div>
                             <div style="font-size:12px;color:#94a3b8;line-height:1.2;margin-top:2px;">
                               AI-First Digital &amp; Software Development Partner
@@ -91,7 +91,7 @@ export function renderElvoriaEmailShell(params: {
                   ${footerNoteHtml}
                 </div>
                 <div style="margin-top:10px;font-size:11px;color:#64748b;line-height:1.6;">
-                  © ${new Date().getFullYear()} Elvoriatech. All rights reserved.
+                  © ${new Date().getFullYear()} Elvoria Technologies. All rights reserved.
                 </div>
               </td>
             </tr>

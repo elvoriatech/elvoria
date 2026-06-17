@@ -10,7 +10,7 @@ export const CALL_INVITE_LINE_HTML = `Would you be open to a <a href="${ELVORIA_
 const LINK_STYLE = 'color:#0891b2;font-weight:600;text-decoration:underline;';
 
 /** Linked brand name for template body copy. */
-export function elvoriaBrandLink(label = 'Elvoria Tech'): string {
+export function elvoriaBrandLink(label = 'Elvoria Technologies'): string {
   return `<a href="${ELVORIA_WEBSITE_URL}" style="${LINK_STYLE}"><strong>${label}</strong></a>`;
 }
 
@@ -55,7 +55,7 @@ const INITIAL_BODY = `<p>Hi [First Name],</p>
 <p>Looking forward to your thoughts.</p>
 
 <p>Best regards,<br />
-${elvoriaBrandLink('Elvoria Tech Team')}<br />
+${elvoriaBrandLink('Elvoria Technologies Team')}<br />
 <a href="${ELVORIA_WEBSITE_URL}">elvoriatech.com</a></p>`;
 
 const FOLLOW_UP_1_BODY = `<p>Hi [First Name],</p>
@@ -67,7 +67,7 @@ const FOLLOW_UP_1_BODY = `<p>Hi [First Name],</p>
 <p>Looking forward to your thoughts.</p>
 
 <p>Best regards,<br />
-${elvoriaBrandLink('Elvoria Tech Team')}<br />
+${elvoriaBrandLink('Elvoria Technologies Team')}<br />
 <a href="${ELVORIA_WEBSITE_URL}">elvoriatech.com</a></p>`;
 
 const FOLLOW_UP_2_BODY = `<p>Hi [First Name],</p>
@@ -79,7 +79,7 @@ const FOLLOW_UP_2_BODY = `<p>Hi [First Name],</p>
 <p>Wishing you great success with your project.</p>
 
 <p>Best regards,<br />
-${elvoriaBrandLink('Elvoria Tech Team')}<br />
+${elvoriaBrandLink('Elvoria Technologies Team')}<br />
 <a href="${ELVORIA_WEBSITE_URL}">elvoriatech.com</a></p>`;
 
 function applySiteLinks(html: string): string {
@@ -103,15 +103,15 @@ export const DEFAULT_TEMPLATES: Record<
   { subject: string; bodyHtml: string }
 > = {
   initial: {
-    subject: 'Quick intro for [Company Name] — Elvoria Tech',
+    subject: 'Quick intro for [Company Name] — Elvoria Technologies',
     bodyHtml: toTemplateBody(INITIAL_BODY),
   },
   follow_up_1: {
-    subject: 'Following up with [Company Name] — Elvoria Tech',
+    subject: 'Following up with [Company Name] — Elvoria Technologies',
     bodyHtml: toTemplateBody(FOLLOW_UP_1_BODY),
   },
   follow_up_2: {
-    subject: 'Last follow-up for [Company Name] — Elvoria Tech',
+    subject: 'Last follow-up for [Company Name] — Elvoria Technologies',
     bodyHtml: toTemplateBody(FOLLOW_UP_2_BODY),
   },
 };

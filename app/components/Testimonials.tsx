@@ -6,7 +6,7 @@ const testimonials = [
     name: 'Sarah Chen',
     role: 'CEO',
     company: 'TechFlow Solutions',
-    text: "Elvoriatech transformed our legacy system into a modern, scalable SaaS platform. The AI automation they built saved us over €400K annually in operational costs. Their team's expertise in cloud architecture and AI integration is unmatched.",
+    text: "Elvoria Technologies transformed our legacy system into a modern, scalable SaaS platform. The AI automation they built saved us over €400K annually in operational costs. Their team's expertise in cloud architecture and AI integration is unmatched.",
     rating: 5,
     image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80',
   },
@@ -14,7 +14,7 @@ const testimonials = [
     name: 'Michael Rodriguez',
     role: 'CTO',
     company: 'FinanceHub',
-    text: "We've worked with 5+ development agencies over the years. Elvoriatech is the first one that truly understands modern architecture. They delivered a microservices platform that handles 10M+ requests daily with 99.99% uptime. Exceptional work.",
+    text: "We've worked with 5+ development agencies over the years. Elvoria Technologies is the first one that truly understands modern architecture. They delivered a microservices platform that handles 10M+ requests daily with 99.99% uptime. Exceptional work.",
     rating: 5,
     image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
   },
@@ -54,7 +54,7 @@ export function Testimonials() {
           </h2>
           <p className="mx-auto max-w-3xl text-base text-muted-foreground sm:text-lg md:text-xl">
             Don&apos;t just take our word for it. Here&apos;s what our clients say about
-            working with Elvoriatech.
+            working with Elvoria Technologies.
           </p>
         </div>
 

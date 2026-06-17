@@ -40,7 +40,7 @@ export function WhyChooseUs() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-12 text-center sm:mb-16">
           <h2 className="mb-5 bg-linear-to-r from-(--brand-primary) to-(--brand-accent) bg-clip-text text-3xl text-transparent sm:mb-6 sm:text-4xl md:text-5xl lg:text-6xl">
-            Why Choose Elvoriatech
+            Why Choose Elvoria Technologies
           </h2>
           <p className="mx-auto max-w-3xl text-base text-muted-foreground sm:text-lg md:text-xl">
             We&apos;re not your typical software agency. Here&apos;s what makes us different
@@ -65,7 +65,7 @@ export function WhyChooseUs() {
 
         <div className="rounded-2xl border border-border/60 bg-card/80 p-4 sm:p-6 md:p-8 dark:bg-linear-to-r dark:from-purple-900/30 dark:to-blue-900/30 dark:border-white/10">
           <h3 className="mb-5 text-center text-2xl text-foreground sm:mb-6 sm:text-3xl">
-            The Elvoriatech Advantage
+            The Elvoria Technologies Advantage
           </h3>
 
           <div className="mb-8 grid gap-6 md:grid-cols-3 md:gap-8">

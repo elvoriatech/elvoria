@@ -15,7 +15,7 @@ export async function sendProposalPdfToVisitorFromAdmin(opts: {
   visitorName: string;
   pdfPath: string;
 }): Promise<{ sent: true } | { sent: false; reason: string; detail?: string }> {
-  const company = process.env.COMPANY_NAME || 'Elvoria Tech';
+  const company = process.env.COMPANY_NAME || 'Elvoria Technologies';
   const site = (process.env.SITE_URL || 'https://elvoriatech.com').replace(/\/$/, '');
   const name = opts.visitorName.trim() || 'there';
   const safeName = escapeHtml(name);

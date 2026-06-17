@@ -30,7 +30,7 @@ function formatFromAddress(user: string): string {
   const addr = user.trim();
   if (!addr) return addr;
   if (addr.includes('<')) return addr;
-  const name = (process.env.COMPANY_NAME || 'Elvoria Tech').trim();
+  const name = (process.env.COMPANY_NAME || 'Elvoria Technologies').trim();
   return name ? `${name} <${addr}>` : addr;
 }
 

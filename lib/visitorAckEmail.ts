@@ -26,7 +26,7 @@ export async function sendContactFormAutoReply(params: {
 
   const { name, email, message } = params;
   const contactEmail = getContactEmail();
-  const companyName = process.env.COMPANY_NAME || 'Elvoria Tech';
+  const companyName = process.env.COMPANY_NAME || 'Elvoria Technologies';
   const safeName = escapeHtml(String(name));
   const safeMessage = escapeHtml(String(message)).replace(/\n/g, '<br>');
 
@@ -68,7 +68,7 @@ export async function sendSupportLeadAutoReply(params: {
 
   const { fullName, email, company } = params;
   const contactEmail = getContactEmail();
-  const companyName = process.env.COMPANY_NAME || 'Elvoria Tech';
+  const companyName = process.env.COMPANY_NAME || 'Elvoria Technologies';
   const safeName = escapeHtml(fullName);
   const safeCompany = escapeHtml(company);
 

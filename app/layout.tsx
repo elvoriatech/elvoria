@@ -32,8 +32,8 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl()),
   title: {
-    default: "Elvoriatech - AI-First Digital & Software Development Partner",
-    template: "%s | Elvoriatech",
+    default: "Elvoria Technologies - AI-First Digital & Software Development Partner",
+    template: "%s | Elvoria Technologies",
   },
   description: "Premium software development for startups and enterprises. We build SaaS platforms, AI solutions, and cloud-native applications.",
   alternates: {
@@ -42,15 +42,15 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     url: "/",
-    siteName: "Elvoriatech",
-    title: "Elvoriatech - AI-First Digital & Software Development Partner",
+    siteName: "Elvoria Technologies",
+    title: "Elvoria Technologies - AI-First Digital & Software Development Partner",
     description:
       "Premium software development for startups and enterprises. We build SaaS platforms, AI solutions, and cloud-native applications.",
     images: [{ url: "/elvoria.png" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Elvoriatech - AI-First Digital & Software Development Partner",
+    title: "Elvoria Technologies - AI-First Digital & Software Development Partner",
     description:
       "Premium software development for startups and enterprises. We build SaaS platforms, AI solutions, and cloud-native applications.",
     images: ["/elvoria.png"],

@@ -54,12 +54,12 @@ describe('siteMailer', () => {
       process.env.EMAIL_SERVICE = 'gmail';
       process.env.EMAIL_USER = 'contact@elvoriatech.com';
       process.env.EMAIL_PASSWORD = 'apppassword16chars';
-      process.env.COMPANY_NAME = 'Elvoria Tech';
+      process.env.COMPANY_NAME = 'Elvoria Technologies';
 
       const kit = createSiteMailer();
       expect(kit.ok).toBe(true);
       if (kit.ok) {
-        expect(kit.from).toBe('Elvoria Tech <contact@elvoriatech.com>');
+        expect(kit.from).toBe('Elvoria Technologies <contact@elvoriatech.com>');
       }
       expect(isSiteMailConfigured()).toBe(true);
     });

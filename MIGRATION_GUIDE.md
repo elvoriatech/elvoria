@@ -1,4 +1,4 @@
-# Elvoriatech - Next.js Migration Guide
+# Elvoria Technologies - Next.js Migration Guide
 
 Your project has been successfully migrated from React + Vite + Express to **Next.js 16.2.4**.
 

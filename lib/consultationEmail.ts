@@ -45,7 +45,7 @@ export function renderEmailShell(params: { title: string; preheader: string; con
                       <div style="display:flex;align-items:center;gap:12px;">
                         <img src="cid:elvoria-mark" alt="" width="36" height="36" style="display:block;border-radius:10px;" />
                         <div>
-                          <div style="font-size:14px;font-weight:700;letter-spacing:0.3px;color:#ffffff;">Elvoriatech</div>
+                          <div style="font-size:14px;font-weight:700;letter-spacing:0.3px;color:#ffffff;">Elvoria Technologiesnologies</div>
                           <div style="font-size:12px;color:#94a3b8;">AI-First Digital &amp; Software Development Partner</div>
                         </div>
                       </div>
@@ -173,7 +173,7 @@ ${visitorAutoReplySignOff()}`;
     const visitor = await sendSiteHtmlEmail({
       to: email,
       replyTo: contactEmail,
-      subject: 'Consultation request received — Elvoria Tech',
+      subject: 'Consultation request received — Elvoria Technologies',
       html: buildVisitorAutoReplyHtml(bodyHtml, 'Thanks — we’ll confirm a time shortly.'),
       attachments: visitorAutoReplyAttachments(),
     });

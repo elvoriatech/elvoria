@@ -14,7 +14,7 @@ export const SEO_LANDING_PAGES: SeoLandingPage[] = [
     slug: 'nodejs-development',
     title: 'Node.js Development Services',
     description:
-      'Build fast, scalable Node.js backends and APIs. Elvoriatech delivers production-ready Node.js systems with clean architecture, performance, and security.',
+      'Build fast, scalable Node.js backends and APIs. Elvoria Technologies delivers production-ready Node.js systems with clean architecture, performance, and security.',
     h1: 'Node.js Development Services',
     intro:
       'We design and build Node.js systems that are reliable under real production load: APIs, SaaS backends, real-time services, and integrations.',

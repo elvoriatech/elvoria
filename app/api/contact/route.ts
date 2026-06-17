@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
     }
 
     const contactEmail = getContactEmail();
-    const companyName = process.env.COMPANY_NAME || 'Elvoriatech';
+    const companyName = process.env.COMPANY_NAME || 'Elvoria Technologies';
     const sendAutoReply = isVisitorAutoReplyEnabled();
 
     const attachmentPath = path.join(process.cwd(), 'public', 'elvoria.png');

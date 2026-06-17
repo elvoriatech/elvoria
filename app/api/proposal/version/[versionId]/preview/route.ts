@@ -26,7 +26,7 @@ export async function GET(req: NextRequest, ctx: RouteContext<'/api/proposal/ver
     return new Response('Not found', { status: 404, headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
   }
 
-  const company = process.env.COMPANY_NAME || 'Elvoriatech';
+  const company = process.env.COMPANY_NAME || 'Elvoria Technologies';
   const siteUrl = (process.env.SITE_URL || 'https://elvoriatech.com').replace(/\/$/, '');
   const htmlBody = marked.parse(markdown, { gfm: true }) as string;
 

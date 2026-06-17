@@ -30,7 +30,7 @@ export function AdminHeader() {
           >
             <Image
               src="/elvoria.png"
-              alt="Elvoria Tech"
+              alt="Elvoria Technologies"
               width={40}
               height={40}
               className="h-9 w-9 rounded-lg sm:h-10 sm:w-10"

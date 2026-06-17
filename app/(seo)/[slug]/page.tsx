@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       url: canonical,
       title: page.title,
       description: page.description,
-      siteName: 'Elvoriatech',
+      siteName: 'Elvoria Technologies',
       images: [{ url: '/elvoria.png' }],
     },
     twitter: {
@@ -60,7 +60,7 @@ export default async function SeoLandingPage({ params }: Props) {
           </div>
           <div className="relative">
             <p className="inline-flex items-center rounded-full border border-border bg-background/70 px-3 py-1 text-xs font-semibold text-muted-foreground backdrop-blur dark:border-white/10 dark:bg-black/20">
-              SEO landing page · Elvoriatech
+              SEO landing page · Elvoria Technologies
             </p>
             <h1 className="mt-4 text-3xl font-extrabold tracking-tight sm:text-4xl md:text-5xl">
               <span className="bg-linear-to-r from-(--brand-accent) to-(--brand-primary) bg-clip-text text-transparent">
@@ -82,7 +82,7 @@ export default async function SeoLandingPage({ params }: Props) {
                 href={`${site}/about`}
                 className="rounded-xl border border-border bg-background px-5 py-3 text-sm font-semibold text-foreground hover:bg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-ring/35 dark:border-white/10 dark:bg-black/20 dark:hover:bg-white/5"
               >
-                About Elvoriatech
+                About Elvoria Technologies
               </a>
             </div>
           </div>

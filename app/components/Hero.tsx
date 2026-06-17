@@ -169,7 +169,7 @@ export function Hero() {
 
         <h1 className="mb-5 flex flex-col items-center font-bold tracking-tight sm:mb-6">
           <div className="flex max-w-full flex-col items-center gap-3 sm:gap-4">
-            <span className="sr-only">Elvoriatech</span>
+            <span className="sr-only">Elvoria Technologies</span>
             <Image
               src="/elvoria.png"
               alt=""

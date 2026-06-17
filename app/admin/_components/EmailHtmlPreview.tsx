@@ -12,7 +12,7 @@ export function EmailHtmlPreview({
   subject,
   bodyHtml,
   toLabel,
-  fromLabel = 'Elvoria Tech <contact@elvoriatech.com>',
+  fromLabel = 'Elvoria Technologies <contact@elvoriatech.com>',
   note,
   className = '',
   matchedHeight,

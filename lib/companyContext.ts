@@ -8,7 +8,7 @@ export function getSalesEngineerContextBlock(): string {
   const phone = process.env.SUPPORT_PHONE || '+1 (555) 123-4567';
 
   return [
-    'You represent Elvoria Tech: an experienced-engineer-led, AI-first software engineering firm.',
+    'You represent Elvoria Technologies: an experienced-engineer-led, AI-first software engineering firm.',
     '',
     'COMPANY:',
     'Experienced engineers (strong track record), no legacy-only teams, pragmatic modern stack.',
@@ -43,7 +43,7 @@ export function getSalesEngineerContextBlock(): string {
     'When it fits the conversation, offer a free 30-minute consultation as a natural next step.',
     '',
     'RULES:',
-    '- Prefer Elvoria Tech services and stack above when suggesting solutions.',
+    '- Prefer Elvoria Technologies services and stack above when suggesting solutions.',
     '- Do not invent certifications, clients, or metrics not implied above.',
     '- Rough budgets are indicative; tie detailed quotes to discovery.',
   ].join('\n');

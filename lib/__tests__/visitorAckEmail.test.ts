@@ -12,7 +12,7 @@ describe('visitorAckEmail', () => {
   const env = process.env;
 
   beforeEach(() => {
-    process.env = { ...env, SEND_AUTOREPLY: 'true', COMPANY_NAME: 'Elvoria Tech' };
+    process.env = { ...env, SEND_AUTOREPLY: 'true', COMPANY_NAME: 'Elvoria Technologies' };
     sendSiteHtmlEmailMock.mockReset();
     sendSiteHtmlEmailMock.mockResolvedValue({ sent: true });
   });
@@ -55,7 +55,7 @@ describe('visitorAckEmail', () => {
       expect(sendSiteHtmlEmailMock).toHaveBeenCalledTimes(1);
       const call = sendSiteHtmlEmailMock.mock.calls[0][0];
       expect(call.to).toBe('jane@example.com');
-      expect(call.subject).toContain('Elvoria Tech');
+      expect(call.subject).toContain('Elvoria Technologies');
       expect(call.html).toContain('Visit elvoriatech.com');
       expect(call.html).toContain('Jane Doe');
       expect(call.html).toContain('Need a SaaS MVP');

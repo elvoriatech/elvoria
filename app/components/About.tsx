@@ -2,7 +2,7 @@ import { Award, Check, Map, MapPin, Target, Users } from 'lucide-react';
 import Image from 'next/image';
 
 const COMPANY_BRANCH = {
-  name: 'Elvoria Tech',
+  name: 'Elvoria Technologies',
   office: 'Koblenz, Germany',
   tagline: 'Engineering-led · AI-first · Cloud-native',
 } as const;
@@ -21,7 +21,7 @@ export function About() {
             </h2>
             <div className="space-y-4 text-base leading-relaxed text-muted-foreground sm:text-lg">
               <p>
-                Elvoria Tech is an engineering-led software development team focused on building AI-first,
+                Elvoria Technologies is an engineering-led software development team focused on building AI-first,
                 cloud-native applications for startups and growing businesses.
               </p>
               <p>

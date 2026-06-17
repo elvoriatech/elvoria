@@ -18,13 +18,13 @@ export function Footer() {
             <div className="mb-4 flex items-center gap-3">
               <Image
                 src="/elvoria.png"
-                alt="Elvoria Tech"
+                alt="Elvoria Technologies"
                 width={48}
                 height={48}
                 className="h-10 w-10 sm:h-12 sm:w-12"
               />
               <h3 className="bg-linear-to-r from-[#06B6D4] to-[#8B5CF6] bg-clip-text text-xl font-bold text-transparent sm:text-2xl">
-                Elvoria Tech
+                Elvoria Technologies
               </h3>
             </div>
             <p className="text-muted-foreground dark:text-slate-400 mb-6 max-w-md leading-relaxed">
@@ -125,7 +125,7 @@ export function Footer() {
         </div>
 
         <div className="pt-8 border-t border-border/60 dark:border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4 pb-10">
-          <div className="text-muted-foreground dark:text-slate-400 text-sm">© 2026 Elvoria Tech. All rights reserved.</div>
+          <div className="text-muted-foreground dark:text-slate-400 text-sm">© 2026 Elvoria Technologies. All rights reserved.</div>
           <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground dark:text-slate-400">
             <a href="#" className="hover:text-[#06B6D4] transition-colors">
               Privacy Policy
