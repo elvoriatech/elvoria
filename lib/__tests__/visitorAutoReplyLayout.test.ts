@@ -5,10 +5,9 @@ import {
 } from '@/lib/visitorAutoReplyLayout';
 
 describe('visitorAutoReplyLayout', () => {
-  it('uses marketing shell with hosted logo url', () => {
+  it('uses marketing shell with logo cid', () => {
     const html = buildVisitorAutoReplyHtml('<p>Thanks for your inquiry.</p>', 'We received your message');
-    expect(html).toContain('/elvoria.png');
-    expect(html).not.toContain('cid:elvoria-logo');
+    expect(html).toContain('cid:elvoria-logo');
     expect(html).toContain('Visit elvoriatech.com');
     expect(html).toContain('Thanks for your inquiry');
   });

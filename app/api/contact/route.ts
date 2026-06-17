@@ -1,6 +1,7 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import { NextRequest, NextResponse } from 'next/server';
 import { escapeHtmlEmail as escapeHtml, renderElvoriaEmailShell } from '@/lib/emailShell';
-import { marketingLogoUrl } from '@/lib/emailMarketing/emailLayout';
 import { getContactEmail, isSiteMailConfigured, sendSiteHtmlEmail } from '@/lib/siteMailer';
 import { isVisitorAutoReplyEnabled, sendContactFormAutoReply } from '@/lib/visitorAckEmail';
 
@@ -44,6 +45,11 @@ export async function POST(request: NextRequest) {
     const companyName = process.env.COMPANY_NAME || 'Elvoria Technologies';
     const sendAutoReply = isVisitorAutoReplyEnabled();
 
+    const attachmentPath = path.join(process.cwd(), 'public', 'elvoria.png');
+    const attachments = fs.existsSync(attachmentPath)
+      ? [{ filename: 'elvoria.png', path: attachmentPath, cid: 'elvoria-mark' }]
+      : [];
+
     // Email to company
     const safeName = escapeHtml(String(name));
     const safeEmail = escapeHtml(String(email));
@@ -61,7 +67,7 @@ export async function POST(request: NextRequest) {
         title: 'New Contact Form Submission',
         preheader: `New contact form submission from ${name}.`,
         showTimestamp: true,
-        logoImgSrc: marketingLogoUrl(),
+        logoImgSrc: 'cid:elvoria-mark',
         footerNoteHtml:
           'You’re receiving this email because a message was submitted via your website contact form.',
         contentHtml: `
@@ -127,6 +133,7 @@ export async function POST(request: NextRequest) {
           </div>
         `,
       }),
+      attachments,
     });
     if (!staffMail.sent) {
       const err = toPublicEmailError(new Error(staffMail.detail || 'Send failed'));

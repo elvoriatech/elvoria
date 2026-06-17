@@ -1,9 +1,10 @@
 import { formatMailSendError, getCampaignSentCopyBcc, sendSiteHtmlEmail } from '@/lib/siteMailer';
 import { SEND_CHUNK_DELAY_MS, SEND_RECIPIENTS_CHUNK } from '@/lib/emailMarketing/constants';
+import { buildFullMarketingEmailHtml } from '@/lib/emailMarketing/emailLayout';
 import {
-  buildFullMarketingEmailHtml,
-  marketingLogoUrl,
-} from '@/lib/emailMarketing/emailLayout';
+  getMarketingEmailLogoAttachment,
+  marketingLogoCidSrc,
+} from '@/lib/emailMarketing/emailLogoAttachment';
 import { applyTemplateVars, recipientToVars } from '@/lib/emailMarketing/templateVars';
 import {
   appendSendLog,
@@ -45,15 +46,17 @@ export async function sendBatchToRecipients(params: {
     const subject = applyTemplateVars(params.template.subject, vars);
     const bodyHtml = applyTemplateVars(params.template.bodyHtml, vars);
     const html = buildFullMarketingEmailHtml(bodyHtml, {
-      logoSrc: marketingLogoUrl(),
+      logoSrc: marketingLogoCidSrc(),
       preheader: subject,
     });
+    const attachments = getMarketingEmailLogoAttachment();
 
     const result = await sendSiteHtmlEmail({
       to: r.email,
       subject,
       html,
       bcc: sentCopyBcc,
+      attachments: attachments.length ? attachments : undefined,
     });
 
     if (result.sent) {
