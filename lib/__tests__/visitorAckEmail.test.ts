@@ -56,7 +56,7 @@ describe('visitorAckEmail', () => {
       const call = sendSiteHtmlEmailMock.mock.calls[0][0];
       expect(call.to).toBe('jane@example.com');
       expect(call.subject).toContain('Elvoria Technologies');
-      expect(call.html).toContain('Visit elvoriatech.com');
+      expect(call.html).toContain('Visit elvoria.tech');
       expect(call.html).toContain('Jane Doe');
       expect(call.html).toContain('Need a SaaS MVP');
       expect(call.attachments?.length).toBeGreaterThanOrEqual(0);

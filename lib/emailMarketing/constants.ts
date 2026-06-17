@@ -1,8 +1,8 @@
 /** Official site — only marketing URL used in templates and the rich-text link action. */
-export const ELVORIA_WEBSITE_URL = 'https://elvoriatech.com/';
+export const ELVORIA_WEBSITE_URL = 'https://elvoria.tech/';
 
 /** Colored logo for gradient email header (admin preview). */
-export const ELVORIA_LOGO_PREVIEW_URL = 'https://elvoriatech.com/elvoria.png';
+export const ELVORIA_LOGO_PREVIEW_URL = 'https://elvoria.tech/elvoria.png';
 
 /** Admin UI: companies per page. */
 export const RECIPIENTS_PAGE_SIZE = 500;

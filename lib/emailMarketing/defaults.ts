@@ -56,7 +56,7 @@ const INITIAL_BODY = `<p>Hi [First Name],</p>
 
 <p>Best regards,<br />
 ${elvoriaBrandLink('Elvoria Technologies Team')}<br />
-<a href="${ELVORIA_WEBSITE_URL}">elvoriatech.com</a></p>`;
+<a href="${ELVORIA_WEBSITE_URL}">elvoria.tech</a></p>`;
 
 const FOLLOW_UP_1_BODY = `<p>Hi [First Name],</p>
 
@@ -68,7 +68,7 @@ const FOLLOW_UP_1_BODY = `<p>Hi [First Name],</p>
 
 <p>Best regards,<br />
 ${elvoriaBrandLink('Elvoria Technologies Team')}<br />
-<a href="${ELVORIA_WEBSITE_URL}">elvoriatech.com</a></p>`;
+<a href="${ELVORIA_WEBSITE_URL}">elvoria.tech</a></p>`;
 
 const FOLLOW_UP_2_BODY = `<p>Hi [First Name],</p>
 
@@ -80,7 +80,7 @@ const FOLLOW_UP_2_BODY = `<p>Hi [First Name],</p>
 
 <p>Best regards,<br />
 ${elvoriaBrandLink('Elvoria Technologies Team')}<br />
-<a href="${ELVORIA_WEBSITE_URL}">elvoriatech.com</a></p>`;
+<a href="${ELVORIA_WEBSITE_URL}">elvoria.tech</a></p>`;
 
 function applySiteLinks(html: string): string {
   const site = ELVORIA_WEBSITE_URL.replace(/\/$/, '');
@@ -90,7 +90,7 @@ function applySiteLinks(html: string): string {
   }
   return html.replace(
     new RegExp(site.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\/?', 'g'),
-    `<a href="${ELVORIA_WEBSITE_URL}">elvoriatech.com</a>`
+    `<a href="${ELVORIA_WEBSITE_URL}">elvoria.tech</a>`
   );
 }
 

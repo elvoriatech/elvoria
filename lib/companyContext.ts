@@ -3,7 +3,7 @@
  * Update here or via env overrides where noted.
  */
 export function getSalesEngineerContextBlock(): string {
-  const site = process.env.SITE_URL || 'https://elvoriatech.com';
+  const site = process.env.SITE_URL || 'https://elvoria.tech';
   const email = process.env.CONTACT_EMAIL || 'contact@elvoria.tech';
   const phone = process.env.SUPPORT_PHONE || '+1 (555) 123-4567';
 

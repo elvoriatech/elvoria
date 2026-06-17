@@ -10,7 +10,7 @@ type CatalogModel = {
 function openRouterClient() {
   const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) throw new Error('Missing environment variable: OPENROUTER_API_KEY');
-  const referer = process.env.OPENROUTER_HTTP_REFERER || process.env.SITE_URL || 'https://elvoriatech.com';
+  const referer = process.env.OPENROUTER_HTTP_REFERER || process.env.SITE_URL || 'https://elvoria.tech';
   const title = process.env.OPENROUTER_TITLE || process.env.COMPANY_NAME || 'Elvoria Technologies';
   return new OpenRouter({
     apiKey,

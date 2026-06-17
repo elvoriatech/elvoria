@@ -8,7 +8,7 @@ import { SEO_LANDING_PAGES, SEO_LANDING_PAGES_BY_SLUG } from '@/lib/seoLandingPa
 type Props = { params: Promise<{ slug: string }> };
 
 function siteUrl(): string {
-  const raw = (process.env.SITE_URL || 'https://elvoriatech.com').trim();
+  const raw = (process.env.SITE_URL || 'https://elvoria.tech').trim();
   return raw.replace(/\/$/, '');
 }
 

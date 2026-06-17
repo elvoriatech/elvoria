@@ -31,7 +31,7 @@ describe('emailMarketing emailLayout', () => {
         logoSrc: 'cid:elvoria-logo',
         preheader: 'Test preheader',
       });
-      expect(html).toContain('Visit elvoriatech.com');
+      expect(html).toContain('Visit elvoria.tech');
       expect(html).toContain('AI-First Digital');
       expect(html).toContain('cid:elvoria-logo');
       expect(html).toContain('GDPR-aware engineering');

@@ -126,7 +126,7 @@ export async function POST(request: NextRequest) {
         '',
         'Branding:',
         `Company: ${process.env.COMPANY_NAME || 'Elvoria Technologies'}`,
-        `Site: ${process.env.SITE_URL || 'https://elvoriatech.com'}`,
+        `Site: ${process.env.SITE_URL || 'https://elvoria.tech'}`,
       ].join('\n'),
     };
 
@@ -160,7 +160,7 @@ export async function POST(request: NextRequest) {
         outPath: tmpPath,
         branding: {
           companyName: process.env.COMPANY_NAME || 'Elvoria Technologies',
-          siteUrl: process.env.SITE_URL || 'https://elvoriatech.com',
+          siteUrl: process.env.SITE_URL || 'https://elvoria.tech',
           primary: '#22d3ee',
           secondary: '#6366f1',
         },
@@ -182,7 +182,7 @@ export async function POST(request: NextRequest) {
 
     let followUpEmailSent = false;
     if (pdfStatus !== 'ready' && visitorEmail && VISITOR_EMAIL_RE.test(visitorEmail)) {
-      const siteUrl = process.env.SITE_URL || 'https://elvoriatech.com';
+      const siteUrl = process.env.SITE_URL || 'https://elvoria.tech';
       const mail = await sendProposalPdfNotReadyVisitorEmail({
         to: visitorEmail,
         visitorName: visitorName || 'there',

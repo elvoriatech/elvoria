@@ -39,7 +39,7 @@ export function EmailRichEditor({
     document.execCommand(
       'insertHTML',
       false,
-      `<a href="${ELVORIA_WEBSITE_URL}">elvoriatech.com</a>`
+      `<a href="${ELVORIA_WEBSITE_URL}">elvoria.tech</a>`
     );
     syncHtml();
   }

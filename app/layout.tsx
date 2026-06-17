@@ -22,7 +22,7 @@ const plexSans = IBM_Plex_Sans({
 });
 
 function siteUrl(): string {
-  const raw = (process.env.SITE_URL || "https://elvoriatech.com").trim();
+  const raw = (process.env.SITE_URL || "https://elvoria.tech").trim();
   return raw.replace(/\/$/, "");
 }
 

@@ -2,7 +2,7 @@ import type { MetadataRoute } from 'next';
 import { SEO_LANDING_PAGES } from '@/lib/seoLandingPages';
 
 function siteUrl(): string {
-  const raw = (process.env.SITE_URL || 'https://elvoriatech.com').trim();
+  const raw = (process.env.SITE_URL || 'https://elvoria.tech').trim();
   return raw.replace(/\/$/, '');
 }
 

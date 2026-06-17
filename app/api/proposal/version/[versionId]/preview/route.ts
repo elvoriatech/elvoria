@@ -27,7 +27,7 @@ export async function GET(req: NextRequest, ctx: RouteContext<'/api/proposal/ver
   }
 
   const company = process.env.COMPANY_NAME || 'Elvoria Technologies';
-  const siteUrl = (process.env.SITE_URL || 'https://elvoriatech.com').replace(/\/$/, '');
+  const siteUrl = (process.env.SITE_URL || 'https://elvoria.tech').replace(/\/$/, '');
   const htmlBody = marked.parse(markdown, { gfm: true }) as string;
 
   const html = `<!doctype html>
