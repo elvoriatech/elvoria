@@ -1,5 +1,9 @@
-import { ELVORIA_WEBSITE_URL } from '@/lib/emailMarketing/constants';
 import { marketingCompanyName } from '@/lib/emailMarketing/companyName';
+import {
+  elvoriaConsultationScheduleUrl,
+  elvoriaWebsiteHostname,
+  elvoriaWebsiteUrl,
+} from '@/lib/emailMarketing/siteUrl';
 
 export function escapeHtml(input: string): string {
   return input
@@ -11,7 +15,7 @@ export function escapeHtml(input: string): string {
 }
 
 export function marketingSiteBaseUrl(): string {
-  return (process.env.SITE_URL || 'https://elvoria.tech').replace(/\/$/, '');
+  return elvoriaWebsiteUrl().replace(/\/$/, '');
 }
 
 /** Hosted colored logo for the gradient header — used in both the admin preview and sent emails. */
@@ -43,7 +47,9 @@ export function wrapMarketingEmailHtml(
   const company = marketingCompanyName();
   const contact =
     process.env.CONTACT_EMAIL || 'contact@elvoria.tech';
-  const site = ELVORIA_WEBSITE_URL;
+  const site = elvoriaWebsiteUrl();
+  const scheduleUrl = elvoriaConsultationScheduleUrl();
+  const siteHost = elvoriaWebsiteHostname();
   const preheader = escapeHtml(
     opts.preheader || `Software development partnership — ${company}`
   );
@@ -97,7 +103,7 @@ export function wrapMarketingEmailHtml(
                     <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="border-collapse:collapse;">
                       <tr>
                         <td align="center" bgcolor="${GRADIENT_CYAN}" style="${CTA_BG_STYLE}border-radius:10px;mso-padding-alt:0;">
-                          <a href="${site}" target="_blank" rel="noopener noreferrer" style="display:inline-block;padding:13px 26px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;font-size:14px;font-weight:600;line-height:1.2;color:#ffffff;text-decoration:none;border:none;border-radius:10px;mso-line-height-rule:exactly;">Visit elvoria.tech</a>
+                          <a href="${scheduleUrl}" target="_blank" rel="noopener noreferrer" style="display:inline-block;padding:13px 26px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;font-size:14px;font-weight:600;line-height:1.2;color:#ffffff;text-decoration:none;border:none;border-radius:10px;mso-line-height-rule:exactly;">Schedule a free consultation</a>
                         </td>
                       </tr>
                     </table>
@@ -114,7 +120,7 @@ export function wrapMarketingEmailHtml(
                 <span style="margin-top:10px;display:inline-block;">
                   <a href="mailto:${encodeURIComponent(contact)}" style="color:#67e8f9;text-decoration:none;">${escapeHtml(contact)}</a>
                   &nbsp;·&nbsp;
-                  <a href="${site}" style="color:#67e8f9;text-decoration:none;">elvoria.tech</a>
+                  <a href="${site}" style="color:#67e8f9;text-decoration:none;">${escapeHtml(siteHost)}</a>
                 </span><br />
                 <span style="color:#64748b;margin-top:10px;display:inline-block;">GDPR-aware engineering · EU delivery</span><br />
                 <span style="color:#475569;margin-top:8px;display:inline-block;">© ${year} <a href="${site}" style="color:#67e8f9;text-decoration:none;">${escapeHtml(company)}</a>. All rights reserved.</span>

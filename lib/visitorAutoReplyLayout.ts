@@ -3,8 +3,9 @@ import {
   getMarketingEmailLogoAttachment,
   marketingLogoCidSrc,
 } from '@/lib/emailMarketing/emailLogoAttachment';
-import { ELVORIA_WEBSITE_URL } from '@/lib/emailMarketing/constants';
+import { marketingCompanyTeamLabel } from '@/lib/emailMarketing/companyName';
 import { elvoriaBrandLink } from '@/lib/emailMarketing/defaults';
+import { elvoriaWebsiteHostname, elvoriaWebsiteUrl } from '@/lib/emailMarketing/siteUrl';
 
 const BODY_LINK = 'color:#0891b2;font-weight:600;text-decoration:underline;';
 
@@ -21,9 +22,10 @@ export function visitorAutoReplyAttachments() {
 }
 
 export function visitorAutoReplySignOff(): string {
+  const host = elvoriaWebsiteHostname();
   return `<p>Best regards,<br />
-${elvoriaBrandLink('Elvoria Technologies Team')}<br />
-<a href="${ELVORIA_WEBSITE_URL}" style="${BODY_LINK}">elvoria.tech</a></p>`;
+${elvoriaBrandLink(marketingCompanyTeamLabel())}<br />
+<a href="${elvoriaWebsiteUrl()}" style="${BODY_LINK}">${host}</a></p>`;
 }
 
 export function visitorAutoReplyMailtoLink(email: string, label?: string): string {

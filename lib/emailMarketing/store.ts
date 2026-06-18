@@ -1,16 +1,18 @@
 import { getPool, isDbConfigured } from '@/lib/db';
 import { isPostgrestMissingTableError } from '@/lib/crmSchemaError';
 import {
-  CALL_INVITE_LINE_HTML,
+  buildCallInviteLineHtml,
   elvoriaBrandLink,
   getDefaultTemplates,
   LEGACY_CALL_INVITE_LINE,
 } from '@/lib/emailMarketing/defaults';
 import {
-  LEGACY_MARKETING_BRAND_NAMES,
+  isBrandTextCorrupted,
   marketingCompanyName,
   marketingCompanyTeamLabel,
+  repairCorruptedBrandText,
 } from '@/lib/emailMarketing/companyName';
+import { elvoriaConsultationScheduleUrl, elvoriaWebsiteHostname } from '@/lib/emailMarketing/siteUrl';
 import {
   RECIPIENT_IDS_CHUNK,
   RECIPIENTS_PAGE_SIZE,
@@ -118,16 +120,19 @@ const LEGACY_TEMPLATE_SUBJECTS: Partial<Record<EmailTemplateType, string[]>> = {
     'Partnership opportunity for [Company Name] — Elvoria Technologies',
     'Quick intro for [Company Name] — Elvoria Tech',
     'Quick intro for [Company Name] — Elvoriatech',
+    'Quick intro for [Company Name] — Elvoria Technologies',
   ],
   follow_up_1: [
     'Following up — Elvoria Technologies',
     'Following up with [Company Name] — Elvoria Tech',
     'Following up with [Company Name] — Elvoriatech',
+    'Following up with [Company Name] — Elvoria Technologies',
   ],
   follow_up_2: [
     'Final follow-up — Elvoria Technologies',
     'Last follow-up for [Company Name] — Elvoria Tech',
     'Last follow-up for [Company Name] — Elvoriatech',
+    'Last follow-up for [Company Name] — Elvoria Technologies',
   ],
 };
 
@@ -146,11 +151,10 @@ async function syncLegacyInitialBodyFormat(pool: ReturnType<typeof getPool>): Pr
   );
 }
 
-/** Replace outdated "Elvoria Tech" / "Elvoriatech" branding in saved templates. */
-async function syncOutdatedBrandInTemplates(pool: ReturnType<typeof getPool>): Promise<void> {
-  const company = marketingCompanyName();
-  const team = marketingCompanyTeamLabel();
+/** Repair corrupted brand strings and reset heavily damaged templates. */
+async function syncCorruptedMarketingTemplates(pool: ReturnType<typeof getPool>): Promise<void> {
   const defaults = getDefaultTemplates();
+  const siteHost = elvoriaWebsiteHostname();
   const now = new Date().toISOString();
   const { rows } = await pool.query<{
     template_type: EmailTemplateType;
@@ -159,41 +163,20 @@ async function syncOutdatedBrandInTemplates(pool: ReturnType<typeof getPool>): P
   }>('SELECT template_type, subject, body_html FROM em_templates');
 
   for (const row of rows) {
-    let subject = row.subject;
-    let body = row.body_html;
-    let changed = false;
+    const heavilyCorrupted =
+      isBrandTextCorrupted(row.subject) || isBrandTextCorrupted(row.body_html);
 
-    for (const legacy of LEGACY_MARKETING_BRAND_NAMES) {
-      if (subject.includes(legacy)) {
-        subject = defaults[row.template_type].subject;
-        changed = true;
-        break;
-      }
-    }
+    let subject = heavilyCorrupted
+      ? defaults[row.template_type].subject
+      : repairCorruptedBrandText(row.subject);
+    let body = heavilyCorrupted
+      ? defaults[row.template_type].bodyHtml
+      : repairCorruptedBrandText(row.body_html);
 
-    if (!changed && /\bElvoria Tech(?!nologies\b)/i.test(subject)) {
-      subject = subject.replace(/\bElvoria Tech(?!nologies\b)/gi, company);
-      changed = true;
-    }
+    body = body.replace(/elvoria\.tech/gi, siteHost);
+    body = body.replace(/https:\/\/elvoria\.tech\/?/gi, `https://${siteHost}/`);
 
-    for (const legacy of LEGACY_MARKETING_BRAND_NAMES) {
-      if (body.includes(legacy)) {
-        body = body.split(legacy).join(legacy.includes('Team') ? team : company);
-        changed = true;
-      }
-    }
-
-    const plainTeam = `<strong>${team}</strong>`;
-    if (body.includes('<strong>Elvoria Tech Team</strong>') && !body.includes(plainTeam)) {
-      body = body.replace(/<strong>Elvoria Tech Team<\/strong>/g, plainTeam);
-      changed = true;
-    }
-    if (body.includes('<strong>Elvoria Tech</strong>') && !body.includes(`<strong>${company}</strong>`)) {
-      body = body.replace(/<strong>Elvoria Tech<\/strong>/g, `<strong>${company}</strong>`);
-      changed = true;
-    }
-
-    if (!changed) continue;
+    if (subject === row.subject && body === row.body_html) continue;
 
     await pool.query(
       'UPDATE em_templates SET subject = $1, body_html = $2, updated_at = $3 WHERE template_type = $4',
@@ -245,20 +228,51 @@ async function syncTemplateContentPatches(pool: ReturnType<typeof getPool>): Pro
   }
 }
 
+async function syncConsultationLinksInTemplates(pool: ReturnType<typeof getPool>): Promise<void> {
+  const scheduleUrl = elvoriaConsultationScheduleUrl();
+  const callInviteHtml = buildCallInviteLineHtml();
+  const { rows } = await pool.query<{ template_type: EmailTemplateType; body_html: string }>(
+    'SELECT template_type, body_html FROM em_templates'
+  );
+  const now = new Date().toISOString();
+
+  for (const row of rows) {
+    if (!row.body_html.includes('minute call')) continue;
+    if (row.body_html.includes(scheduleUrl) && row.body_html.includes(callInviteHtml)) continue;
+
+    let body = row.body_html;
+    body = body.replace(
+      /<a [^>]*href="[^"]*"[^>]*>quick 10–15 minute call this week<\/a>/gi,
+      `<a href="${scheduleUrl}">quick 10–15 minute call this week</a>`
+    );
+    body = body.replace(
+      /<a [^>]*href="[^"]*"[^>]*>quick 10-15 minute call this week<\/a>/gi,
+      `<a href="${scheduleUrl}">quick 10-15 minute call this week</a>`
+    );
+
+    if (body === row.body_html) continue;
+    await pool.query(
+      'UPDATE em_templates SET body_html = $1, updated_at = $2 WHERE template_type = $3',
+      [body.slice(0, 100_000), now, row.template_type]
+    );
+  }
+}
+
 async function syncLegacyCallInviteLink(pool: ReturnType<typeof getPool>): Promise<void> {
+  const callInviteHtml = buildCallInviteLineHtml();
   const { rows } = await pool.query<{ body_html: string }>(
     "SELECT body_html FROM em_templates WHERE template_type = 'initial' LIMIT 1"
   );
   if (!rows.length) return;
   let body = rows[0].body_html;
-  if (body.includes(CALL_INVITE_LINE_HTML) || !body.includes('minute call')) return;
+  if (body.includes(callInviteHtml) || !body.includes('minute call')) return;
 
-  const linkedParagraph = `<p>${CALL_INVITE_LINE_HTML}</p>`;
+  const linkedParagraph = `<p>${callInviteHtml}</p>`;
   const replacements: Array<[string, string]> = [
     [`<p>${LEGACY_CALL_INVITE_LINE}</p>`, linkedParagraph],
     [`<p>${LEGACY_CALL_INVITE_LINE.replace('–', '-')}</p>`, linkedParagraph],
-    [LEGACY_CALL_INVITE_LINE, CALL_INVITE_LINE_HTML],
-    [LEGACY_CALL_INVITE_LINE.replace('–', '-'), CALL_INVITE_LINE_HTML],
+    [LEGACY_CALL_INVITE_LINE, callInviteHtml],
+    [LEGACY_CALL_INVITE_LINE.replace('–', '-'), callInviteHtml],
   ];
   for (const [from, to] of replacements) {
     if (body.includes(from)) { body = body.split(from).join(to); break; }
@@ -301,9 +315,10 @@ export async function ensureDefaultTemplates(): Promise<void> {
   }
 
   await syncLegacyTemplateSubjects(pool);
-  await syncOutdatedBrandInTemplates(pool);
+  await syncCorruptedMarketingTemplates(pool);
   await syncLegacyInitialBodyFormat(pool);
   await syncLegacyCallInviteLink(pool);
+  await syncConsultationLinksInTemplates(pool);
   await syncTemplateContentPatches(pool);
 }
 

@@ -8,14 +8,15 @@ describe('visitorAutoReplyLayout', () => {
   it('uses marketing shell with logo cid', () => {
     const html = buildVisitorAutoReplyHtml('<p>Thanks for your inquiry.</p>', 'We received your message');
     expect(html).toContain('cid:elvoria-logo');
-    expect(html).toContain('Visit elvoria.tech');
+    expect(html).toContain('Schedule a free consultation');
+    expect(html).toContain('elvoriatech.com');
     expect(html).toContain('Thanks for your inquiry');
   });
 
   it('renders sign-off with brand link', () => {
     const signOff = visitorAutoReplySignOff();
-    expect(signOff).toContain('Elvoria Technologies Team');
-    expect(signOff).toContain('elvoria.tech');
+    expect(signOff).toContain('Elvoria Tech Team');
+    expect(signOff).toContain('elvoriatech.com');
   });
 
   it('renders info box with light card styles', () => {

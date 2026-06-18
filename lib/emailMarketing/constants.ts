@@ -1,8 +1,21 @@
-/** Official site — only marketing URL used in templates and the rich-text link action. */
-export const ELVORIA_WEBSITE_URL = 'https://elvoria.tech/';
+import {
+  elvoriaConsultationScheduleUrl,
+  elvoriaWebsiteHostname,
+  elvoriaWebsiteUrl,
+} from '@/lib/emailMarketing/siteUrl';
+
+/** @deprecated Use elvoriaWebsiteUrl() — kept for older imports. */
+export const ELVORIA_WEBSITE_URL = elvoriaWebsiteUrl();
 
 /** Colored logo for gradient email header (admin preview). */
-export const ELVORIA_LOGO_PREVIEW_URL = 'https://elvoria.tech/elvoria.png';
+export function elvoriaLogoPreviewUrl(): string {
+  return `${elvoriaWebsiteUrl().replace(/\/$/, '')}/elvoria.png`;
+}
+
+/** @deprecated Use elvoriaLogoPreviewUrl() */
+export const ELVORIA_LOGO_PREVIEW_URL = elvoriaLogoPreviewUrl();
+
+export { elvoriaConsultationScheduleUrl, elvoriaWebsiteHostname, elvoriaWebsiteUrl };
 
 /** Admin UI: companies per page. */
 export const RECIPIENTS_PAGE_SIZE = 500;

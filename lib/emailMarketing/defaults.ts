@@ -1,25 +1,38 @@
-import { ELVORIA_WEBSITE_URL } from '@/lib/emailMarketing/constants';
 import {
   marketingCompanyName,
   marketingCompanyTeamLabel,
 } from '@/lib/emailMarketing/companyName';
+import {
+  elvoriaConsultationScheduleUrl,
+  elvoriaWebsiteBase,
+  elvoriaWebsiteHostname,
+  elvoriaWebsiteUrl,
+} from '@/lib/emailMarketing/siteUrl';
 import type { EmailTemplateType } from '@/lib/emailMarketing/types';
 
 /** Plain-text line stored before the website link was added. */
 export const LEGACY_CALL_INVITE_LINE =
   'Would you be open to a quick 10–15 minute call this week?';
 
-export const CALL_INVITE_LINE_HTML = `Would you be open to a <a href="${ELVORIA_WEBSITE_URL}">quick 10–15 minute call this week</a>?`;
+export function buildCallInviteLineHtml(): string {
+  const scheduleUrl = elvoriaConsultationScheduleUrl();
+  return `Would you be open to a <a href="${scheduleUrl}">quick 10–15 minute call this week</a>?`;
+}
 
 const LINK_STYLE = 'color:#0891b2;font-weight:600;text-decoration:underline;';
 
 /** Linked brand name for template body copy. */
 export function elvoriaBrandLink(label = marketingCompanyName()): string {
-  return `<a href="${ELVORIA_WEBSITE_URL}" style="${LINK_STYLE}"><strong>${label}</strong></a>`;
+  return `<a href="${elvoriaWebsiteUrl()}" style="${LINK_STYLE}"><strong>${label}</strong></a>`;
 }
 
 const H3 =
   'margin:22px 0 10px 0;font-size:15px;font-weight:700;color:#0f172a;line-height:1.35;';
+
+function siteLinkHtml(): string {
+  const host = elvoriaWebsiteHostname();
+  return `<a href="${elvoriaWebsiteUrl()}">${host}</a>`;
+}
 
 function buildInitialBody(): string {
   const team = marketingCompanyTeamLabel();
@@ -56,13 +69,13 @@ function buildInitialBody(): string {
 <li>Explore how we can support your roadmap</li>
 </ul>
 
-<p>${CALL_INVITE_LINE_HTML}</p>
+<p>${buildCallInviteLineHtml()}</p>
 
 <p>Looking forward to your thoughts.</p>
 
 <p>Best regards,<br />
 ${elvoriaBrandLink(team)}<br />
-<a href="${ELVORIA_WEBSITE_URL}">elvoria.tech</a></p>`;
+${siteLinkHtml()}</p>`;
 }
 
 function buildFollowUp1Body(): string {
@@ -77,7 +90,7 @@ function buildFollowUp1Body(): string {
 
 <p>Best regards,<br />
 ${elvoriaBrandLink(team)}<br />
-<a href="${ELVORIA_WEBSITE_URL}">elvoria.tech</a></p>`;
+${siteLinkHtml()}</p>`;
 }
 
 function buildFollowUp2Body(): string {
@@ -92,18 +105,19 @@ function buildFollowUp2Body(): string {
 
 <p>Best regards,<br />
 ${elvoriaBrandLink(team)}<br />
-<a href="${ELVORIA_WEBSITE_URL}">elvoria.tech</a></p>`;
+${siteLinkHtml()}</p>`;
 }
 
 function applySiteLinks(html: string): string {
-  const site = ELVORIA_WEBSITE_URL.replace(/\/$/, '');
-  const bareUrl = ELVORIA_WEBSITE_URL;
-  if (html.includes(`href="${bareUrl}"`) || html.includes(`href="${site}/"`)) {
+  const site = elvoriaWebsiteUrl();
+  const base = elvoriaWebsiteBase();
+  const host = elvoriaWebsiteHostname();
+  if (html.includes(`href="${site}"`) || html.includes(`href="${base}/"`)) {
     return html;
   }
   return html.replace(
-    new RegExp(site.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\/?', 'g'),
-    `<a href="${ELVORIA_WEBSITE_URL}">elvoria.tech</a>`
+    new RegExp(base.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\/?', 'g'),
+    `<a href="${site}">${host}</a>`
   );
 }
 
@@ -111,7 +125,7 @@ function toTemplateBody(html: string): string {
   return applySiteLinks(html.trim());
 }
 
-/** Built-in template defaults — reads COMPANY_NAME from .env at call time. */
+/** Built-in template defaults for customer-facing outreach. */
 export function getDefaultTemplates(): Record<
   EmailTemplateType,
   { subject: string; bodyHtml: string }

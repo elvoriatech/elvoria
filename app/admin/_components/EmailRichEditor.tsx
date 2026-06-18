@@ -2,7 +2,12 @@
 
 import { Link2 } from 'lucide-react';
 import { useCallback, useRef } from 'react';
-import { ELVORIA_WEBSITE_URL } from '@/lib/emailMarketing/constants';
+
+const MARKETING_SITE_URL = (
+  process.env.NEXT_PUBLIC_SITE_URL || 'https://elvoriatech.com'
+).replace(/\/$/, '');
+
+const MARKETING_SITE_HOST = MARKETING_SITE_URL.replace(/^https?:\/\//, '');
 
 export function EmailRichEditor({
   value,
@@ -33,13 +38,13 @@ export function EmailRichEditor({
     ref.current?.focus();
     const sel = window.getSelection();
     if (sel && sel.rangeCount > 0 && !sel.getRangeAt(0).collapsed) {
-      exec('createLink', ELVORIA_WEBSITE_URL);
+      exec('createLink', `${MARKETING_SITE_URL}/`);
       return;
     }
     document.execCommand(
       'insertHTML',
       false,
-      `<a href="${ELVORIA_WEBSITE_URL}">elvoria.tech</a>`
+      `<a href="${MARKETING_SITE_URL}/">${MARKETING_SITE_HOST}</a>`
     );
     syncHtml();
   }
@@ -58,7 +63,7 @@ export function EmailRichEditor({
         </button>
         <button
           type="button"
-          title={`Link to ${ELVORIA_WEBSITE_URL}`}
+          title={`Link to ${MARKETING_SITE_URL}`}
           className="inline-flex items-center gap-1 rounded px-2 py-1 text-xs font-semibold hover:bg-background"
           onClick={insertWebsiteLink}
         >
@@ -79,8 +84,8 @@ export function EmailRichEditor({
 
       <p className="text-xs text-muted-foreground">
         Variables: <code>[First Name]</code>, <code>[Company Name]</code>, <code>[Industry]</code>. Links use{' '}
-        <a href={ELVORIA_WEBSITE_URL} className="text-[#0e7490] underline dark:text-cyan-300">
-          {ELVORIA_WEBSITE_URL}
+        <a href={`${MARKETING_SITE_URL}/`} className="text-[#0e7490] underline dark:text-cyan-300">
+          {MARKETING_SITE_URL}/
         </a>{' '}
         only.
       </p>

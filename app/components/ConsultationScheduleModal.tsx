@@ -4,7 +4,23 @@ import { X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { ConsultationScheduleForm } from './ConsultationScheduleForm';
 
-/** Global consultation booking dialog; opened via `elvoria:open-schedule` (see ScheduleConsultationTrigger). */
+function shouldOpenFromUrl(): boolean {
+  if (typeof window === 'undefined') return false;
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('schedule') === 'consultation') return true;
+  return window.location.hash === '#schedule-consultation';
+}
+
+function clearScheduleUrlParam(): void {
+  if (typeof window === 'undefined') return;
+  const url = new URL(window.location.href);
+  url.searchParams.delete('schedule');
+  if (url.hash === '#schedule-consultation') url.hash = '';
+  const next = `${url.pathname}${url.search}${url.hash}`;
+  window.history.replaceState({}, '', next);
+}
+
+/** Global consultation booking dialog; opened via `elvoria:open-schedule` or `?schedule=consultation`. */
 export function ConsultationScheduleModal() {
   const [open, setOpen] = useState(false);
 
@@ -12,6 +28,12 @@ export function ConsultationScheduleModal() {
     const onOpen = () => setOpen(true);
     window.addEventListener('elvoria:open-schedule', onOpen);
     return () => window.removeEventListener('elvoria:open-schedule', onOpen);
+  }, []);
+
+  useEffect(() => {
+    if (!shouldOpenFromUrl()) return;
+    setOpen(true);
+    clearScheduleUrlParam();
   }, []);
 
   if (!open) return null;
