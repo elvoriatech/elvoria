@@ -12,13 +12,16 @@ type Props = {
 
 export function SendJobProgressBanner({ job, progressPercent, busy, onCancel }: Props) {
   const isActive = job.status === 'queued' || job.status === 'running';
+  const hasFailures = job.failedCount > 0 || job.status === 'failed';
 
   return (
     <div
       className={
         isActive
           ? 'rounded-xl border border-amber-500/40 bg-amber-500/10 p-4'
-          : 'rounded-xl border border-emerald-500/40 bg-emerald-500/10 p-4'
+          : hasFailures
+            ? 'rounded-xl border border-red-500/40 bg-red-500/10 p-4'
+            : 'rounded-xl border border-emerald-500/40 bg-emerald-500/10 p-4'
       }
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -49,8 +52,17 @@ export function SendJobProgressBanner({ job, progressPercent, busy, onCancel }: 
           style={{ width: `${progressPercent}%` }}
         />
       </div>
-      {job.lastError && isActive ? (
-        <p className="mt-2 text-xs text-muted-foreground">Latest: {job.lastError}</p>
+      {job.lastError ? (
+        <p
+          className={
+            hasFailures
+              ? 'mt-2 text-xs font-medium text-red-600 dark:text-red-400'
+              : 'mt-2 text-xs text-muted-foreground'
+          }
+        >
+          {hasFailures ? 'Error: ' : 'Latest: '}
+          {job.lastError}
+        </p>
       ) : null}
     </div>
   );
