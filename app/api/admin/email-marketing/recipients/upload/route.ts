@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
     const buffer = Buffer.from(await file.arrayBuffer());
     const rows = parseRecipientExcel(buffer);
     if (!rows.length) {
-      return NextResponse.json({ error: 'No valid rows found. Expected columns: First Name, Email, Company Name, Industry' }, { status: 400 });
+      return NextResponse.json({ error: 'No valid rows found. Expected a header row with at least Business Name (or Company Name) and Email.' }, { status: 400 });
     }
     const result = await upsertRecipientsFromRows(rows);
     return NextResponse.json(result);

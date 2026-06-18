@@ -13,32 +13,76 @@ function pick(row: Record<string, unknown>, keys: string[]): string {
   return '';
 }
 
-export function parseRecipientExcel(buffer: Buffer): Array<{
+/** Accepted header aliases (normalized: lowercased, single-spaced). */
+const EMAIL_KEYS = ['email', 'e-mail', 'mail', 'email address', 'e-mail address'];
+const COMPANY_KEYS = [
+  'business name',
+  'company name',
+  'company',
+  'business',
+  'organization',
+  'organisation',
+  'firm',
+];
+const INDUSTRY_KEYS = [
+  'type / branche',
+  'type/branche',
+  'branche',
+  'industry',
+  'sector',
+  'type',
+  'category',
+];
+const CONTACT_KEYS = [
+  'first name',
+  'firstname',
+  'contact name',
+  'contact person',
+  'contact',
+  'full name',
+  'name',
+];
+
+export type ParsedRecipient = {
   contactName: string;
   email: string;
   companyName: string;
   industry: string;
-}> {
-  const wb = XLSX.read(buffer, { type: 'buffer' });
-  const sheet = wb.Sheets[wb.SheetNames[0]];
-  if (!sheet) return [];
+};
 
+function rowsFromSheet(sheet: XLSX.WorkSheet): ParsedRecipient[] {
   const raw = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, { defval: '' });
-  const out: Array<{ contactName: string; email: string; companyName: string; industry: string }> = [];
+  const out: ParsedRecipient[] = [];
 
   for (const row of raw) {
     const normalized: Record<string, unknown> = {};
     for (const [k, v] of Object.entries(row)) {
       normalized[normHeader(String(k))] = v;
     }
-    const email = pick(normalized, ['email', 'e-mail', 'mail']);
+    const email = pick(normalized, EMAIL_KEYS);
     if (!email) continue;
     out.push({
-      contactName: pick(normalized, ['first name', 'firstname', 'name', 'contact', 'contact person']),
+      contactName: pick(normalized, CONTACT_KEYS),
       email,
-      companyName: pick(normalized, ['company name', 'company', 'organization']),
-      industry: pick(normalized, ['industry', 'sector']),
+      companyName: pick(normalized, COMPANY_KEYS),
+      industry: pick(normalized, INDUSTRY_KEYS),
     });
   }
   return out;
+}
+
+/**
+ * Parses recipients from an uploaded workbook. Header names are flexible
+ * (e.g. "Business Name" or "Company Name", "Type / Branche" or "Industry").
+ * Multi-sheet files are supported: the first sheet that contains email rows wins.
+ */
+export function parseRecipientExcel(buffer: Buffer): ParsedRecipient[] {
+  const wb = XLSX.read(buffer, { type: 'buffer' });
+  for (const name of wb.SheetNames) {
+    const sheet = wb.Sheets[name];
+    if (!sheet) continue;
+    const rows = rowsFromSheet(sheet);
+    if (rows.length) return rows;
+  }
+  return [];
 }

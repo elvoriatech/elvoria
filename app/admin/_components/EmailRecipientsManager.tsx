@@ -216,13 +216,15 @@ export function EmailRecipientsManager() {
       <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
         <h3 className="text-sm font-semibold text-foreground">Upload Excel (.xlsx)</h3>
         <p className="mt-1 text-sm text-muted-foreground">
-          Required columns (row 1 = headers): <strong className="text-foreground">First Name</strong>,{' '}
-          <strong className="text-foreground">Email</strong>, <strong className="text-foreground">Company Name</strong>,{' '}
-          <strong className="text-foreground">Industry</strong>.
+          Row 1 = headers. Required: <strong className="text-foreground">Business Name</strong> and{' '}
+          <strong className="text-foreground">Email</strong>. Optional:{' '}
+          <strong className="text-foreground">Type / Branche</strong>,{' '}
+          <strong className="text-foreground">City</strong>, <strong className="text-foreground">Country</strong>.
+          Header names are flexible (e.g. &ldquo;Company Name&rdquo; / &ldquo;Industry&rdquo; also work).
         </p>
         <a
-          href="/email-recipients-sample.xlsx"
-          download="email-recipients-sample.xlsx"
+          href="/api/admin/email-marketing/recipients/sample"
+          download="elvoria-recipients-sample.xlsx"
           className="mt-2 inline-block text-sm font-semibold text-[#0e7490] underline decoration-[#06B6D4]/50 hover:text-[#0891b2] dark:text-cyan-300"
         >
           Download sample template (.xlsx)
