@@ -34,6 +34,8 @@ describe('emailMarketing emailLayout', () => {
       expect(html).toContain('Schedule a free consultation');
       expect(html).toContain('schedule=consultation');
       expect(html).toContain('elvoriatech.com');
+      expect(html).toContain('Elvoria Technologies');
+      expect(html).not.toMatch(/\bElvoria Tech\b(?!nologies)/);
       expect(html).toContain('AI-First Digital');
       expect(html).toContain('cid:elvoria-logo');
       expect(html).toContain('GDPR-aware engineering');

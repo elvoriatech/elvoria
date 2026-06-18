@@ -10,7 +10,9 @@ import {
   isBrandTextCorrupted,
   marketingCompanyName,
   marketingCompanyTeamLabel,
+  normalizeLegacyShortBrand,
   repairCorruptedBrandText,
+  usesLegacyShortBrand,
 } from '@/lib/emailMarketing/companyName';
 import { elvoriaConsultationScheduleUrl, elvoriaWebsiteHostname } from '@/lib/emailMarketing/siteUrl';
 import {
@@ -168,10 +170,18 @@ async function syncCorruptedMarketingTemplates(pool: ReturnType<typeof getPool>)
 
     let subject = heavilyCorrupted
       ? defaults[row.template_type].subject
-      : repairCorruptedBrandText(row.subject);
+      : normalizeLegacyShortBrand(repairCorruptedBrandText(row.subject));
     let body = heavilyCorrupted
       ? defaults[row.template_type].bodyHtml
-      : repairCorruptedBrandText(row.body_html);
+      : normalizeLegacyShortBrand(repairCorruptedBrandText(row.body_html));
+
+    if (
+      !heavilyCorrupted &&
+      (usesLegacyShortBrand(row.body_html) || usesLegacyShortBrand(row.subject))
+    ) {
+      body = defaults[row.template_type].bodyHtml;
+      subject = defaults[row.template_type].subject;
+    }
 
     body = body.replace(/elvoria\.tech/gi, siteHost);
     body = body.replace(/https:\/\/elvoria\.tech\/?/gi, `https://${siteHost}/`);
@@ -206,6 +216,14 @@ async function syncTemplateContentPatches(pool: ReturnType<typeof getPool>): Pro
     }
     if (body.includes(`<strong>${team}</strong>`) && !body.includes(teamLinked)) {
       body = body.replace(new RegExp(`<strong>${team.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}</strong>`, 'g'), teamLinked);
+      changed = true;
+    }
+    if (body.includes('<strong>Elvoria Tech Team</strong>') && !body.includes(teamLinked)) {
+      body = body.replace(/<strong>Elvoria Tech Team<\/strong>/g, teamLinked);
+      changed = true;
+    }
+    if (body.includes('<strong>Elvoria Tech</strong>') && !body.includes(brandLinked)) {
+      body = body.replace(/<strong>Elvoria Tech<\/strong>/g, brandLinked);
       changed = true;
     }
     if (body.includes('<strong>Elvoria Technologies Team</strong>') && !body.includes(teamLinked)) {

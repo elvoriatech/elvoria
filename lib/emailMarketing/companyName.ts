@@ -1,6 +1,6 @@
-/** Customer-facing brand in outreach emails (distinct from legal COMPANY_NAME). */
+/** Customer-facing brand in outreach emails — same as COMPANY_NAME. */
 export function marketingCompanyName(): string {
-  return (process.env.MARKETING_BRAND_NAME || 'Elvoria Tech').trim();
+  return (process.env.COMPANY_NAME || 'Elvoria Technologies').trim();
 }
 
 export function marketingCompanyTeamLabel(): string {
@@ -16,12 +16,26 @@ export function repairCorruptedBrandText(text: string): string {
   out = out.replace(/Elvoria Technologies(?:nologies)+(?: Team)?/gi, (match) =>
     /team/i.test(match) ? team : brand
   );
-  out = out.replace(/\bElvoria Technologies Team\b/g, team);
-  out = out.replace(/\bElvoria Technologies\b/g, brand);
+
+  return normalizeLegacyShortBrand(out);
+}
+
+/** Upgrade saved "Elvoria Tech" copy to the full brand name. */
+export function normalizeLegacyShortBrand(text: string): string {
+  const brand = marketingCompanyName();
+  const team = marketingCompanyTeamLabel();
+  let out = text;
+
+  out = out.replace(/\bElvoria Tech Team\b/g, team);
+  out = out.replace(/\bElvoria Tech\b(?!nologies\b)/gi, brand);
 
   return out;
 }
 
 export function isBrandTextCorrupted(text: string): boolean {
   return /Technologies(?:nologies)+/i.test(text);
+}
+
+export function usesLegacyShortBrand(text: string): boolean {
+  return /\bElvoria Tech\b(?!nologies\b)/i.test(text);
 }
