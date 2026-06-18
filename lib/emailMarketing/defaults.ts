@@ -1,4 +1,8 @@
 import { ELVORIA_WEBSITE_URL } from '@/lib/emailMarketing/constants';
+import {
+  marketingCompanyName,
+  marketingCompanyTeamLabel,
+} from '@/lib/emailMarketing/companyName';
 import type { EmailTemplateType } from '@/lib/emailMarketing/types';
 
 /** Plain-text line stored before the website link was added. */
@@ -10,14 +14,16 @@ export const CALL_INVITE_LINE_HTML = `Would you be open to a <a href="${ELVORIA_
 const LINK_STYLE = 'color:#0891b2;font-weight:600;text-decoration:underline;';
 
 /** Linked brand name for template body copy. */
-export function elvoriaBrandLink(label = 'Elvoria Technologies'): string {
+export function elvoriaBrandLink(label = marketingCompanyName()): string {
   return `<a href="${ELVORIA_WEBSITE_URL}" style="${LINK_STYLE}"><strong>${label}</strong></a>`;
 }
 
 const H3 =
   'margin:22px 0 10px 0;font-size:15px;font-weight:700;color:#0f172a;line-height:1.35;';
 
-const INITIAL_BODY = `<p>Hi [First Name],</p>
+function buildInitialBody(): string {
+  const team = marketingCompanyTeamLabel();
+  return `<p>Hi [First Name],</p>
 
 <p>I hope you're doing well.</p>
 
@@ -55,10 +61,13 @@ const INITIAL_BODY = `<p>Hi [First Name],</p>
 <p>Looking forward to your thoughts.</p>
 
 <p>Best regards,<br />
-${elvoriaBrandLink('Elvoria Technologies Team')}<br />
+${elvoriaBrandLink(team)}<br />
 <a href="${ELVORIA_WEBSITE_URL}">elvoria.tech</a></p>`;
+}
 
-const FOLLOW_UP_1_BODY = `<p>Hi [First Name],</p>
+function buildFollowUp1Body(): string {
+  const team = marketingCompanyTeamLabel();
+  return `<p>Hi [First Name],</p>
 
 <p>Just following up on my previous email — I wanted to check if you had a chance to review it.</p>
 
@@ -67,10 +76,13 @@ const FOLLOW_UP_1_BODY = `<p>Hi [First Name],</p>
 <p>Looking forward to your thoughts.</p>
 
 <p>Best regards,<br />
-${elvoriaBrandLink('Elvoria Technologies Team')}<br />
+${elvoriaBrandLink(team)}<br />
 <a href="${ELVORIA_WEBSITE_URL}">elvoria.tech</a></p>`;
+}
 
-const FOLLOW_UP_2_BODY = `<p>Hi [First Name],</p>
+function buildFollowUp2Body(): string {
+  const team = marketingCompanyTeamLabel();
+  return `<p>Hi [First Name],</p>
 
 <p>Just a final follow-up from my side. If now is not the right time, we completely understand.</p>
 
@@ -79,8 +91,9 @@ const FOLLOW_UP_2_BODY = `<p>Hi [First Name],</p>
 <p>Wishing you great success with your project.</p>
 
 <p>Best regards,<br />
-${elvoriaBrandLink('Elvoria Technologies Team')}<br />
+${elvoriaBrandLink(team)}<br />
 <a href="${ELVORIA_WEBSITE_URL}">elvoria.tech</a></p>`;
+}
 
 function applySiteLinks(html: string): string {
   const site = ELVORIA_WEBSITE_URL.replace(/\/$/, '');
@@ -98,20 +111,24 @@ function toTemplateBody(html: string): string {
   return applySiteLinks(html.trim());
 }
 
-export const DEFAULT_TEMPLATES: Record<
+/** Built-in template defaults — reads COMPANY_NAME from .env at call time. */
+export function getDefaultTemplates(): Record<
   EmailTemplateType,
   { subject: string; bodyHtml: string }
-> = {
-  initial: {
-    subject: 'Quick intro for [Company Name] — Elvoria Technologies',
-    bodyHtml: toTemplateBody(INITIAL_BODY),
-  },
-  follow_up_1: {
-    subject: 'Following up with [Company Name] — Elvoria Technologies',
-    bodyHtml: toTemplateBody(FOLLOW_UP_1_BODY),
-  },
-  follow_up_2: {
-    subject: 'Last follow-up for [Company Name] — Elvoria Technologies',
-    bodyHtml: toTemplateBody(FOLLOW_UP_2_BODY),
-  },
-};
+> {
+  const brand = marketingCompanyName();
+  return {
+    initial: {
+      subject: `Quick intro for [Company Name] — ${brand}`,
+      bodyHtml: toTemplateBody(buildInitialBody()),
+    },
+    follow_up_1: {
+      subject: `Following up with [Company Name] — ${brand}`,
+      bodyHtml: toTemplateBody(buildFollowUp1Body()),
+    },
+    follow_up_2: {
+      subject: `Last follow-up for [Company Name] — ${brand}`,
+      bodyHtml: toTemplateBody(buildFollowUp2Body()),
+    },
+  };
+}

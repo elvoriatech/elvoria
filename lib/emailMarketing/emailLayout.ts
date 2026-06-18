@@ -1,4 +1,5 @@
 import { ELVORIA_WEBSITE_URL } from '@/lib/emailMarketing/constants';
+import { marketingCompanyName } from '@/lib/emailMarketing/companyName';
 
 export function escapeHtml(input: string): string {
   return input
@@ -39,12 +40,12 @@ export function wrapMarketingEmailHtml(
   bodyHtml: string,
   opts: WrapMarketingEmailOptions
 ): string {
-  const company = process.env.COMPANY_NAME || 'Elvoria Technologies';
+  const company = marketingCompanyName();
   const contact =
     process.env.CONTACT_EMAIL || 'contact@elvoria.tech';
   const site = ELVORIA_WEBSITE_URL;
   const preheader = escapeHtml(
-    opts.preheader || 'Software development partnership — Elvoria Technologies'
+    opts.preheader || `Software development partnership — ${company}`
   );
   const year = new Date().getFullYear();
 

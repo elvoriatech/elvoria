@@ -2,10 +2,15 @@ import { getPool, isDbConfigured } from '@/lib/db';
 import { isPostgrestMissingTableError } from '@/lib/crmSchemaError';
 import {
   CALL_INVITE_LINE_HTML,
-  DEFAULT_TEMPLATES,
   elvoriaBrandLink,
+  getDefaultTemplates,
   LEGACY_CALL_INVITE_LINE,
 } from '@/lib/emailMarketing/defaults';
+import {
+  LEGACY_MARKETING_BRAND_NAMES,
+  marketingCompanyName,
+  marketingCompanyTeamLabel,
+} from '@/lib/emailMarketing/companyName';
 import {
   RECIPIENT_IDS_CHUNK,
   RECIPIENTS_PAGE_SIZE,
@@ -111,12 +116,23 @@ const LEGACY_TEMPLATE_SUBJECTS: Partial<Record<EmailTemplateType, string[]>> = {
     'Elvoria Technologies — software development for [Company Name]',
     'Elvoria Technologies - software development for [Company Name]',
     'Partnership opportunity for [Company Name] — Elvoria Technologies',
+    'Quick intro for [Company Name] — Elvoria Tech',
+    'Quick intro for [Company Name] — Elvoriatech',
   ],
-  follow_up_1: ['Following up — Elvoria Technologies'],
-  follow_up_2: ['Final follow-up — Elvoria Technologies'],
+  follow_up_1: [
+    'Following up — Elvoria Technologies',
+    'Following up with [Company Name] — Elvoria Tech',
+    'Following up with [Company Name] — Elvoriatech',
+  ],
+  follow_up_2: [
+    'Final follow-up — Elvoria Technologies',
+    'Last follow-up for [Company Name] — Elvoria Tech',
+    'Last follow-up for [Company Name] — Elvoriatech',
+  ],
 };
 
 async function syncLegacyInitialBodyFormat(pool: ReturnType<typeof getPool>): Promise<void> {
+  const defaults = getDefaultTemplates();
   const { rows } = await pool.query<{ body_html: string }>(
     "SELECT body_html FROM em_templates WHERE template_type = 'initial' LIMIT 1"
   );
@@ -126,8 +142,64 @@ async function syncLegacyInitialBodyFormat(pool: ReturnType<typeof getPool>): Pr
   if (body.includes('<h3') && body.includes('<ul>')) return;
   await pool.query(
     "UPDATE em_templates SET body_html = $1, updated_at = $2 WHERE template_type = 'initial'",
-    [DEFAULT_TEMPLATES.initial.bodyHtml, new Date().toISOString()]
+    [defaults.initial.bodyHtml, new Date().toISOString()]
   );
+}
+
+/** Replace outdated "Elvoria Tech" / "Elvoriatech" branding in saved templates. */
+async function syncOutdatedBrandInTemplates(pool: ReturnType<typeof getPool>): Promise<void> {
+  const company = marketingCompanyName();
+  const team = marketingCompanyTeamLabel();
+  const defaults = getDefaultTemplates();
+  const now = new Date().toISOString();
+  const { rows } = await pool.query<{
+    template_type: EmailTemplateType;
+    subject: string;
+    body_html: string;
+  }>('SELECT template_type, subject, body_html FROM em_templates');
+
+  for (const row of rows) {
+    let subject = row.subject;
+    let body = row.body_html;
+    let changed = false;
+
+    for (const legacy of LEGACY_MARKETING_BRAND_NAMES) {
+      if (subject.includes(legacy)) {
+        subject = defaults[row.template_type].subject;
+        changed = true;
+        break;
+      }
+    }
+
+    if (!changed && /\bElvoria Tech(?!nologies\b)/i.test(subject)) {
+      subject = subject.replace(/\bElvoria Tech(?!nologies\b)/gi, company);
+      changed = true;
+    }
+
+    for (const legacy of LEGACY_MARKETING_BRAND_NAMES) {
+      if (body.includes(legacy)) {
+        body = body.split(legacy).join(legacy.includes('Team') ? team : company);
+        changed = true;
+      }
+    }
+
+    const plainTeam = `<strong>${team}</strong>`;
+    if (body.includes('<strong>Elvoria Tech Team</strong>') && !body.includes(plainTeam)) {
+      body = body.replace(/<strong>Elvoria Tech Team<\/strong>/g, plainTeam);
+      changed = true;
+    }
+    if (body.includes('<strong>Elvoria Tech</strong>') && !body.includes(`<strong>${company}</strong>`)) {
+      body = body.replace(/<strong>Elvoria Tech<\/strong>/g, `<strong>${company}</strong>`);
+      changed = true;
+    }
+
+    if (!changed) continue;
+
+    await pool.query(
+      'UPDATE em_templates SET subject = $1, body_html = $2, updated_at = $3 WHERE template_type = $4',
+      [subject.slice(0, 500), body.slice(0, 100_000), now, row.template_type]
+    );
+  }
 }
 
 async function syncTemplateContentPatches(pool: ReturnType<typeof getPool>): Promise<void> {
@@ -135,7 +207,9 @@ async function syncTemplateContentPatches(pool: ReturnType<typeof getPool>): Pro
     'SELECT template_type, body_html FROM em_templates'
   );
   const brandLinked = elvoriaBrandLink();
-  const teamLinked = elvoriaBrandLink('Elvoria Technologies Team');
+  const teamLinked = elvoriaBrandLink(marketingCompanyTeamLabel());
+  const company = marketingCompanyName();
+  const team = marketingCompanyTeamLabel();
   const now = new Date().toISOString();
 
   for (const row of rows) {
@@ -147,8 +221,16 @@ async function syncTemplateContentPatches(pool: ReturnType<typeof getPool>): Pro
       body = body.replace(/Node\.js, Java, Spring Boot<\/li>/g, 'Node.js, Java, Spring Boot, Python</li>');
       changed = true;
     }
+    if (body.includes(`<strong>${team}</strong>`) && !body.includes(teamLinked)) {
+      body = body.replace(new RegExp(`<strong>${team.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}</strong>`, 'g'), teamLinked);
+      changed = true;
+    }
     if (body.includes('<strong>Elvoria Technologies Team</strong>') && !body.includes(teamLinked)) {
       body = body.replace(/<strong>Elvoria Technologies Team<\/strong>/g, teamLinked);
+      changed = true;
+    }
+    if (type === 'initial' && body.includes(`<strong>${company}</strong>`) && !body.includes(brandLinked)) {
+      body = body.replace(new RegExp(`<strong>${company.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}</strong>`, 'g'), brandLinked);
       changed = true;
     }
     if (type === 'initial' && body.includes('<strong>Elvoria Technologies</strong>') && !body.includes(brandLinked)) {
@@ -189,6 +271,7 @@ async function syncLegacyCallInviteLink(pool: ReturnType<typeof getPool>): Promi
 }
 
 async function syncLegacyTemplateSubjects(pool: ReturnType<typeof getPool>): Promise<void> {
+  const defaults = getDefaultTemplates();
   const now = new Date().toISOString();
   for (const type of Object.keys(LEGACY_TEMPLATE_SUBJECTS) as EmailTemplateType[]) {
     const legacy = LEGACY_TEMPLATE_SUBJECTS[type];
@@ -196,27 +279,29 @@ async function syncLegacyTemplateSubjects(pool: ReturnType<typeof getPool>): Pro
     const placeholders = legacy.map((_, i) => `$${i + 3}`).join(', ');
     await pool.query(
       `UPDATE em_templates SET subject = $1, updated_at = $2 WHERE template_type = '${type}' AND subject IN (${placeholders})`,
-      [DEFAULT_TEMPLATES[type].subject, now, ...legacy]
+      [defaults[type].subject, now, ...legacy]
     );
   }
 }
 
 export async function ensureDefaultTemplates(): Promise<void> {
   const pool = requireDb();
+  const defaults = getDefaultTemplates();
   const { rows } = await pool.query<{ template_type: EmailTemplateType }>(
     'SELECT template_type FROM em_templates'
   );
   const existing = new Set(rows.map((r) => r.template_type));
-  const toInsert = (Object.keys(DEFAULT_TEMPLATES) as EmailTemplateType[]).filter((t) => !existing.has(t));
+  const toInsert = (Object.keys(defaults) as EmailTemplateType[]).filter((t) => !existing.has(t));
 
   for (const t of toInsert) {
     await pool.query(
       'INSERT INTO em_templates (template_type, subject, body_html) VALUES ($1, $2, $3)',
-      [t, DEFAULT_TEMPLATES[t].subject, DEFAULT_TEMPLATES[t].bodyHtml]
+      [t, defaults[t].subject, defaults[t].bodyHtml]
     );
   }
 
   await syncLegacyTemplateSubjects(pool);
+  await syncOutdatedBrandInTemplates(pool);
   await syncLegacyInitialBodyFormat(pool);
   await syncLegacyCallInviteLink(pool);
   await syncTemplateContentPatches(pool);
@@ -247,12 +332,12 @@ export async function getTemplate(type: EmailTemplateType): Promise<EmailTemplat
 }
 
 export async function resetTemplateToDefault(type: EmailTemplateType): Promise<EmailTemplate> {
-  const def = DEFAULT_TEMPLATES[type];
+  const def = getDefaultTemplates()[type];
   return updateTemplate(type, { subject: def.subject, bodyHtml: def.bodyHtml });
 }
 
 export function getDefaultTemplateSnapshot(type: EmailTemplateType): { subject: string; bodyHtml: string } {
-  return { ...DEFAULT_TEMPLATES[type] };
+  return { ...getDefaultTemplates()[type] };
 }
 
 export async function updateTemplate(
